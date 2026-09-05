@@ -51,6 +51,9 @@ PRICE_BANDS = {
 }
 
 
+# ── The product universe ─────────────────────────────────────────────────────
+
+
 def _specs(code: str, rng: random.Random) -> dict:
     """Plausible technical specs for one product of this category."""
     if code == "PWR":
@@ -165,6 +168,9 @@ def build_catalog(rng: random.Random) -> list[dict]:
                 }
             )
     return catalog
+
+
+# ── The four exports ─────────────────────────────────────────────────────────
 
 
 def _erp_code(sku: str, rng: random.Random) -> str:
