@@ -162,9 +162,11 @@ def extract_specs(category: Category, description: str) -> dict:
         elif key == "watt":
             value = parse_watt(description)
         elif key == "poe":
-            value = "PoE" in description
+            value = "poe" in description.lower()
         elif key == "managed":
-            value = "unmanaged" not in description and "managed" in description
+            # "managed" sits inside "unmanaged", so the negative has to be ruled out first.
+            lowered = description.lower()
+            value = "unmanaged" not in lowered and "managed" in lowered
         else:
             pattern, convert = _SIMPLE_SPECS[key]
             match = pattern.search(description)
