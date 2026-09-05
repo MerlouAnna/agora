@@ -29,6 +29,15 @@ class Warehouse(StrEnum):
     PAT_01 = "PAT-01"
 
 
+class SupplierCode(StrEnum):
+    """The suppliers the catalogue buys from. The registry file carries the rest of their details."""
+
+    SUP_01 = "SUP-01"
+    SUP_02 = "SUP-02"
+    SUP_03 = "SUP-03"
+    SUP_04 = "SUP-04"
+
+
 SKU_PREFIXES = {
     Category.POWER: "PWR",
     Category.DATA: "DAT",
