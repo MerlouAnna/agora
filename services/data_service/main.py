@@ -1,9 +1,15 @@
 from fastapi import FastAPI
 
+from services.data_service import models
+from services.data_service.database import engine
+from services.data_service.routers import products, stats
+
 app = FastAPI(title="Agora — Catalogue Service")
 
-# Everything that touches the database lives behind this service. The product routers
-# arrive in phase 3; until then /health is the whole API.
+models.TableBase.metadata.create_all(bind=engine)
+
+app.include_router(products.router, prefix="/products", tags=["Products"])
+app.include_router(stats.router, prefix="/stats", tags=["Statistics"])
 
 
 @app.get("/health")
