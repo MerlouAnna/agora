@@ -6,8 +6,10 @@ prices, and the suppliers behind them.
 """
 
 from sqlalchemy import (
+    JSON,
     Column,
     Date,
+    DateTime,
     Float,
     ForeignKey,
     Integer,
@@ -78,3 +80,22 @@ class Supplier(TableBase):
     name = Column(String)
     lead_time_days = Column(Integer)
     reliability_score = Column(Float)
+
+
+class GenerationRun(TableBase):
+    """One row per generation request, so the catalogue can say where its rows came from."""
+
+    __tablename__ = "generation_runs"
+
+    request_id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, index=True)
+    seed = Column(Integer)
+    requested = Column(Integer)
+    products_added = Column(Integer)
+    specs_added = Column(Integer)
+    stock_rows_added = Column(Integer)
+    rejected = Column(Integer)
+    rounds = Column(Integer, default=1)
+    descriptions_rejected = Column(Integer, default=0)
+    parameters = Column(JSON)
+    skus = Column(JSON)
