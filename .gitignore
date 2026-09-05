@@ -15,7 +15,7 @@ data/catalog.db # this is the catalog database used by the application and the e
 chroma_db/
 
 # Editors / OS
-# .vscode/ # this is commented out to make debugging available
+.vscode/settings.json
 .idea/
 .DS_Store
 Thumbs.db
