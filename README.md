@@ -23,20 +23,28 @@ always come from the data, never from the language model.
 
 ## 2. Installation
 
+Agora needs **Python 3.14** and [Poetry](https://python-poetry.org/) for dependency
+management.
+
 ```bash
 git clone <repository-url>
 cd agora
 
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-source .venv/bin/activate      # macOS / Linux
-
-pip install -r requirements.txt
-
-copy .env.example .env         # Windows  (cp on macOS / Linux)
+poetry install
 ```
 
-Then open `.env` and add your OpenAI key.
+Poetry creates the virtual environment and installs everything from `pyproject.toml`,
+locked by `poetry.lock`. If Poetry is not on your machine:
+
+```bash
+pipx install poetry        # or: pip install --user poetry
+```
+
+Then copy the environment template and add your OpenAI key:
+
+```bash
+copy .env.example .env     # Windows  (cp on macOS / Linux)
+```
 
 ## 3. Run the backend
 
@@ -44,8 +52,8 @@ Agora is two FastAPI services. Start each one from the **repository root**, in i
 terminal:
 
 ```bash
-uvicorn services.data_service.main:app  --reload --port 8001   # the catalogue
-uvicorn services.offer_service.main:app --reload --port 8000   # the AI workflow
+poetry run uvicorn services.data_service.main:app  --reload --port 8001   # the catalogue
+poetry run uvicorn services.offer_service.main:app --reload --port 8000   # the AI workflow
 ```
 
 Swagger UI: http://localhost:8001/docs and http://localhost:8000/docs.

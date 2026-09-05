@@ -1,0 +1,34 @@
+[tool.poetry]
+# Agora is an application, not a distributable library — Poetry manages the
+# dependencies and the virtual environment, it does not build a package.
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.14"
+
+# API
+fastapi = "^0.135.2"
+uvicorn = { extras = ["standard"], version = "^0.46.0" }
+pydantic = "^2.13.3"
+pydantic-settings = "^2.14.0"
+python-dotenv = "^1.2.2"
+httpx = "^0.28.1"
+
+# Database
+sqlalchemy = "^2.0.49"
+
+# Data preparation
+pandas = "^3.0.3"
+
+# GenAI
+openai = "^2.33.0"
+chromadb = "^1.5.9"
+langgraph = "^1.1.10"
+langchain-core = "^1.3.3"
+langchain-openai = "^1.2.1"
+
+# UI
+gradio = "^6.10.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.2"
