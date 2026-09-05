@@ -10,6 +10,7 @@ from services.data_service.ingestion import parsers
         ("PWR-1007", "PWR-1007"),
         ("pwr1007", "PWR-1007"),
         ("PWR 1003", "PWR-1003"),
+        ('"PWR-1007"', "PWR-1007"),
         ("", None),
     ],
 )
