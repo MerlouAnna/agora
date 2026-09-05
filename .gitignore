@@ -10,7 +10,7 @@ __pycache__/
 .pytest_cache/
 
 # Generated data
-data/catalog.db
+# data/catalog.db # this is commented out to make the catalog database available for running the application
 chroma_db/
 
 # Editors / OS
