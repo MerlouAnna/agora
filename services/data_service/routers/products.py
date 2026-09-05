@@ -39,7 +39,9 @@ async def search_products(
         None, description="Restrict to one category. Leave empty to search all six."
     ),
     min_watt: float | None = Query(
-        None, ge=0, description="Lowest acceptable wattage. Cables, power supplies, UPS units."
+        None,
+        ge=0,
+        description="Lowest acceptable wattage. Cables, power supplies, UPS units.",
     ),
     min_length_m: float | None = Query(
         None, ge=0, description="Lowest acceptable length in metres. Cables only."
@@ -122,7 +124,9 @@ async def read_stock(db: db_dependency, sku: str = Path(min_length=3)):
     return ProductStock(
         sku=sku,
         total=total,
-        entries=[StockEntry(warehouse=e.warehouse, quantity=e.quantity) for e in entries],
+        entries=[
+            StockEntry(warehouse=e.warehouse, quantity=e.quantity) for e in entries
+        ],
     )
 
 
@@ -142,8 +146,9 @@ def _summarize(db: Session, products: list[Product]) -> list[ProductSummary]:
                 category=str(product.category),
                 brand=str(product.brand),
                 description=str(product.description),
+                web_description=product.web_description,
                 unit=str(product.unit),
-                supplier_code=str(product.supplier_code),
+                supplier_code=product.supplier_code,
                 price=float(price.amount) if price else None,
                 currency=str(price.currency) if price else None,
                 price_updated_at=price.updated_at if price else None,

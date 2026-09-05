@@ -18,9 +18,13 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from services.data_service import repository
-from services.data_service.categories import SKU_PREFIXES, Category, Warehouse
-from services.data_service.categories import SupplierCode
-from services.data_service.generation import builder
+from services.data_service.categories import (
+    SKU_PREFIXES,
+    Category,
+    SupplierCode,
+    Warehouse,
+)
+from services.data_service.generation import builder, descriptions
 from services.data_service.ingestion import normalizer
 from services.data_service.ingestion.pipeline import spec_rows
 from services.data_service.models import (
@@ -56,15 +60,18 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
 
     before = repository.count_products(db)
     drafts, exhausted = _draft(db, request, rng)
+    described, unphrased, rounds = _phrase(drafts)
 
-    erp_rows, pricing_rows, stock_rows = _raw_rows(drafts)
+    erp_rows, pricing_rows, stock_rows = _raw_rows(described)
     products, rejections, _ = normalizer.normalize_products(
-        erp_rows, pricing_rows, _supplier_entries(drafts)
+        erp_rows, pricing_rows, _supplier_entries(described)
     )
     stock, stock_rejections = normalizer.normalize_stock(
         stock_rows, {product.sku for product in products}
     )
-    rejections = rejections + stock_rejections + _exhausted(exhausted)
+    rejections = (
+        rejections + stock_rejections + _exhausted(exhausted) + _unphrased(unphrased)
+    )
 
     skus, specs_added, stock_added = _persist(db, products, stock)
 
@@ -76,8 +83,8 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
         specs_added=specs_added,
         stock_rows_added=stock_added,
         rejected=len(rejections),
-        rounds=1,
-        descriptions_rejected=0,
+        rounds=rounds,
+        descriptions_rejected=len(unphrased),
         parameters=request.model_dump(mode="json", exclude_none=True),
         skus=skus,
     )
@@ -85,7 +92,12 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
     db.commit()
     db.refresh(run)
 
-    logger.info("run %d — %d products added, %d rejected", run.request_id, len(skus), len(rejections))
+    logger.info(
+        "run %d — %d products added, %d rejected",
+        run.request_id,
+        len(skus),
+        len(rejections),
+    )
 
     return GenerationReport(
         **GenerationRunSummary.model_validate(run).model_dump(),
@@ -163,9 +175,13 @@ def _draft(
     """One draft record per requested product, with a SKU no one else holds."""
     categories = [request.category] if request.category else list(Category)
     brands = request.brands or builder.DEFAULT_BRANDS
-    suppliers = [request.supplier_code] if request.supplier_code else _supplier_codes(db)
+    suppliers = (
+        [request.supplier_code] if request.supplier_code else _supplier_codes(db)
+    )
     band = (
-        (request.price_min, request.price_max) if request.price_min is not None else None
+        (request.price_min, request.price_max)
+        if request.price_min is not None
+        else None
     )
     next_number = _next_numbers(db)
 
@@ -187,6 +203,7 @@ def _draft(
                 "category": category,
                 "brand": rng.choice(brands),
                 "description": builder.describe(category, specs, rng),
+                "specs": specs,
                 "price": builder.price_for(category, rng, band),
                 "supplier": rng.choice(suppliers),
                 "stock": _stock_for(request, rng),
@@ -194,6 +211,44 @@ def _draft(
         )
 
     return drafts, exhausted
+
+
+def _phrase(drafts: list[dict]) -> tuple[list[dict], list[str], int]:
+    """Send the ERP lines to the model and keep only the products it wrote a shop text for.
+
+    A product the model never gets right is left out of the run. Loading it with its ERP
+    line as the shop text would put another near-copy of an existing description into a
+    catalogue that is about to be embedded, which is the one thing the index cannot afford.
+
+    Returns:
+        The drafts that came back with a usable description, the SKUs that did not, and
+        how many rounds it took.
+    """
+    if not drafts:
+        return [], [], 0
+
+    outcome = descriptions.write(
+        [
+            {
+                "sku": draft["sku"],
+                "category": draft["category"],
+                "brand": draft["brand"],
+                "specs": draft["specs"],
+                "erp": draft["description"],
+            }
+            for draft in drafts
+        ]
+    )
+
+    described = []
+    for draft in drafts:
+        shop_text = outcome.texts.get(draft["sku"])
+        if shop_text is None:
+            continue
+        draft["web_description"] = shop_text
+        described.append(draft)
+
+    return described, outcome.rejected, outcome.rounds_used
 
 
 def _stock_for(request: GenerationRequest, rng: random.Random) -> list[tuple[str, int]]:
@@ -238,6 +293,7 @@ def _raw_rows(drafts: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
             {
                 "item_code": draft["sku"],
                 "description": draft["description"],
+                "web_description": draft["web_description"],
                 "cat": str(draft["category"]),
                 "brand": draft["brand"],
                 "unit": "ΤΕΜ",
@@ -277,6 +333,10 @@ def _exhausted(categories: list[Category]) -> list[normalizer.Rejection]:
         normalizer.Rejection("generator", str(category), "no SKU numbers left")
         for category in categories
     ]
+
+
+def _unphrased(skus: list[str]) -> list[normalizer.Rejection]:
+    return [normalizer.Rejection("model", sku, "no usable description") for sku in skus]
 
 
 # ── Loading ──────────────────────────────────────────────────────────────────

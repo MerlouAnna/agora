@@ -1,9 +1,16 @@
 """
 Normalizer
 ==========
-Four sources with four sets of column names become one canonical record. Every source
-is read through its own field map, every value through the parsers, and whatever cannot
-be salvaged is returned as a rejection instead of stopping the run.
+Whatever arrives becomes one canonical record. There are two ways in.
+
+`normalize_catalog` takes the structured catalogue, where the values already have types and
+the work is validation and pulling the specifications out of the ERP line.
+
+`normalize_products` and `normalize_stock` take rows that were exported by something else —
+the generation endpoint, a partner's CSV — where the column names differ, the prices are
+written three ways and the SKUs have been typed by hand. Every value goes through the
+parsers, and whatever cannot be salvaged comes back as a rejection instead of stopping the
+run.
 """
 
 import logging
@@ -20,6 +27,7 @@ logger = logging.getLogger(__name__)
 ERP_FIELDS = {
     "sku": "item_code",
     "description": "description",
+    "web_description": "web_description",
     "category": "cat",
     "brand": "brand",
     "unit": "unit",
@@ -40,6 +48,7 @@ class CanonicalProduct(BaseModel):
     category: Category
     brand: str
     description: str
+    web_description: str | None = None
     unit: str = "ΤΕΜ"
     specs: dict = Field(default_factory=dict)
     supplier_code: str | None = None
@@ -61,7 +70,67 @@ class Rejection:
     reason: str
 
 
-# ── Products ──────────────────────────────────────────────────────────────────
+# ── The catalogue ─────────────────────────────────────────────────────────────
+
+
+def normalize_catalog(
+    products: list[dict],
+) -> tuple[list[CanonicalProduct], list[CanonicalStock], list[Rejection]]:
+    """Turn the structured catalogue into canonical products and their stock entries.
+
+    Args:
+        products: One record per SKU, as the catalogue file holds them.
+
+    Returns:
+        The products, their stock entries, and whatever could not be read. A record that
+        fails is left out; the rest of the catalogue still loads.
+    """
+    canonical: dict[str, CanonicalProduct] = {}
+    entries: list[CanonicalStock] = []
+    rejections: list[Rejection] = []
+
+    for record in products:
+        raw_sku = str(record.get("sku", ""))
+        sku = parsers.normalize_sku(raw_sku)
+
+        if sku is None:
+            rejections.append(Rejection("catalog", raw_sku.strip(), "unreadable SKU"))
+            continue
+        if sku in canonical:
+            rejections.append(Rejection("catalog", sku, "duplicate SKU"))
+            continue
+
+        try:
+            category = Category(record["category"])
+            product = CanonicalProduct(
+                sku=sku,
+                category=category,
+                brand=record["brand"],
+                description=record["description"].strip(),
+                web_description=(record.get("web_description") or "").strip() or None,
+                unit=record.get("unit", "ΤΕΜ"),
+                specs=parsers.extract_specs(category, record["description"]),
+                supplier_code=record.get("supplier"),
+                price=record.get("price"),
+                currency=record.get("currency", "EUR"),
+                price_updated_at=parsers.parse_date(record.get("price_updated_at", "")),
+            )
+        except (ValidationError, ValueError, KeyError) as exc:
+            rejections.append(Rejection("catalog", sku, _first_problem(exc)))
+            continue
+
+        canonical[sku] = product
+
+        for held in record.get("stock", []):
+            try:
+                entries.append(CanonicalStock(sku=sku, **held))
+            except (ValidationError, TypeError) as exc:
+                rejections.append(Rejection("catalog", sku, _first_problem(exc)))
+
+    return list(canonical.values()), entries, rejections
+
+
+# ── Exported rows ─────────────────────────────────────────────────────────────
 
 
 def normalize_products(
@@ -87,6 +156,7 @@ def normalize_products(
             continue
 
         description = row[ERP_FIELDS["description"]].strip()
+        shop_text = (row.get(ERP_FIELDS["web_description"]) or "").strip()
         price = prices.get(sku, {})
 
         try:
@@ -95,6 +165,7 @@ def normalize_products(
                 category=row[ERP_FIELDS["category"]].strip(),
                 brand=row[ERP_FIELDS["brand"]].strip(),
                 description=description,
+                web_description=shop_text or None,
                 unit=row[ERP_FIELDS["unit"]].strip().upper(),
                 specs=parsers.extract_specs(Category(row[ERP_FIELDS["category"]]), description),
                 supplier_code=supplier_of.get(sku),
@@ -183,4 +254,6 @@ def _first_problem(exc: Exception) -> str:
     if isinstance(exc, ValidationError):
         error = exc.errors()[0]
         return f"{error['loc'][0]}: {error['msg']}"
+    if isinstance(exc, KeyError):
+        return f"missing field {exc}"
     return str(exc)

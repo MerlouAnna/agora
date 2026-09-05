@@ -15,7 +15,10 @@ class ProductSummary(BaseModel):
     sku: str
     category: str
     brand: str
-    description: str = Field(..., description="The ERP text, specs included")
+    description: str = Field(..., description="The ERP line, terse, specs included")
+    web_description: str | None = Field(
+        None, description="What the shop shows a customer. This is the text worth embedding."
+    )
     unit: str
     supplier_code: str | None = None
     price: float | None = Field(None, description="List price, absent if the source had none")
@@ -163,15 +166,44 @@ class GenerationRemoval(BaseModel):
 
 
 class LoadReport(BaseModel):
-    """What one pass over the source files put into the catalogue, and what it could not."""
+    """What one load put into the catalogue, and what it could not."""
 
-    erp_rows: int
+    source: str = Field(..., description="Where the records came from")
+    records_read: int
     products_loaded: int
     duplicates: int
     specs_loaded: int
     prices_loaded: int
-    stock_rows: int
+    stock_entries_read: int
     stock_loaded: int
     products_without_stock: int
     rejected: int
     rejected_by_reason: dict[str, int] = Field(default_factory=dict)
+
+
+class UsageLine(BaseModel):
+    """One way of slicing the model spend."""
+
+    label: str
+    calls: int
+    prompt_tokens: int
+    completion_tokens: int
+    estimated_cost_usd: float
+
+
+class UsageReport(BaseModel):
+    """Everything the project has spent on models, and what asked for it."""
+
+    calls: int
+    failed: int
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    estimated_cost_usd: float = Field(
+        ..., description="At list prices recorded in services/usage.py — an estimate, not a bill"
+    )
+    first_call: datetime | None = None
+    last_call: datetime | None = None
+    by_model: list[UsageLine] = Field(default_factory=list)
+    by_purpose: list[UsageLine] = Field(default_factory=list)
+    by_day: list[UsageLine] = Field(default_factory=list)

@@ -1,8 +1,8 @@
 """
 Ingestion pipeline
 ==================
-Loads the raw exports, normalizes them and rebuilds the catalogue tables, then reports
-what went in and what did not.
+Loads the catalogue file, normalizes it and rebuilds the tables, then reports what went in
+and what did not.
 
 Run from the repository root:  python -m services.data_service.ingestion.pipeline
 """
@@ -38,19 +38,12 @@ def run(db: Session | None = None) -> LoadReport:
     Returns:
         What went in, and what was left out and why.
     """
-    erp_rows = loader.load_erp()
-    stock_rows = loader.load_stock()
-    pricing_rows = loader.load_pricing()
-    suppliers = loader.load_suppliers()
+    catalog = loader.load_catalog()
+    records, suppliers = catalog["products"], catalog["suppliers"]
 
-    products, product_rejections, duplicates = normalizer.normalize_products(
-        erp_rows, pricing_rows, suppliers
-    )
-    stock, stock_rejections = normalizer.normalize_stock(
-        stock_rows, {p.sku for p in products}
-    )
+    products, stock, rejections = normalizer.normalize_catalog(records)
+    duplicates = sum(1 for r in rejections if r.reason == "duplicate SKU")
 
-    rejections = product_rejections + stock_rejections
     if db is not None:
         _rebuild(db, products, stock, suppliers)
     else:
@@ -58,12 +51,13 @@ def run(db: Session | None = None) -> LoadReport:
             _rebuild(session, products, stock, suppliers)
 
     report = LoadReport(
-        erp_rows=len(erp_rows),
+        source="catalog.json",
+        records_read=len(records),
         products_loaded=len(products),
         duplicates=duplicates,
         specs_loaded=sum(len(p.specs) for p in products),
         prices_loaded=sum(1 for p in products if p.price is not None),
-        stock_rows=len(stock_rows),
+        stock_entries_read=sum(len(r.get("stock", [])) for r in records),
         stock_loaded=len(stock),
         products_without_stock=len(products) - len({e.sku for e in stock}),
         rejected=len(rejections),
@@ -91,15 +85,7 @@ def _rebuild(
     for model in (ProductSpec, Stock, Price, Product, Supplier, GenerationRun):
         db.query(model).delete()
 
-    db.add_all(
-        Supplier(
-            code=entry["supplier_code"],
-            name=entry["name"],
-            lead_time_days=entry["lead_time_days"],
-            reliability_score=entry["reliability_score"],
-        )
-        for entry in suppliers
-    )
+    db.add_all(Supplier(**entry) for entry in suppliers)
 
     for product in products:
         db.add(
@@ -108,6 +94,7 @@ def _rebuild(
                 category=product.category,
                 brand=product.brand,
                 description=product.description,
+                web_description=product.web_description,
                 unit=product.unit,
                 supplier_code=product.supplier_code,
             )
@@ -148,12 +135,13 @@ def spec_rows(product: normalizer.CanonicalProduct) -> list[ProductSpec]:
 
 
 def _log(report: LoadReport, rejections: list[normalizer.Rejection]) -> None:
-    logger.info("ERP rows read        %d", report.erp_rows)
+    logger.info("read from            %s", report.source)
+    logger.info("records read         %d", report.records_read)
     logger.info("products loaded      %d", report.products_loaded)
     logger.info("duplicate SKUs       %d", report.duplicates)
     logger.info("specs loaded         %d", report.specs_loaded)
     logger.info("prices loaded        %d", report.prices_loaded)
-    logger.info("stock rows read      %d", report.stock_rows)
+    logger.info("stock entries read   %d", report.stock_entries_read)
     logger.info("stock rows loaded    %d", report.stock_loaded)
     logger.info("products with no stock record %d", report.products_without_stock)
     logger.info("rejected             %d", report.rejected)

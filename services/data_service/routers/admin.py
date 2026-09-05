@@ -5,21 +5,28 @@ Growing the catalogue on demand, taking a batch back out, and rebuilding the who
 from the source files.
 """
 
+from datetime import datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from starlette import status
 
+from services import usage
+from services.data_service import repository
 from services.data_service.database import get_db
-from services.data_service.generation import service
+from services.data_service.generation import descriptions, service
 from services.data_service.ingestion import pipeline
+from services.data_service.models import LlmCall
 from services.data_service.schemas import (
     GenerationRemoval,
     GenerationReport,
     GenerationRequest,
     GenerationRunSummary,
     LoadReport,
+    UsageLine,
+    UsageReport,
 )
 
 router = APIRouter()
@@ -42,14 +49,30 @@ async def generate_products(db: db_dependency, request: GenerationRequest):
     specifications, its price band and its SKU prefix follow. Leave `category` empty and
     the products are spread over all six.
 
+    The description is the one thing the code does not write. Each product's drafted line
+    goes to the language model to be rewritten as a real catalogue entry, and what comes
+    back is checked: every specification the code chose has to be readable out of the
+    returned text, or the line goes back with the reason attached, up to three rounds. A
+    product the model never gets right is **left out of the run** and counted in
+    `descriptions_rejected` — a machine-written description would be a near-copy of one
+    already in the catalogue, and the index this feeds cannot tell near-copies apart.
+    A run can therefore add fewer products than were asked for.
+
     The rows are then written out the way the ERP, the pricing export and the warehouse
     system write them, and read back through the same normalizer the file ingestion uses.
     A record that cannot survive that trip is counted in `rejected` rather than stored.
 
     Every run keeps its `seed`. Pass a previous seed back with the same parameters and the
-    same products come out — which is what makes a generated catalogue worth trusting.
+    same products come out, though the model phrases them afresh each time.
+
+    Needs `OPENAI_API_KEY` in the environment; without one the request answers 503.
     """
-    return service.generate(db, request)
+    try:
+        return service.generate(db, request)
+    except descriptions.ModelUnavailable as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        ) from exc
 
 
 @router.get(
@@ -119,3 +142,75 @@ async def rebuild_catalogue(db: db_dependency):
     price the source wrote as `N/A` shows up.
     """
     return pipeline.run(db)
+
+
+@router.get(
+    "/usage",
+    response_model=UsageReport,
+    summary="What the models have cost so far",
+    response_description="Tokens and estimated spend, broken down by model, purpose and day",
+)
+async def read_usage(
+    db: db_dependency,
+    days: int | None = Query(
+        None, ge=1, le=365, description="Look only this far back. Leave empty for everything."
+    ),
+):
+    """
+    Every call to a language or embedding model is written down as it happens — which
+    service made it, what it was for, which model answered, how many tokens each way and
+    how long it took. This is the sum of that log.
+
+    `by_purpose` is the one to read first: it says where the spend is going, and it will
+    grow a line as each part of the system starts calling a model.
+
+    `estimated_cost_usd` is arithmetic over the list prices recorded in
+    `services/usage.py`, not anything the provider told us. Treat it as an order of
+    magnitude, and check the numbers against the provider's own dashboard before quoting
+    them anywhere that matters.
+    """
+    since = datetime.now() - timedelta(days=days) if days else None
+
+    calls, failed, prompt, completion, first, last = repository.usage_totals(db, since)
+    by_model = _lines(repository.usage_grouped(db, LlmCall.model, since))
+
+    return UsageReport(
+        calls=calls,
+        failed=failed or 0,
+        prompt_tokens=prompt or 0,
+        completion_tokens=completion or 0,
+        total_tokens=(prompt or 0) + (completion or 0),
+        estimated_cost_usd=round(sum(line.estimated_cost_usd for line in by_model), 6),
+        first_call=first,
+        last_call=last,
+        by_model=by_model,
+        by_purpose=_lines(repository.usage_grouped(db, LlmCall.purpose, since)),
+        by_day=_lines(
+            repository.usage_grouped(db, func.date(LlmCall.called_at), since)
+        ),
+    )
+
+
+def _lines(rows: list) -> list[UsageLine]:
+    """Fold the per-model rows back into one line per label, pricing each model's share."""
+    folded: dict[str, dict] = {}
+
+    for label, model, calls, prompt, completion in rows:
+        entry = folded.setdefault(
+            str(label), {"calls": 0, "prompt": 0, "completion": 0, "cost": 0.0}
+        )
+        entry["calls"] += calls
+        entry["prompt"] += prompt or 0
+        entry["completion"] += completion or 0
+        entry["cost"] += usage.cost(model, prompt or 0, completion or 0)
+
+    return [
+        UsageLine(
+            label=label,
+            calls=entry["calls"],
+            prompt_tokens=entry["prompt"],
+            completion_tokens=entry["completion"],
+            estimated_cost_usd=round(entry["cost"], 6),
+        )
+        for label, entry in sorted(folded.items())
+    ]

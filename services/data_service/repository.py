@@ -6,10 +6,19 @@ numeric conditions needs two joins onto the same table — that assembly happens
 nowhere else.
 """
 
-from sqlalchemy import func
+from datetime import datetime
+
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session, aliased
 
-from services.data_service.models import Price, Product, ProductSpec, Stock, Supplier
+from services.data_service.models import (
+    LlmCall,
+    Price,
+    Product,
+    ProductSpec,
+    Stock,
+    Supplier,
+)
 
 DEFAULT_LIMIT = 20
 
@@ -207,3 +216,39 @@ def _stock_totals_subquery(db: Session):
         .group_by(Stock.sku)
         .subquery()
     )
+
+
+# ── Model usage ───────────────────────────────────────────────────────────────
+
+
+def usage_totals(db: Session, since: datetime | None = None) -> tuple:
+    """Calls, failures, tokens either way, and the window the log covers."""
+    return _since(
+        db.query(
+            func.count(LlmCall.id),
+            func.sum(case((LlmCall.ok.is_(False), 1), else_=0)),
+            func.sum(LlmCall.prompt_tokens),
+            func.sum(LlmCall.completion_tokens),
+            func.min(LlmCall.called_at),
+            func.max(LlmCall.called_at),
+        ),
+        since,
+    ).one()
+
+
+def usage_grouped(db: Session, column, since: datetime | None = None) -> list:
+    """Tokens per group, split by model as well, because the price depends on the model."""
+    return _since(
+        db.query(
+            column,
+            LlmCall.model,
+            func.count(LlmCall.id),
+            func.sum(LlmCall.prompt_tokens),
+            func.sum(LlmCall.completion_tokens),
+        ).group_by(column, LlmCall.model),
+        since,
+    ).all()
+
+
+def _since(query, since: datetime | None):
+    return query if since is None else query.filter(LlmCall.called_at >= since)

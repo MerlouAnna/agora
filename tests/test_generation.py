@@ -8,7 +8,7 @@ from sqlalchemy.pool import StaticPool
 
 from services.data_service.categories import Category, specs_for
 from services.data_service.database import get_db
-from services.data_service.generation import builder
+from services.data_service.generation import builder, descriptions
 from services.data_service.ingestion.parsers import extract_specs
 from services.data_service.main import app
 from services.data_service.models import Supplier, TableBase
@@ -34,6 +34,16 @@ def catalogue():
     app.dependency_overrides[get_db] = lambda: TestingSession()
     yield
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def phrasing(monkeypatch):
+    """Stand in for the model with a line the validator accepts."""
+    monkeypatch.setattr(
+        descriptions,
+        "_ask_model",
+        lambda requests: {r["sku"]: f"{r['erp']}, {r['brand']}" for r in requests},
+    )
 
 
 client = TestClient(app)
@@ -85,6 +95,16 @@ def test_a_run_can_be_taken_back_out():
     assert removal["products_removed"] == report["products_added"]
     assert client.get("/stats").json()["products"] == before
     assert client.delete(f"/admin/runs/{report['request_id']}").status_code == 404
+
+
+def test_a_product_the_model_cannot_phrase_is_left_out(monkeypatch):
+    monkeypatch.setattr(descriptions, "_ask_model", lambda requests: {})
+
+    report = client.post("/admin/generate", json={"count": 3, "seed": 77}).json()
+
+    assert report["products_added"] == 0
+    assert report["descriptions_rejected"] == 3
+    assert report["rounds"] == descriptions.MAX_ROUNDS
 
 
 def test_the_rebuild_loads_the_source_files_into_this_catalogue():

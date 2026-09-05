@@ -7,6 +7,7 @@ prices, and the suppliers behind them.
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     Column,
     Date,
     DateTime,
@@ -21,7 +22,12 @@ from services.data_service.database import TableBase
 
 
 class Product(TableBase):
-    """One row per SKU. The description is the ERP's own text, kept as it arrived."""
+    """One row per SKU, with both texts the ERP holds for it.
+
+    `description` is the internal line — terse, every specification written the way the
+    systems read it. `web_description` is what the shop shows a customer, and it is the
+    one worth embedding.
+    """
 
     __tablename__ = "products"
 
@@ -29,6 +35,7 @@ class Product(TableBase):
     category = Column(String, index=True)
     brand = Column(String)
     description = Column(String)
+    web_description = Column(String, nullable=True)
     unit = Column(String, default="ΤΕΜ")
     supplier_code = Column(String, ForeignKey("suppliers.code"), index=True)
 
@@ -99,3 +106,20 @@ class GenerationRun(TableBase):
     descriptions_rejected = Column(Integer, default=0)
     parameters = Column(JSON)
     skus = Column(JSON)
+
+
+class LlmCall(TableBase):
+    """One row per call to a model, so a bill can be traced back to what asked for it."""
+
+    __tablename__ = "llm_calls"
+
+    id = Column(Integer, primary_key=True, index=True)
+    called_at = Column(DateTime, index=True)
+    service = Column(String, index=True)
+    purpose = Column(String, index=True)
+    model = Column(String, index=True)
+    prompt_tokens = Column(Integer, default=0)
+    completion_tokens = Column(Integer, default=0)
+    duration_ms = Column(Integer, default=0)
+    ok = Column(Boolean, default=True)
+    detail = Column(String, nullable=True)

@@ -1,35 +1,29 @@
 """
 Loader
 ======
-Reads the four raw exports exactly as they are. Nothing is cleaned, converted or
-rejected here — every value comes back as the string the source system wrote.
+Reads what the sources hand over, exactly as they hand it over. Nothing is cleaned,
+converted or rejected here.
+
+There are two of them. `catalog.json` is the catalogue the reseller's systems agree on and
+comes in structured. Everything else arrives as a CSV somebody exported — from the
+generation endpoint or from a partner's feed — and comes in as strings.
 """
 
 import csv
+import io
 import json
 from pathlib import Path
 
 RAW_DIR = Path(__file__).resolve().parent.parent.parent.parent / "data" / "raw"
+CATALOG_FILE = RAW_DIR / "catalog.json"
 
 
-def load_erp() -> list[dict]:
-    return _read_csv(RAW_DIR / "erp_products.csv")
+def load_catalog() -> dict:
+    """The whole catalogue: the supplier registry and one record per SKU."""
+    with open(CATALOG_FILE, encoding="utf-8") as f:
+        return json.load(f)
 
 
-def load_stock() -> list[dict]:
-    return _read_csv(RAW_DIR / "wms_stock.csv", delimiter=";")
-
-
-def load_pricing() -> list[dict]:
-    return _read_csv(RAW_DIR / "pricing.csv")
-
-
-def load_suppliers() -> list[dict]:
-    """The supplier file is nested JSON: each supplier carries the SKUs it supplies."""
-    with open(RAW_DIR / "suppliers.json", encoding="utf-8") as f:
-        return json.load(f)["suppliers"]
-
-
-def _read_csv(path: Path, delimiter: str = ",") -> list[dict]:
-    with open(path, encoding="utf-8", newline="") as f:
-        return list(csv.DictReader(f, delimiter=delimiter))
+def read_rows(text: str, delimiter: str = ",") -> list[dict]:
+    """A CSV that arrived as text, one dict per row, every value still a string."""
+    return list(csv.DictReader(io.StringIO(text), delimiter=delimiter))
