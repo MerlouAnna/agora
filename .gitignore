@@ -14,7 +14,7 @@ data/catalog.db
 chroma_db/
 
 # Editors / OS
-.vscode/
+# .vscode/ # this is commented out to make debugging available
 .idea/
 .DS_Store
 Thumbs.db

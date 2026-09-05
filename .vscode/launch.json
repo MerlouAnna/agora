@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Generate mock data",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/generate_mock_data.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "data_service :8001",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["services.data_service.main:app", "--port", "8001"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "offer_service :8000",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["services.offer_service.main:app", "--port", "8000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
