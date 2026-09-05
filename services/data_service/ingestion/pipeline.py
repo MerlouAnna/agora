@@ -10,32 +10,34 @@ Run from the repository root:  python -m services.data_service.ingestion.pipelin
 import logging
 from collections import Counter
 
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from services.data_service.categories import is_numeric
-from services.data_service.database import SessionLocal, TableBase, engine
+from services.data_service.database import SessionLocal, TableBase
 from services.data_service.ingestion import loader, normalizer
-from services.data_service.models import Price, Product, ProductSpec, Stock, Supplier
+from services.data_service.models import (
+    GenerationRun,
+    Price,
+    Product,
+    ProductSpec,
+    Stock,
+    Supplier,
+)
+from services.data_service.schemas import LoadReport
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
-class LoadReport(BaseModel):
-    erp_rows: int
-    products_loaded: int
-    duplicates: int
-    specs_loaded: int
-    prices_loaded: int
-    stock_rows: int
-    stock_loaded: int
-    products_without_stock: int
-    rejected: int
-    rejected_by_reason: dict[str, int]
+def run(db: Session | None = None) -> LoadReport:
+    """Read the four source files and rebuild the catalogue from them.
 
+    Args:
+        db: Session to rebuild through. A session of its own is opened when none is given,
+            which is how the module runs from the command line.
 
-def run() -> LoadReport:
+    Returns:
+        What went in, and what was left out and why.
+    """
     erp_rows = loader.load_erp()
     stock_rows = loader.load_stock()
     pricing_rows = loader.load_pricing()
@@ -49,8 +51,11 @@ def run() -> LoadReport:
     )
 
     rejections = product_rejections + stock_rejections
-    with SessionLocal() as db:
+    if db is not None:
         _rebuild(db, products, stock, suppliers)
+    else:
+        with SessionLocal() as session:
+            _rebuild(session, products, stock, suppliers)
 
     report = LoadReport(
         erp_rows=len(erp_rows),
@@ -75,10 +80,15 @@ def _rebuild(
     stock: list[normalizer.CanonicalStock],
     suppliers: list[dict],
 ) -> None:
-    """Replace the catalogue with what the raw files currently say."""
-    TableBase.metadata.create_all(bind=engine)
+    """Replace the catalogue with what the raw files currently say.
 
-    for model in (ProductSpec, Stock, Price, Product, Supplier):
+    Everything the generation endpoint added goes with it, history included — a rebuild
+    is a return to the four source files, and a run log pointing at SKUs that no longer
+    exist would be worse than no log at all.
+    """
+    TableBase.metadata.create_all(bind=db.get_bind())
+
+    for model in (ProductSpec, Stock, Price, Product, Supplier, GenerationRun):
         db.query(model).delete()
 
     db.add_all(
@@ -102,7 +112,7 @@ def _rebuild(
                 supplier_code=product.supplier_code,
             )
         )
-        db.add_all(_spec_rows(product))
+        db.add_all(spec_rows(product))
 
         if product.price is not None:
             db.add(
@@ -122,7 +132,7 @@ def _rebuild(
     db.commit()
 
 
-def _spec_rows(product: normalizer.CanonicalProduct) -> list[ProductSpec]:
+def spec_rows(product: normalizer.CanonicalProduct) -> list[ProductSpec]:
     rows = []
 
     for key, value in product.specs.items():
@@ -155,4 +165,5 @@ def _log(report: LoadReport, rejections: list[normalizer.Rejection]) -> None:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     run()
