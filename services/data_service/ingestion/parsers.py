@@ -15,6 +15,7 @@ from datetime import date
 from services.data_service.categories import Category, specs_for
 
 SKU_PATTERN = re.compile(r"^([A-Z]{3})(\d{4})$")
+SKU_NOISE = re.compile(r"[^A-Za-z0-9]")
 PRICE_CLEAN = re.compile(r"[^\d,.\-]")
 LENGTH_PATTERN = re.compile(r"(\d+)\s*(cm|μ\.|m)(?!m)")
 WATT_PATTERN = re.compile(r"(\d+(?:[.,]\d+)?)\s*(kW|W)\b")
@@ -39,11 +40,16 @@ CONNECTOR_PATTERN = re.compile(r"\b(IEC C13|IEC C19|Schuko|CEE)\b")
 
 
 def normalize_sku(raw: str) -> str | None:
-    """Reduce any of the spellings the three systems use to `PWR-1007`."""
+    """Reduce any spelling of a SKU to `PWR-1007`.
+
+    Everything that is not a letter or a digit comes out first, which covers the dashes
+    and spaces the three source systems disagree on, and the quotes people paste around
+    a code when they copy it from somewhere else.
+    """
     if not raw:
         return None
 
-    compact = raw.strip().upper().replace("-", "").replace(" ", "")
+    compact = SKU_NOISE.sub("", raw).upper()
     match = SKU_PATTERN.match(compact)
     if match is None:
         return None

@@ -19,3 +19,12 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 TableBase = declarative_base()
+
+
+def get_db():
+    """One session per request, closed when the request is done."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
