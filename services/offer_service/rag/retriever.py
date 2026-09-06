@@ -21,6 +21,7 @@ REQUEST = "customer-request"
 QUESTION = "policy-question"
 
 CANDIDATES = 50
+RRF_K = 60
 
 
 class IndexNotBuilt(RuntimeError):
@@ -87,7 +88,7 @@ def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> t
 
     by_word = lexical.ranked(requirements.request, codes, list(eligible["documents"] or []))
     by_meaning = _by_meaning(products, requirements.request, where, len(codes))
-    ordered = _merged(by_word, by_meaning)[:limit]
+    ordered = _scored(by_word, by_meaning)[:limit]
 
     trace |= {"by_word": by_word[:limit], "by_meaning": by_meaning[:limit], "merged": ordered}
     return ordered, trace
@@ -188,14 +189,23 @@ def _by_meaning(
 ) -> list[str]:
     """Everything eligible, nearest first — both rankings cover the same set.
 
-    The two are taken in turn, so cutting one of them short would hand its tail to the
-    other half alone rather than to both.
+    Cutting one of them short would leave its tail to the other half alone.
     """
     vector = embeddings.embed([request], purpose)[0]
     found = products.query(
         query_embeddings=[list(vector)], where=where, n_results=eligible, include=[]
     )
     return list(found["ids"][0])
+
+
+def _scored(*rankings: list[str]) -> list[str]:
+    """Reciprocal rank fusion: a product both halves place well beats one either places first."""
+    scores: dict[str, float] = {}
+    for ranking in rankings:
+        for place, code in enumerate(ranking, 1):
+            scores[code] = scores.get(code, 0.0) + 1 / (RRF_K + place)
+
+    return sorted(scores, key=lambda code: (-scores[code], code))
 
 
 def _merged(*rankings: list[str]) -> list[str]:
