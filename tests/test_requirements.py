@@ -3,7 +3,7 @@ from pydantic import ValidationError
 
 from services.data_service.categories import Category
 from services.offer_service.rag import filters
-from services.offer_service.requirements import Constraint, CustomerRequirements
+from services.offer_service.requirements import Constraint, CustomerRequirements, Ordering
 
 
 def asked(**changes) -> CustomerRequirements:
@@ -19,6 +19,9 @@ def test_a_label_with_no_order_takes_no_comparison():
     """SFX is not more than ATX, and a filter that pretended otherwise would answer anyway."""
     with pytest.raises(ValidationError, match="no order"):
         Constraint(key="form_factor", op="gte", value="SFX")
+
+    with pytest.raises(ValidationError, match="no order"):
+        Ordering(key="form_factor", end="max")
 
 
 def test_a_flag_is_on_or_off_rather_than_the_word():

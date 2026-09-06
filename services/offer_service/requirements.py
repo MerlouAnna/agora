@@ -57,6 +57,20 @@ class Constraint(BaseModel):
         return self
 
 
+class Ordering(BaseModel):
+    """Which end of a specification's range the request is asking for."""
+
+    key: str = Field(..., description="A specification that can be compared, such as `length_m`")
+    end: Literal["max", "min"]
+
+    @field_validator("key")
+    @classmethod
+    def _comparable(cls, key: str) -> str:
+        if not is_numeric(key) and key not in ORDERED_LABELS:
+            raise ValueError(f"{key} has no order to sit at the end of")
+        return key
+
+
 class CustomerRequirements(BaseModel):
     """A request as the rest of the pipeline gets to see it.
 
@@ -68,6 +82,9 @@ class CustomerRequirements(BaseModel):
     category: Category | None = None
     quantity: int | None = Field(default=None, gt=0)
     constraints: list[Constraint] = Field(default_factory=list)
+    order: Ordering | None = Field(
+        default=None, description="Set when the request asks for the end of a range"
+    )
     price_min: float | None = Field(default=None, gt=0)
     price_max: float | None = Field(default=None, gt=0)
     immediate: bool = Field(
@@ -82,7 +99,10 @@ class CustomerRequirements(BaseModel):
 
         if self.category is not None:
             carried = specs_for(self.category)
-            stray = [c.key for c in self.constraints if c.key not in carried]
+            named = [c.key for c in self.constraints]
+            if self.order is not None:
+                named.append(self.order.key)
+            stray = [key for key in named if key not in carried]
             if stray:
                 raise ValueError(f"{self.category.value} products have no {', '.join(stray)}")
         return self
