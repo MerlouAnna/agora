@@ -15,7 +15,6 @@ Run from the repository root:  python -m tools.check_descriptions
 Exits non-zero when something is wrong, so it can gate a commit.
 """
 
-import json
 import logging
 import re
 import sys
@@ -23,7 +22,7 @@ from itertools import combinations
 
 from services.data_service.categories import Category
 from services.data_service.generation import validator
-from services.data_service.ingestion.loader import CATALOG_FILE, load_catalog
+from services.data_service.ingestion.loader import load_catalog
 from services.data_service.ingestion.parsers import extract_specs, normalize_sku
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")

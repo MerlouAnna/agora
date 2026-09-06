@@ -15,11 +15,13 @@ NO_SHIELDING = "Το CAT6a της Nordion, σε μήκος 10m, καλύπτει
 
 
 def test_a_changed_number_is_caught():
-    assert "length_m" in validator.check(ITEM["category"], ITEM["specs"], WRONG_LENGTH)
+    reason = validator.check(ITEM["category"], ITEM["specs"], WRONG_LENGTH)
+    assert reason and "length_m" in reason
 
 
 def test_a_dropped_spec_is_caught():
-    assert "shielding" in validator.check(ITEM["category"], ITEM["specs"], NO_SHIELDING)
+    reason = validator.check(ITEM["category"], ITEM["specs"], NO_SHIELDING)
+    assert reason and "shielding" in reason
 
 
 def test_a_rejected_description_goes_back_with_the_reason():
