@@ -1,16 +1,8 @@
 """
 Business documents
 ==================
-The policies and datasheets in `data/docs`, cut where they were written to be cut.
-
-Each document was written so that a section answers on its own — no "as mentioned above",
-no "see the table below" — because what a search hands back is a passage, not a document.
-So the passage is the section, and it carries the document it came from and the heading it
-sits under in its own text: a question about the discount policy has to be able to find it
-by name.
-
-Tables are pulled out separately and written back row by row. Read as running text, a
-table comes out as `Έως 799,99 €0%` — and every threshold in these documents lives in one.
+The policies and datasheets in `data/docs`, cut into the sections they were written as.
+A passage is retrieved alone, so it carries its document and heading in its own text.
 """
 
 import logging
@@ -64,12 +56,14 @@ def read(path: Path) -> list[Passage]:
     """One document, split into its sections."""
     title, effective, version, sections = _sections(path)
     sku = SKU.search(path.stem)
+    # A datasheet is asked for by the code it describes, and the code is only in the footer.
+    name = f"{title} · {sku.group(1)}" if sku else title
 
     passages = []
     for number, section in enumerate(sections, 1):
         body = " ".join(section["body"])
         tables = "\n".join(_written(rows) for rows in section["tables"])
-        text = "\n".join(part for part in (f"{title} · {section['heading']}", body, tables) if part)
+        text = "\n".join(part for part in (f"{name} · {section['heading']}", body, tables) if part)
 
         metadata = {
             "document": path.stem,
@@ -98,7 +92,10 @@ def _sections(path: Path) -> tuple[str, str, str, list[dict]]:
         body_size, title_size = _sizes(pdf)
 
         for page in pdf.pages:
-            tables = [(table.bbox[1], table.extract()) for table in page.find_tables()]
+            tables = [
+                (table.bbox[1], table.extract())
+                for table in sorted(page.find_tables(), key=lambda found: found.bbox[1])
+            ]
 
             for top, chars in _lines(page):
                 # A table sits between two headings; it belongs to the one above it.
