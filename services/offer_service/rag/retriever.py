@@ -2,7 +2,8 @@
 Retrieval
 =========
 The products a request should be shown: narrowed by its constraints, then found twice over
-the same cards — by meaning and by word — merged, and priced from the catalogue.
+the same cards — by meaning and by word — merged, and priced from the catalogue. The same
+two halves answer a question put to the business documents.
 """
 
 import logging
@@ -15,7 +16,8 @@ from services.offer_service.requirements import CustomerRequirements, Ordering
 
 logger = logging.getLogger(__name__)
 
-PURPOSE = "customer-request"
+REQUEST = "customer-request"
+QUESTION = "policy-question"
 
 CANDIDATES = 50
 RRF_K = 60
@@ -42,6 +44,15 @@ class Retrieval:
 
     matches: list[Match]
     trace: dict
+
+
+@dataclass(frozen=True)
+class Excerpt:
+    """One section of one business document, as a question gets it back."""
+
+    id: str
+    text: str
+    metadata: dict
 
 
 def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> tuple[list, dict]:
@@ -103,12 +114,52 @@ def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
     return Retrieval(_priced(ordered, cards), trace)
 
 
-def _built():
-    products = store.collection(store.PRODUCTS)
-    if products.count() == 0:
-        raise IndexNotBuilt("the products collection is empty — run the indexer first")
+def search_policies(question: str, limit: int = 5) -> tuple[list[Excerpt], dict]:
+    """The sections of the business documents that answer a question about the terms.
 
-    return products
+    Nothing is filtered out first. A datasheet section carries the code of the product it
+    describes in its own text, so a question naming one finds it by name.
+
+    Args:
+        question: What the salesperson, or the graph on their behalf, wants to know.
+        limit: How many sections to hand back.
+
+    Returns:
+        The sections and a trace of what each half of the search proposed.
+
+    Raises:
+        IndexNotBuilt: The documents have not been indexed.
+        EmbeddingsUnavailable: The question could not be embedded.
+    """
+    passages = _built(store.POLICIES)
+    held = passages.get(include=["documents", "metadatas"])
+    codes = list(held["ids"])
+    texts = list(held["documents"] or [])
+
+    by_word = lexical.ranked(question, codes, texts)
+    by_meaning = _by_meaning(passages, question, None, len(codes), QUESTION)
+    ordered = _fused(by_word, by_meaning)[:limit]
+
+    sections = dict(zip(codes, zip(texts, held["metadatas"] or [], strict=True), strict=True))
+    trace = {
+        "passages": len(codes),
+        "by_word": by_word[:limit],
+        "by_meaning": by_meaning[:limit],
+        "fused": ordered,
+    }
+    found = [
+        Excerpt(id=code, text=sections[code][0], metadata=dict(sections[code][1]))
+        for code in ordered
+    ]
+    return found, trace
+
+
+def _built(name: str = store.PRODUCTS):
+    collection = store.collection(name)
+    if collection.count() == 0:
+        raise IndexNotBuilt(f"the {name} collection is empty — run the indexer first")
+
+    return collection
 
 
 def _at_the_end(order: Ordering, codes: list[str], metadata: list) -> list[str]:
@@ -132,13 +183,15 @@ def _place(key: str, value) -> float:
     return float(value)
 
 
-def _by_meaning(products, request: str, where: dict | None, eligible: int) -> list[str]:
-    """Every eligible product, nearest first — both rankings have to cover the same set.
+def _by_meaning(
+    products, request: str, where: dict | None, eligible: int, purpose: str = REQUEST
+) -> list[str]:
+    """Everything eligible, nearest first — both rankings have to cover the same set.
 
-    A product missing from one of them scores nothing from that half, which is a heavier
+    A document missing from one of them scores nothing from that half, which is a heavier
     penalty than being placed last in it.
     """
-    vector = embeddings.embed([request], PURPOSE)[0]
+    vector = embeddings.embed([request], purpose)[0]
     found = products.query(
         query_embeddings=[list(vector)], where=where, n_results=eligible, include=[]
     )

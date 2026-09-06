@@ -1,0 +1,71 @@
+{
+  "ground_truth": "read out of the documents by hand — unlike the product eval, no query computes these answers",
+  "cases": [
+    {
+      "id": "discount-tiers",
+      "question": "Τι έκπτωση δικαιούται παραγγελία 12.000 ευρώ;",
+      "trap": "the tiers are a table, and 12.000 sits between the two examples the text spells out",
+      "expected": ["politiki-ekptoseon#1"]
+    },
+    {
+      "id": "discount-cap",
+      "question": "Υπάρχει ανώτατο όριο στην έκπτωση ανά κατηγορία;",
+      "trap": "three sections of the same document speak about limits, and only one is the ceiling",
+      "expected": ["politiki-ekptoseon#2"]
+    },
+    {
+      "id": "discount-approval",
+      "question": "Ποιος πρέπει να εγκρίνει έκπτωση 8%;",
+      "trap": "8% is printed in the tiers table as well, but the answer is who signs it off",
+      "expected": ["politiki-ekptoseon#4"]
+    },
+    {
+      "id": "return-window",
+      "question": "Πόσες μέρες έχω για να επιστρέψω ένα προϊόν;",
+      "trap": "a second section speaks of 30 days for early failure, which answers a different question",
+      "expected": ["eggyisi-kai-epistrofes#3"]
+    },
+    {
+      "id": "warranty-psu",
+      "question": "Πόσα χρόνια εγγύηση έχει ένα τροφοδοτικό;",
+      "trap": "the policy answers by category in a table; the datasheet answers only because its title is in the passage",
+      "expected": ["eggyisi-kai-epistrofes#1", "datasheet-PSU-1020#7"]
+    },
+    {
+      "id": "new-customer-credit",
+      "question": "Τι πίστωση παίρνει ένας νέος πελάτης;",
+      "trap": "the credit table never names a new customer — what one actually pays is in the deposit section",
+      "expected": ["oroi-pliromis#1", "oroi-pliromis#2"]
+    },
+    {
+      "id": "early-payment",
+      "question": "Κερδίζω κάτι αν πληρώσω το τιμολόγιο σε μία εβδομάδα;",
+      "trap": "\"μία εβδομάδα\" has to reach \"10 ημερών\", and the word έκπτωση points at the other document",
+      "expected": ["oroi-pliromis#7"]
+    },
+    {
+      "id": "delivery-time",
+      "question": "Σε πόσες εργάσιμες παραδίδετε στη Θεσσαλονίκη από αποθήκη Αττικής;",
+      "trap": "the answer is a cell of a table, not a sentence anywhere in the text",
+      "expected": ["oroi-paradosis#1"]
+    },
+    {
+      "id": "free-shipping",
+      "question": "Από ποιο ποσό δεν πληρώνω μεταφορικά;",
+      "trap": "the section is titled cost, and the answer is the single line above its table",
+      "expected": ["oroi-paradosis#4"]
+    },
+    {
+      "id": "product-limit",
+      "question": "Μέχρι πόσα Watt αντέχει το PWR-1045;",
+      "trap": "the code reaches the passage only because it is written into it; the body never repeats it",
+      "expected": ["datasheet-PWR-1045#5"]
+    },
+    {
+      "id": "what-is-managed",
+      "question": "Τι σημαίνει managed switch;",
+      "trap": "managed appears in every switch datasheet and in the product cards too",
+      "expected": ["datasheet-SWT-1020#3"]
+    }
+  ]
+}
