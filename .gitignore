@@ -11,8 +11,7 @@ __pycache__/
 
 # Generated data
 # catalog.db is committed on purpose: the API ships ready to browse
-data/catalog.db # this is the catalog database used by the application and the extra generated data should not be committed to version control
-chroma_db/
+data/chroma/
 
 # Editors / OS
 .vscode/settings.json
