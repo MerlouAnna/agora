@@ -17,11 +17,14 @@ class ProductSummary(BaseModel):
     brand: str
     description: str = Field(..., description="The ERP line, terse, specs included")
     web_description: str | None = Field(
-        default=None, description="What the shop shows a customer. This is the text worth embedding."
+        default=None,
+        description="What the shop shows a customer. This is the text worth embedding.",
     )
     unit: str
     supplier_code: str | None = None
-    price: float | None = Field(default=None, description="List price, absent if the source had none")
+    price: float | None = Field(
+        default=None, description="List price, absent if the source had none"
+    )
     currency: str | None = None
     price_updated_at: date | None = None
     specs: dict = Field(default_factory=dict)
@@ -37,7 +40,9 @@ class StockEntry(BaseModel):
 
 class ProductStock(BaseModel):
     sku: str
-    total: int | None = Field(default=None, description="Null when the warehouse system has no record")
+    total: int | None = Field(
+        default=None, description="Null when the warehouse system has no record"
+    )
     entries: list[StockEntry] = Field(default_factory=list)
 
 
