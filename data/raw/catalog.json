@@ -1,0 +1,4073 @@
+{
+  "suppliers": [
+    {
+      "code": "SUP-01",
+      "name": "Ionia Electric",
+      "lead_time_days": 3,
+      "reliability_score": 0.96
+    },
+    {
+      "code": "SUP-02",
+      "name": "Aegean Supplies",
+      "lead_time_days": 7,
+      "reliability_score": 0.88
+    },
+    {
+      "code": "SUP-03",
+      "name": "Balkan Cables",
+      "lead_time_days": 14,
+      "reliability_score": 0.74
+    },
+    {
+      "code": "SUP-04",
+      "name": "Hellenic Power Systems",
+      "lead_time_days": 5,
+      "reliability_score": 0.92
+    }
+  ],
+  "products": [
+    {
+      "sku": "PWR-1000",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x1.5mm 30 μ. 3kW IP67 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό καλώδιο ρεύματος Nordion 5x1.5mm σε ρολό 30 μ., στεγανό κατά IP67 και για φορτία έως 3kW, κατάλληλο για μόνιμες υπαίθριες παροχές.",
+      "price": 134.2,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1001",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 500cm 3kW IP44 εξωτερικού χώρου",
+      "web_description": "Το τριπολικό 3x2.5mm της Elektra έρχεται σε τεμάχιο 500cm, αντέχει φορτία 3kW και με στεγανότητα IP44 δουλεύει άνετα σε ημιυπαίθριους χώρους και εργοτάξια.",
+      "price": 163.95,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1002",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x1.5mm 500cm 2200W IP67 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό καλώδιο ρεύματος Elektra 5x1.5mm σε τεμάχιο 500cm, στεγανό κατά IP67 και για φορτία έως 2200W, βολικό για σύνδεση αντλίας κήπου εκτεθειμένης στη βροχή.",
+      "price": 145.17,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1003",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 500cm 3kW IP54 εξωτερικού χώρου",
+      "web_description": "Το τριπολικό 3x1.5mm της Elektra, σε κομμάτι 500cm, αντέχει έως 3kW και με στεγανότητα IP54 ταιριάζει σε εργοτάξιο όπου σκόνη και πιτσιλιές είναι καθημερινό ζήτημα.",
+      "price": 96.2,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": []
+    },
+    {
+      "sku": "PWR-1004",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 5 μ. 1000W IP54 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Delta Line 3x1.5mm μήκους 5 μ., για φορτία έως 1000W, με στεγανότητα IP54 κατάλληλο για φωτιστικά κήπου και μικρά εργαλεία σε αποθήκη.",
+      "price": 135.76,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1005",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 3000cm 3000W IP44 εξωτερικού χώρου",
+      "web_description": "Σε ρολό 3000cm, το 3x4.0mm της Delta Line αντέχει έως 3000W και με προστασία IP44 τροφοδοτεί γεννήτρια ή πίνακα κάτω από στεγασμένο υπόστεγο.",
+      "price": 56.23,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1006",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x6.0mm 2000cm 750W IP44 εξωτερικού χώρου",
+      "web_description": "Το πενταπολικό 5x6.0mm της Elektra έρχεται σε ρολό 2000cm, με στεγανότητα IP44 και αντοχή 750W, για τροφοδοσία εξοπλισμού σε βεράντα με σκέπη.",
+      "price": 108.27,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1007",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x6.0mm 25 μ. 1500W IP67 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό καλώδιο Delta Line 5x6.0mm σε μήκος 25 μ., στεγανό κατά IP67, για παροχές έως 1500W σε υπαίθρια εργοτάξια εκτεθειμένα σε βροχή.",
+      "price": 160.42,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1008",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 50m 1kW IP44 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος 3x2.5mm της Elektra, σε ρολό 50m, με αντοχή έως 1kW και στεγανότητα IP44, για επεκτάσεις ρεύματος σε αυλή με μερική σκέπη.",
+      "price": 131.88,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1009",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 3000cm 3kW IP54 εξωτερικού χώρου",
+      "web_description": "Η Nordion δίνει το 3x1.5mm σε κομμάτι 3000cm, με αντοχή 3kW και προστασία IP54, για εργαλεία βαρέος τύπου σε χώρο με σκόνη και υγρασία.",
+      "price": 98.22,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1010",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 30 μ. 3kW IP54 εξωτερικού χώρου",
+      "web_description": "Το πενταπολικό 5x2.5mm της Elektra, σε μήκος 30 μ., αντέχει έως 3kW και με στεγανότητα IP54 ταιριάζει σε βιοτεχνικό χώρο με σκόνη στον αέρα.",
+      "price": 26.95,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1011",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x6.0mm 50 μ. 750W IP44 εξωτερικού χώρου",
+      "web_description": "Σε ρολό 50 μ., το 5x6.0mm της Voltera καλύπτει αποστάσεις μεγάλης έκτασης, αντέχει έως 750W και με IP44 ταιριάζει σε βεράντα ή υπόστεγο.",
+      "price": 174.84,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1012",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 500cm 750W IP67 εξωτερικού χώρου",
+      "web_description": "Κοντό πενταπολικό καλώδιο Elektra 5x2.5mm, 500cm, με στεγανότητα IP67 και αντοχή 750W, για σύνδεση φωτιστικών κήπου εκτεθειμένων στη βροχή.",
+      "price": 49.04,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1013",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 15 μ. 3000W IP67 εξωτερικού χώρου",
+      "web_description": "Το 3x4.0mm της Delta Line, σε μήκος 15 μ., στεγανό κατά IP67 και για φορτία έως 3000W, τροφοδοτεί μηχανήματα εργοταξίου εκτεθειμένα στις καιρικές συνθήκες.",
+      "price": 28.99,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1014",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 30m 3000W IP54 εξωτερικού χώρου",
+      "web_description": "Η Kyma προσφέρει το 3x6.0mm σε ρολό 30m, με αντοχή έως 3000W και προστασία IP54, κατάλληλο για γεννήτριες ή πίνακες σε χώρο με σκόνη και υγρασία.",
+      "price": 142.24,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1015",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 1000cm 3000W IP44 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Nordion 3x6.0mm, μήκους 1000cm, για φορτία έως 3000W, με IP44 ταιριάζει σε ημιστεγασμένο χώρο αποθήκευσης.",
+      "price": 112.15,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1016",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x6.0mm 20m 2200W IP44 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό 5x6.0mm της Elektra σε ρολό 20m, αντοχή έως 2200W, με στεγανότητα IP44 για τροφοδοσία εξοπλισμού κάτω από πέργκολα.",
+      "price": 123.98,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1017",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 3000cm 1500W IP67 εξωτερικού χώρου",
+      "web_description": "Το 5x2.5mm της Voltera, σε κομμάτι 3000cm, στεγανό κατά IP67 και για φορτία έως 1500W, κατάλληλο για αντλία πισίνας σε ανοιχτό χώρο.",
+      "price": 106.39,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1018",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 1500cm 2200W IP67 εξωτερικού χώρου",
+      "web_description": "Καλώδιο Kyma 3x1.5mm, μήκους 1500cm, με στεγανότητα IP67 και αντοχή 2200W, για εξοπλισμό αυλής που δέχεται άμεσα τη βροχή.",
+      "price": 84.61,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1019",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 1500cm 1kW IP44 εξωτερικού χώρου",
+      "web_description": "Η Nordion δίνει το 3x4.0mm σε τεμάχιο 1500cm, για φορτία έως 1kW, με προστασία IP44 κατάλληλη για μπαλκόνι ή βεράντα με σκέπη.",
+      "price": 74.38,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1020",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 20 μ. 750W IP67 εξωτερικού χώρου",
+      "web_description": "Το 3x4.0mm της Elektra σε μήκος 20 μ. αντέχει έως 750W και με στεγανότητα IP67 τροφοδοτεί εξοπλισμό κήπου εκτεθειμένο σε νερό.",
+      "price": 149.49,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1021",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 30m 2200W IP54 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό καλώδιο Kyma 5x2.5mm, σε ρολό 30m, με αντοχή 2200W και στεγανότητα IP54, για βιοτεχνικό χώρο με σκόνη στον αέρα.",
+      "price": 126.66,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1022",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 10 μ. 2200W IP54 εξωτερικού χώρου",
+      "web_description": "Το 3x6.0mm της Kyma, μήκους 10 μ., αντέχει φορτία έως 2200W και με προστασία IP54 ταιριάζει σε γκαράζ ή εργαστήριο με σκόνη.",
+      "price": 122.41,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1023",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 3000cm 1000W IP44 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Voltera 3x4.0mm σε ρολό 3000cm, για φορτία έως 1000W, με στεγανότητα IP44 κατάλληλο για χώρο με μερική σκέπη από τη βροχή.",
+      "price": 29.12,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1024",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 25m 3000W IP54 εξωτερικού χώρου",
+      "web_description": "Η Voltera δίνει το 3x1.5mm σε ρολό 25m, με αντοχή έως 3000W και στεγανότητα IP54, για εργαλεία βαρέος τύπου σε εργοτάξιο με σκόνη και πιτσιλιές.",
+      "price": 86.11,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1025",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x4.0mm 3000cm 2200W IP67 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό 5x4.0mm της Nordion, σε κομμάτι 3000cm, στεγανό κατά IP67 και για φορτία έως 2200W, για εξοπλισμό εκτεθειμένο μόνιμα στις καιρικές συνθήκες.",
+      "price": 69.59,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1026",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x4.0mm 2000cm 750W IP54 εξωτερικού χώρου",
+      "web_description": "Το 5x4.0mm της Voltera, μήκους 2000cm, αντέχει έως 750W και με προστασία IP54 ταιριάζει σε αποθήκη όπου η σκόνη είναι δεδομένη.",
+      "price": 8.42,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1027",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 30 μ. 3000W IP67 εξωτερικού χώρου",
+      "web_description": "Καλώδιο Delta Line 3x1.5mm σε ρολό 30 μ., με στεγανότητα IP67 και αντοχή έως 3000W, για μόνιμη υπαίθρια παροχή σε κήπο ή αυλή.",
+      "price": 28.42,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1028",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 15m 750W IP54 εξωτερικού χώρου",
+      "web_description": "Η Delta Line προσφέρει το 3x2.5mm σε ρολό 15m, με αντοχή 750W και στεγανότητα IP54, για μικρά εργαλεία σε χώρο με σκόνη.",
+      "price": 93.6,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1029",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 10m 750W IP44 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Nordion 3x2.5mm, μήκους 10m, για φορτία έως 750W, με προστασία IP44 κατάλληλο για βεράντα ή στεγασμένο μπαλκόνι.",
+      "price": 100.01,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1030",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x1.5mm 5000cm 750W IP54 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό 5x1.5mm της Nordion σε μεγάλο ρολό 5000cm, αντοχή έως 750W, με στεγανότητα IP54 για βιοτεχνικό χώρο με σκόνη.",
+      "price": 14.57,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1031",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x1.5mm 1500cm 1500W IP67 εξωτερικού χώρου",
+      "web_description": "Το 5x1.5mm της Delta Line, μήκους 1500cm, στεγανό κατά IP67 και για φορτία έως 1500W, τροφοδοτεί αντλία ή εξοπλισμό εκτεθειμένο στη βροχή.",
+      "price": 167.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1032",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 3000cm 2200W IP67 εξωτερικού χώρου",
+      "web_description": "Καλώδιο Voltera 3x6.0mm σε ρολό 3000cm, με στεγανότητα IP67 και αντοχή 2200W, για μηχανήματα εργοταξίου εκτεθειμένα μόνιμα στον καιρό.",
+      "price": 107.19,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1033",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 1000cm 750W IP67 εξωτερικού χώρου",
+      "web_description": "Η Kyma δίνει το 3x2.5mm σε κομμάτι 1000cm, στεγανό κατά IP67 και για φορτία έως 750W, κατάλληλο για φωτισμό κήπου δίπλα σε πισίνα.",
+      "price": 126.12,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1034",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 30m 1000W IP54 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Elektra 3x1.5mm σε ρολό 30m, με αντοχή 1000W και προστασία IP54, για εργαλεία σε γκαράζ ή αποθήκη με σκόνη.",
+      "price": 51.31,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1035",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 20m 1500W IP44 εξωτερικού χώρου",
+      "web_description": "Το 3x1.5mm της Kyma, σε ρολό 20m, αντέχει έως 1500W και με στεγανότητα IP44 ταιριάζει σε βεράντα με μερική κάλυψη από τη βροχή.",
+      "price": 80.21,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1036",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 50m 1000W IP67 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό καλώδιο Elektra 5x2.5mm σε μεγάλο ρολό 50m, στεγανό κατά IP67 και για φορτία έως 1000W, για υπαίθριες εγκαταστάσεις εκτεθειμένες στη βροχή.",
+      "price": 103.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1037",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 10m 750W IP44 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Voltera 3x4.0mm, μήκους 10m, με αντοχή έως 750W και προστασία IP44, κατάλληλο για μπαλκόνι ή χώρο με ελαφρύ στέγαστρο από τη βροχή.",
+      "price": 169.19,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1038",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 15m 3000W IP67 εξωτερικού χώρου",
+      "web_description": "Το 3x4.0mm της Kyma σε ρολό 15m αντέχει έως 3000W και με στεγανότητα IP67 τροφοδοτεί γεννήτρια ή εξοπλισμό βαρέος τύπου σε ανοιχτό χώρο.",
+      "price": 65.15,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1039",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 50 μ. 1kW IP44 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό 5x2.5mm της Kyma, σε μεγάλο ρολό 50 μ., για φορτία έως 1kW, με προστασία IP44 κατάλληλο για βεράντα ή υπόστεγο.",
+      "price": 54.89,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1040",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 30 μ. 2200W IP54 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Elektra 5x2.5mm σε ρολό 30 μ., με αντοχή 2200W και στεγανότητα IP54, για βιοτεχνία ή χώρο με σκόνη στον αέρα.",
+      "price": 30.24,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1041",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 50 μ. 2200W IP54 εξωτερικού χώρου",
+      "web_description": "Η Kyma δίνει το 3x4.0mm σε μεγάλο ρολό 50 μ., με αντοχή 2200W και στεγανότητα IP54, για εργαλεία βαρέος τύπου σε χώρο με σκόνη.",
+      "price": 104.06,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1042",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x1.5mm 1500cm 3kW IP54 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό 5x1.5mm της Delta Line, σε ρολό 1500cm, στεγανό κατά IP54 και για φορτία έως 3kW, τροφοδοτεί εργαλεία βαρέος τύπου σε χώρο με σκόνη.",
+      "price": 66.11,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1043",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 3000cm 3kW IP54 εξωτερικού χώρου",
+      "web_description": "Καλώδιο Delta Line 5x2.5mm σε ρολό 3000cm, με αντοχή έως 3kW και στεγανότητα IP54, κατάλληλο για γεννήτρια σε εργοτάξιο με σκόνη.",
+      "price": 66.09,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1044",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x1.5mm 5m 2200W IP54 εξωτερικού χώρου",
+      "web_description": "Το 3x1.5mm της Kyma, μήκους 5m, αντέχει έως 2200W και με προστασία IP54 ταιριάζει σε μικρά εργαλεία κήπου σε χώρο με σκόνη.",
+      "price": 172.24,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1045",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 20 μ. 1000W IP54 εξωτερικού χώρου",
+      "web_description": "Η Nordion δίνει το 3x2.5mm σε μήκος 20 μ., για φορτία έως 1000W, με στεγανότητα IP54 κατάλληλο για βιοτεχνικό χώρο με σκόνη στον αέρα.",
+      "price": 158.69,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1046",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 500cm 1000W IP54 εξωτερικού χώρου",
+      "web_description": "Κοντό καλώδιο Kyma 3x6.0mm, 500cm, με αντοχή 1000W και στεγανότητα IP54, για σύνδεση εξοπλισμού μέσα σε πίνακα εκτεθειμένο σε σκόνη.",
+      "price": 59.66,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1047",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 1500cm 750W IP44 εξωτερικού χώρου",
+      "web_description": "Το 3x6.0mm της Delta Line, σε ρολό 1500cm, αντέχει έως 750W και με προστασία IP44 ταιριάζει σε βεράντα ή χώρο με μερική σκέπη.",
+      "price": 37.07,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1048",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x4.0mm 3000cm 750W IP44 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Kyma 3x4.0mm σε ρολό 3000cm, με αντοχή έως 750W και στεγανότητα IP44, κατάλληλο για μπαλκόνι ή βεράντα με ελαφρύ στέγαστρο.",
+      "price": 71.56,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1049",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x1.5mm 500cm 2200W IP67 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό 5x1.5mm της Nordion, σε κομμάτι 500cm, στεγανό κατά IP67 και για φορτία έως 2200W, τροφοδοτεί αντλία εκτεθειμένη στη βροχή.",
+      "price": 29.57,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1050",
+      "category": "POWER",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x4.0mm 3000cm 1000W IP67 εξωτερικού χώρου",
+      "web_description": "Το 5x4.0mm της Elektra, σε ρολό 3000cm, με στεγανότητα IP67 και αντοχή έως 1000W, ταιριάζει σε υπαίθρια εγκατάσταση πλήρως εκτεθειμένη στον καιρό.",
+      "price": 149.43,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1051",
+      "category": "POWER",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 2500cm 3000W IP44 εξωτερικού χώρου",
+      "web_description": "Καλώδιο Voltera 3x6.0mm σε ρολό 2500cm, με αντοχή έως 3000W και προστασία IP44, για γεννήτρια κάτω από στεγασμένο υπόστεγο.",
+      "price": 98.84,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1052",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 10m 3000W IP67 εξωτερικού χώρου",
+      "web_description": "Η Delta Line δίνει το 3x2.5mm σε ρολό 10m, στεγανό κατά IP67 και για φορτία έως 3000W, κατάλληλο για εξοπλισμό εργοταξίου εκτεθειμένο στη βροχή.",
+      "price": 148.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1053",
+      "category": "POWER",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 25 μ. 1500W IP67 εξωτερικού χώρου",
+      "web_description": "Το 3x2.5mm της Nordion, σε μήκος 25 μ., στεγανό κατά IP67 και αντοχή έως 1500W, τροφοδοτεί αντλία πισίνας σε ανοιχτό χώρο.",
+      "price": 127.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1054",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x2.5mm 50 μ. 2200W IP67 εξωτερικού χώρου",
+      "web_description": "Καλώδιο ρεύματος Kyma 3x2.5mm σε μεγάλο ρολό 50 μ., με στεγανότητα IP67 και αντοχή έως 2200W, για υπαίθριο φωτισμό κήπου εκτεθειμένο στη βροχή.",
+      "price": 67.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1055",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 20 μ. 1kW IP54 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό 5x2.5mm της Kyma, μήκους 20 μ., για φορτία έως 1kW, με στεγανότητα IP54 κατάλληλο για βιοτεχνία ή γκαράζ με σκόνη.",
+      "price": 107.12,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1056",
+      "category": "POWER",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 3x6.0mm 1500cm 1000W IP44 εξωτερικού χώρου",
+      "web_description": "Το 3x6.0mm της Kyma, σε ρολό 1500cm, αντέχει έως 1000W και με προστασία IP44 ταιριάζει σε αυλή με μερική σκέπη από τη βροχή.",
+      "price": 26.75,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PWR-1057",
+      "category": "POWER",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο ρεύματος 5x2.5mm 25m 750W IP67 εξωτερικού χώρου",
+      "web_description": "Πενταπολικό καλώδιο Delta Line 5x2.5mm σε ρολό 25m, στεγανό κατά IP67 και για φορτία έως 750W, τροφοδοτεί φωτιστικά κήπου εκτεθειμένα στη βροχή.",
+      "price": 147.7,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1000",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 FTP 5m",
+      "web_description": "Patch καλώδιο Kyma CAT6 FTP μήκους 5m, με απλή θωράκιση για δομημένη καλωδίωση σε γραφεία και μικρά rack όπου η όδευση περνά δίπλα από ρεύμα.",
+      "price": 21.21,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1001",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e FTP 1m",
+      "web_description": "Κοντό patch CAT5e FTP της Kyma, μόλις 1m, για συνδέσεις μέσα στο ίδιο rack χωρίς περίσσιο καλώδιο να κρέμεται στο πλάι του ερμαρίου.",
+      "price": 52.13,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1002",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a S/FTP 20 μ.",
+      "web_description": "Πλήρως θωρακισμένο, το CAT6a S/FTP της Elektra σε μήκος 20 μ. κρατά το σήμα καθαρό ακόμα και δίπλα σε γραμμές ρεύματος υψηλής ισχύος, στην οριζόντια καλωδίωση ενός ορόφου.",
+      "price": 58.59,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1003",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 FTP 1m",
+      "web_description": "Μόλις 1m, το CAT7 FTP της Voltera είναι φτιαγμένο για τη σύνδεση δύο συσκευών μέσα στο ίδιο rack, εκεί που δεν περισσεύει χώρος για μακρύ καλώδιο.",
+      "price": 23.68,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": []
+    },
+    {
+      "sku": "DAT-1004",
+      "category": "DATA",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 UTP 1m",
+      "web_description": "Το CAT6 UTP της Nordion δεν χρειάζεται θωράκιση για το 1m που καλύπτει μέσα στο ίδιο ερμάριο δικτύου, από τον μεταγωγέα ως τη συσκευή δίπλα του.",
+      "price": 69.77,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1005",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 UTP 30m",
+      "web_description": "Σε μεγάλο μήκος 30m, το CAT6 UTP της Kyma φτάνει από το rack ως τις πιο απομακρυσμένες θέσεις εργασίας ενός ανοιχτού γραφείου, χωρίς να χρειάζεται θωράκιση στη διαδρομή.",
+      "price": 34.97,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1006",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 S/FTP 20m",
+      "web_description": "Η Elektra δίνει το CAT6 S/FTP πλήρως θωρακισμένο, ώστε τα 20m να διασχίζουν χώρο με γειτονικές γραμμές ρεύματος χωρίς το σήμα να χάνει σε ταχύτητα.",
+      "price": 34.6,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1007",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 UTP 3000cm",
+      "web_description": "Χωρίς θωράκιση και σε ρολό 3000cm, το CAT6 UTP της Voltera είναι η οικονομική επιλογή για δομημένη καλωδίωση σε μια αίθουσα διδασκαλίας.",
+      "price": 63.77,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1008",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 UTP 10 μ.",
+      "web_description": "Για τη σύνδεση ενός σταθμού εργασίας με τον πλησιέστερο μεταγωγέα αρκεί το CAT6 UTP της Elektra, σε μήκος 10 μ. και χωρίς ανάγκη θωράκισης.",
+      "price": 63.5,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1009",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 S/FTP 500cm",
+      "web_description": "Κοντό στα 500cm αλλά πλήρως θωρακισμένο, το CAT6 S/FTP της Voltera συνδέει ένα σημείο πρόσβασης Wi-Fi τοποθετημένο δίπλα σε πίνακα ρεύματος.",
+      "price": 62.88,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1010",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 S/FTP 3m",
+      "web_description": "Το CAT7 S/FTP της Elektra είναι η πιο θωρακισμένη επιλογή της κατηγορίας, και σε μήκος 3m ταιριάζει σε data center με μεγάλη πυκνότητα καλωδίων.",
+      "price": 45.8,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1011",
+      "category": "DATA",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a S/FTP 3 μ.",
+      "web_description": "Η Delta Line κόβει το CAT6a S/FTP της στα 3 μ. για σύντομες συνδέσεις υψηλής ταχύτητας μέσα σε rack, εκεί όπου η πλήρης θωράκιση αξίζει τον χώρο που πιάνει.",
+      "price": 22.21,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1012",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 UTP 500cm",
+      "web_description": "Ένα τηλέφωνο VoIP σε γραφείο χωρίς έντονες παρεμβολές δεν χρειάζεται παραπάνω από το CAT6 UTP της Kyma, σε κομμάτι 500cm και χωρίς θωράκιση.",
+      "price": 59.71,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1013",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a S/FTP 30 μ.",
+      "web_description": "Στα 30 μ. το σήμα θα περνούσε δίπλα από αρκετές πηγές παρεμβολών, γι' αυτό το CAT6a S/FTP της Voltera έρχεται πλήρως θωρακισμένο ως το access point της οροφής.",
+      "price": 60.95,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1014",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e FTP 1500cm",
+      "web_description": "Το CAT5e FTP της Voltera καλύπτει ανάγκες χαμηλότερου κόστους σε ρολό 1500cm, με απλή θωράκιση αρκετή για ένα reception desk καταστήματος.",
+      "price": 89.84,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1015",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 UTP 20 μ.",
+      "web_description": "Το CAT7 UTP της Elektra δίνει ταχύτητα αιχμής χωρίς το κόστος της θωράκισης, σε μήκος 20 μ. για ένα εργαστήριο πληροφορικής χωρίς γειτονικά καλώδια ρεύματος.",
+      "price": 81.61,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1016",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a FTP 2000cm",
+      "web_description": "Για οριζόντια καλωδίωση σε γραφείο μεσαίου μεγέθους, το CAT6a FTP της Kyma σε ρολό 2000cm προσφέρει απλή θωράκιση χωρίς το κόστος του S/FTP.",
+      "price": 69.64,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1017",
+      "category": "DATA",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 UTP 20 μ.",
+      "web_description": "Η Delta Line δίνει το CAT7 UTP σε μήκος 20 μ. για μια αίθουσα server όπου το rack είναι μακριά από πίνακες ρεύματος και η θωράκιση απλά δεν χρειάζεται.",
+      "price": 82.71,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1018",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 S/FTP 10m",
+      "web_description": "Ένας μεταγωγέας που τροφοδοτεί ένα access point μέσα από χώρο με καλώδια ρεύματος χρειάζεται το CAT6 S/FTP της Voltera, σε μήκος 10m και πλήρως θωρακισμένο.",
+      "price": 77.16,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1019",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e FTP 1 μ.",
+      "web_description": "Μόλις 1 μ. φτάνει το CAT5e FTP της Elektra για να συνδέσει δύο θύρες μέσα στο ίδιο patch panel, με απλή θωράκιση που δεν περισσεύει ούτε λείπει.",
+      "price": 68.96,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1020",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 UTP 5m",
+      "web_description": "Ο σταθμός εργασίας δίπλα στον μεταγωγέα συνδέεται με το CAT6 UTP της Voltera σε μήκος 5m, χωρίς να χρειάζεται καμία θωράκιση στη διαδρομή.",
+      "price": 67.29,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1021",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e S/FTP 3000cm",
+      "web_description": "Παρότι το CAT5e θεωρείται παλαιότερο πρότυπο, η Kyma το προσφέρει και σε S/FTP πλήρως θωρακισμένο, σε ρολό 3000cm για εγκαταστάσεις όπου τα καλώδια ρεύματος περνούν δίπλα.",
+      "price": 63.57,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1022",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e UTP 15 μ.",
+      "web_description": "Το CAT5e UTP της Kyma καλύπτει 15 μ. με την πιο απλή δυνατή κατασκευή, αρκετή για desktop σε γραφείο μακριά από πηγές παρεμβολών.",
+      "price": 42.19,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1023",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e UTP 5m",
+      "web_description": "Σε μήκος 5m, το CAT5e UTP της Kyma καλύπτει μια σύντομη σύνδεση μέσα σε switch cabinet παλαιότερης εγκατάστασης χωρίς αξίωση για θωράκιση.",
+      "price": 57.89,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1024",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a FTP 15m",
+      "web_description": "Ένα ασύρματο access point οροφής σε γραφείο μεσαίου μεγέθους τροφοδοτείται από το CAT6a FTP της Elektra, σε μήκος 15m με απλή θωράκιση.",
+      "price": 44.92,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1025",
+      "category": "DATA",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e FTP 10 μ.",
+      "web_description": "Μια κάμερα ασφαλείας σε χώρο γραφείου συνδέεται άνετα με το CAT5e FTP της Delta Line, σε μήκος 10 μ. και με απλή θωράκιση.",
+      "price": 44.64,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1026",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 UTP 100cm",
+      "web_description": "Στο ελάχιστο δυνατό μήκος, 100cm, το CAT7 UTP της Kyma συνδέει server με μεταγωγέα μέσα στο ίδιο rack χωρίς να χρειάζεται θωράκιση.",
+      "price": 15.94,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1027",
+      "category": "DATA",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e FTP 30 μ.",
+      "web_description": "Σε μεγάλο μήκος 30 μ., το CAT5e FTP της Delta Line με απλή θωράκιση καλύπτει την οριζόντια όδευση ενός παλαιότερου κτιρίου γραφείων.",
+      "price": 49.48,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1028",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a FTP 3m",
+      "web_description": "Μόλις 3m αρκούν στο CAT6a FTP της Elektra για μια σύνδεση υψηλής ταχύτητας μέσα στο ίδιο rack ενός τεχνικού τμήματος, με απλή θωράκιση.",
+      "price": 79.73,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1029",
+      "category": "DATA",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a UTP 1m",
+      "web_description": "Το CAT6a UTP της Nordion, χωρίς θωράκιση, χρειάζεται μόλις 1m για να συνδέσει δύο συσκευές υψηλής ταχύτητας στο ίδιο ερμάριο δικτύου.",
+      "price": 36.49,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1030",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 S/FTP 10m",
+      "web_description": "Το CAT6 S/FTP της Kyma μένει αμετάβλητο σε ταχύτητα ακόμα κι όταν το πέρασμα των 10m βρίσκεται δίπλα σε πηγή ηλεκτρικού θορύβου.",
+      "price": 40.19,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1031",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 FTP 2000cm",
+      "web_description": "Σε ρολό 2000cm, το CAT7 FTP της Elektra με απλή θωράκιση καλύπτει τις ανάγκες υψηλής ταχύτητας ενός control room όπου μετράει πάνω απ' όλα η σταθερότητα της σύνδεσης.",
+      "price": 82.6,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1032",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a FTP 100cm",
+      "web_description": "Μόλις 100cm χρειάζεται το CAT6a FTP της Voltera για να συνδέσει δύο συσκευές μέσα σε rack υψηλής πυκνότητας, με απλή θωράκιση.",
+      "price": 60.37,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1033",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e UTP 10 μ.",
+      "web_description": "Ανάμεσα στα μήκη που προσφέρει η Kyma για το CAT5e UTP, τα 10 μ. καλύπτουν ένα τηλέφωνο ή ένα desktop σε γραφείο δίχως απαίτηση για θωράκιση.",
+      "price": 93.27,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1034",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 S/FTP 1 μ.",
+      "web_description": "Μόλις 1 μ. καλύπτει το CAT6 S/FTP της Kyma, πλήρως θωρακισμένο, για να συνδέσει server και μεταγωγέα μέσα στο ίδιο rack.",
+      "price": 94.84,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1035",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a FTP 15 μ.",
+      "web_description": "Η Kyma δίνει το CAT6a FTP της σε 15 μ. σαν εναλλακτική στο S/FTP, όταν ο δρόμος του καλωδίου δεν περνά κοντά σε πηγές παρεμβολών.",
+      "price": 91.74,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1036",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 UTP 20m",
+      "web_description": "Το CAT6 UTP της Elektra απλώνεται σε 20m χωρίς θωράκιση, όσο η όδευση μένει μακριά από ισχυρές πηγές ηλεκτρικού θορύβου.",
+      "price": 8.5,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1037",
+      "category": "DATA",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a S/FTP 30m",
+      "web_description": "Στα 30m, το CAT6a S/FTP της Delta Line κρατά πλήρη θωράκιση απέναντι σε παρεμβολές μέσα σε βιομηχανικό περιβάλλον με κινητήρες και μεγάλα ηλεκτρικά φορτία δίπλα στη διαδρομή.",
+      "price": 58.33,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1038",
+      "category": "DATA",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT5e S/FTP 1m",
+      "web_description": "Το CAT5e S/FTP της Nordion φτάνει το 1m πλήρως θωρακισμένο, αρκετό για να συνδέσει δύο θύρες μέσα στο ίδιο patch panel χωρίς να περισσεύει καλώδιο.",
+      "price": 45.9,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1039",
+      "category": "DATA",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a FTP 2000cm",
+      "web_description": "Η Delta Line προσφέρει το CAT6a FTP σε 2000cm σαν μέση λύση θωράκισης, για ένα ασύρματο access point μέσα σε αίθουσα εκπαίδευσης.",
+      "price": 80.14,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1040",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 FTP 10 μ.",
+      "web_description": "Το CAT7 FTP της Voltera καλύπτει 10 μ. χωρίς να χρειάζεται πλήρη θωράκιση, αρκετό για εξοπλισμό υψηλής ταχύτητας σε ένα studio ηχογράφησης.",
+      "price": 24.5,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1041",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a FTP 10m",
+      "web_description": "Το CAT6a FTP της Elektra, σε μήκος 10m και με απλή θωράκιση, τροφοδοτεί ένα access point τοποθετημένο πάνω από ράφια σε αποθήκη με τερματικό WMS.",
+      "price": 46.73,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1042",
+      "category": "DATA",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6a UTP 10 μ.",
+      "web_description": "Το CAT6a UTP της Elektra καλύπτει 10 μ. χωρίς κόστος θωράκισης, εκεί που η αίθουσα ελέγχου παραγωγής δεν έχει καλώδια ρεύματος δίπλα στη διαδρομή.",
+      "price": 29.36,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1043",
+      "category": "DATA",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 S/FTP 10m",
+      "web_description": "Το CAT6 S/FTP της Kyma, μήκους 10m και με πλήρη θωράκιση, καλύπτει μια οριζόντια όδευση δίπλα σε γραμμές ρεύματος χωρίς να χρειάζεται επιπλέον κανάλι προστασίας.",
+      "price": 16.17,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1044",
+      "category": "DATA",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT6 S/FTP 10m",
+      "web_description": "Ανάμεσα σε δύο rack υψηλής πυκνότητας, τα 10m CAT6 S/FTP της Voltera κρατούν πλήρη θωράκιση χωρίς να χρειάζεται επιπλέον προστασία.",
+      "price": 23.37,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "DAT-1045",
+      "category": "DATA",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Καλώδιο δικτύου CAT7 S/FTP 300cm",
+      "web_description": "Το CAT7 S/FTP της Nordion, σε ρολό 300cm, δίνει πλήρη θωράκιση για μια σύντομη αλλά κρίσιμη σύνδεση μέσα σε server room.",
+      "price": 94.31,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1000",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 450W 80+ Platinum ATX",
+      "web_description": "Τροφοδοτικό ATX 450W της Voltera με πιστοποίηση 80+ Platinum, για συστήματα γραφείου που δουλεύουν όλη μέρα και θέλουμε να μένουν κρύα και αθόρυβα.",
+      "price": 124.85,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": []
+    },
+    {
+      "sku": "PSU-1001",
+      "category": "PSU",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 450W 80+ Platinum ATX",
+      "web_description": "Το ATX 450W της Kyma πιάνει 80+ Platinum απόδοση, οπότε ταιριάζει σε σταθμούς εργασίας με μέτριο φορτίο και σε μηχανήματα που μένουν ανοιχτά συνεχώς.",
+      "price": 140.19,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1002",
+      "category": "PSU",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 750W 80+ Gold ATX",
+      "web_description": "Το ATX 750W της Kyma με πιστοποίηση 80+ Gold σηκώνει φορτίο μεσαίου συστήματος γραφείου χωρίς η κατανάλωση στο ρελαντί να ανεβαίνει υπερβολικά.",
+      "price": 70.22,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1003",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 550W 80+ Platinum ATX",
+      "web_description": "Η Voltera φτάνει σε 80+ Platinum απόδοση με το ATX 550W της, επιλογή για σταθμό εργασίας που μένει ανοιχτός όλη μέρα και θέλει χαμηλή απώλεια σε θερμότητα.",
+      "price": 70.87,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1004",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 850W 80+ Bronze ATX",
+      "web_description": "Το ATX 850W της Voltera καλύπτει build με ισχυρή κάρτα γραφικών, με πιστοποίηση 80+ Bronze για όσους δεν χρειάζονται το κόστος ανώτερης απόδοσης.",
+      "price": 228.29,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1005",
+      "category": "PSU",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 1kW 80+ Platinum ATX",
+      "web_description": "Στο ανώτερο άκρο ισχύος, το ATX 1kW της Delta Line με 80+ Platinum ταιριάζει σε σταθμό εργασίας πολλαπλών οθονών που τρέχει συνέχεια.",
+      "price": 62.14,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1006",
+      "category": "PSU",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 750W 80+ Gold ATX",
+      "web_description": "Η Delta Line προσφέρει το ATX 750W με 80+ Gold για build γραφείου που θέλει περιθώριο ισχύος χωρίς να φτάνει σε ακριβότερη πιστοποίηση.",
+      "price": 231.1,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1007",
+      "category": "PSU",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 850W 80+ Bronze SFX",
+      "web_description": "Το SFX 850W της Delta Line, με 80+ Bronze, χωρά σε μικρό case όπου η ισχύς μετράει περισσότερο από την απόδοση στο ρελαντί.",
+      "price": 147.66,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1008",
+      "category": "PSU",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 550W 80+ Platinum SFX",
+      "web_description": "Σε μικρό case, το SFX 550W της Elektra με 80+ Platinum κρατά τη θερμοκρασία χαμηλά όταν ο αέρας μέσα στο κουτί είναι λίγος.",
+      "price": 190.47,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1009",
+      "category": "PSU",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 850W 80+ Gold SFX",
+      "web_description": "Το SFX 850W της Elektra πιάνει 80+ Gold απόδοση, αρκετό για build με ισχυρή κάρτα γραφικών μέσα σε στενό σασί που δεν αφήνει πολύ χώρο για αερισμό.",
+      "price": 139.98,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1010",
+      "category": "PSU",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 550W 80+ Platinum ATX",
+      "web_description": "Η Elektra δίνει το ATX 550W με 80+ Platinum σαν λύση για γραφείο που θέλει χαμηλή κατανάλωση ρεύματος χωρίς να περνά στο μικρότερο SFX φορμά.",
+      "price": 227.75,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1011",
+      "category": "PSU",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 450W 80+ Gold SFX",
+      "web_description": "Το SFX 450W της Delta Line με 80+ Gold αρκεί για ένα mini PC σαλονιού, όπου η ησυχία του ανεμιστήρα μετράει όσο και η ισχύς.",
+      "price": 61.04,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1012",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 1000W 80+ Gold ATX",
+      "web_description": "Το ATX 1000W της Voltera, με 80+ Gold, δίνει περιθώριο σε build με πολλαπλούς δίσκους και κάρτα γραφικών υψηλής κατανάλωσης.",
+      "price": 125.16,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1013",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 450W 80+ Platinum SFX",
+      "web_description": "Στα 450W, το SFX της Voltera φτάνει 80+ Platinum απόδοση, αρκετό για σταθμό εργασίας μικρών διαστάσεων χωρίς ξεχωριστή κάρτα γραφικών.",
+      "price": 196.55,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1014",
+      "category": "PSU",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 850W 80+ Platinum SFX",
+      "web_description": "Η Nordion βάζει 80+ Platinum στο SFX της των 850W, ώστε ένα ισχυρό build μικρού όγκου να μη ζεσταίνεται μέσα στο στενό κουτί.",
+      "price": 239.08,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1015",
+      "category": "PSU",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 550W 80+ Gold SFX",
+      "web_description": "Το SFX 550W της Nordion με 80+ Gold ταιριάζει σε ήσυχο mini PC γραφείου, όπου δεν υπάρχει απαιτητική κάρτα γραφικών να τροφοδοτήσει.",
+      "price": 110.29,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1016",
+      "category": "PSU",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 750W 80+ Platinum SFX",
+      "web_description": "Στο SFX 750W της Delta Line, η πιστοποίηση 80+ Platinum κρατά χαμηλή τη θερμοκρασία μέσα σε στενό σασί με περιορισμένο αερισμό.",
+      "price": 104.01,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1017",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 550W 80+ Gold SFX",
+      "web_description": "Το SFX 550W της Voltera πιάνει 80+ Gold απόδοση, επιλογή για μικρό build γραφείου που δεν χρειάζεται την ανώτερη πιστοποίηση Platinum.",
+      "price": 158.07,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1018",
+      "category": "PSU",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 1000W 80+ Gold ATX",
+      "web_description": "Στο ανώτερο άκρο της σειράς 80+ Gold, το ATX 1000W της Kyma αφήνει περιθώριο για μελλοντική αναβάθμιση χωρίς αλλαγή τροφοδοτικού.",
+      "price": 56.57,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1019",
+      "category": "PSU",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 650W 80+ Platinum SFX",
+      "web_description": "Το SFX 650W της Nordion με 80+ Platinum ταιριάζει σε build μικρού όγκου και μεσαίου φορτίου που θέλει χαμηλή κατανάλωση στο ρελαντί.",
+      "price": 126.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1020",
+      "category": "PSU",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 750W 80+ Platinum SFX",
+      "web_description": "Στα 750W, το SFX της Kyma φτάνει 80+ Platinum απόδοση, για build σε στενό κουτί με ισχυρή κάρτα γραφικών που δεν θέλει να ζεσταίνεται.",
+      "price": 45.78,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1021",
+      "category": "PSU",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 1kW 80+ Bronze ATX",
+      "web_description": "Το ATX 1kW της Delta Line με 80+ Bronze δίνει μέγιστη ισχύ σε build πολλαπλών καρτών χωρίς το κόστος ανώτερης πιστοποίησης.",
+      "price": 138.62,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1022",
+      "category": "PSU",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 1kW 80+ Bronze ATX",
+      "web_description": "Η Nordion καλύπτει με το ATX 1kW της, 80+ Bronze, ένα σύστημα που χρειάζεται μεγάλο απόθεμα ισχύος αλλά όχι υψηλή απόδοση στο ρελαντί.",
+      "price": 193.64,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1023",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 750W 80+ Bronze SFX",
+      "web_description": "Το SFX 750W της Voltera με 80+ Bronze σηκώνει build μικρού μεγέθους και μεσαίου φορτίου χωρίς την ανάγκη για ανώτερη πιστοποίηση.",
+      "price": 225.49,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1024",
+      "category": "PSU",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 550W 80+ Bronze SFX",
+      "web_description": "Στα 550W, το SFX της Nordion με 80+ Bronze είναι η οικονομική επιλογή για ένα μικρό build γραφείου χωρίς απαιτητικό φορτίο.",
+      "price": 102.48,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1025",
+      "category": "PSU",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 650W 80+ Gold SFX",
+      "web_description": "Το SFX 650W της Elektra φτάνει 80+ Gold, μια ισορροπία ισχύος και απόδοσης για build μικρού όγκου με μεσαίο φορτίο εργασίας.",
+      "price": 193.64,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1026",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 450W 80+ Gold SFX",
+      "web_description": "Η Voltera δίνει το SFX 450W της με 80+ Gold για ένα μικρό build που δεν πρόκειται ποτέ να χρειαστεί παραπάνω ισχύ από αυτήν.",
+      "price": 71.32,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1027",
+      "category": "PSU",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 750W 80+ Platinum SFX",
+      "web_description": "Η Elektra προσφέρει 80+ Platinum στο SFX 750W της, για όποιον φτιάχνει build σε στενό κουτί και δεν θέλει να συμβιβαστεί στην απόδοση.",
+      "price": 126.7,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1028",
+      "category": "PSU",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 450W 80+ Bronze ATX",
+      "web_description": "Το ATX 450W της Nordion με 80+ Bronze αρκεί για έναν βασικό υπολογιστή γραφείου χωρίς κάρτα γραφικών ή επιπλέον σκληρούς δίσκους.",
+      "price": 197.29,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1029",
+      "category": "PSU",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 1kW 80+ Platinum SFX",
+      "web_description": "Η Nordion βάζει 80+ Platinum στο SFX 1kW της, για build υψηλής ισχύος που δεν θέλει να ζεσταίνεται μέσα στο στενό κουτί.",
+      "price": 235.17,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1030",
+      "category": "PSU",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 450W 80+ Gold ATX",
+      "web_description": "Το ATX 450W της Elektra με 80+ Gold ταιριάζει σε υπολογιστή γραφείου βασικών προδιαγραφών, χωρίς κάρτα γραφικών ή απαιτητικό φορτίο εργασίας.",
+      "price": 107.66,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1031",
+      "category": "PSU",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 550W 80+ Platinum ATX",
+      "web_description": "Η Delta Line κρατάει το ATX της στα 550W με 80+ Platinum, για όποιον θέλει την ανώτερη πιστοποίηση χωρίς να πληρώσει για ισχύ που δεν θα χρησιμοποιήσει.",
+      "price": 208.96,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1032",
+      "category": "PSU",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 750W 80+ Gold ATX",
+      "web_description": "Ανάμεσα στις επιλογές 80+ Gold της Voltera, το ATX 750W καλύπτει build γραφείου με δεύτερο δίσκο ή κάρτα επέκτασης, χωρίς να αγγίζει τα όριά του.",
+      "price": 141.12,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "PSU-1033",
+      "category": "PSU",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Τροφοδοτικό 850W 80+ Bronze SFX",
+      "web_description": "Η Elektra βάζει το SFX 850W της με 80+ Bronze σε ένα build με ισχυρή κάρτα γραφικών, εκεί που ο χώρος μέσα στο κουτί είναι το πραγματικό όριο.",
+      "price": 155.51,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1000",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1500VA / 900W αυτονομία 8 λεπτά",
+      "web_description": "Μονάδα αδιάλειπτης παροχής Voltera 1500VA / 900W, τοπολογίας line-interactive με αυτονομία 8 λεπτά, αρκετή για να κλείσει ομαλά ένας server ή ένα ταμείο.",
+      "price": 123.39,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1001",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1500VA / 900W αυτονομία 8 λεπτά",
+      "web_description": "Το line-interactive UPS της Voltera δίνει 1500VA / 900W και με αυτονομία 8 λεπτά καλύπτει τις σύντομες διακοπές που ταλαιπωρούν τα σημεία πώλησης.",
+      "price": 1038.58,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1002",
+      "category": "UPS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1500VA / 900W αυτονομία 8 λεπτά",
+      "web_description": "Η Kyma δίνει 1500VA / 900W σε τοπολογία line-interactive, με αυτονομία 8 λεπτά αρκετή ώστε ένα μικρό δίκτυο γραφείου να κλείσει τις συσκευές του με τη σειρά.",
+      "price": 567.61,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1003",
+      "category": "UPS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 2200VA / 1320W αυτονομία 12 λεπτά",
+      "web_description": "Η Delta Line βάζει το 2200VA / 1320W της σε τοπολογία online, όπου η μηδενική καθυστέρηση μεταγωγής προστατεύει εξοπλισμό που δεν αντέχει ούτε στιγμιαία πτώση τάσης, με αυτονομία 12 λεπτά.",
+      "price": 1017.49,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1004",
+      "category": "UPS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 3000VA / 1800W αυτονομία 12 λεπτά",
+      "web_description": "Στα 3000VA / 1800W, η Elektra κρατά τοπολογία line-interactive για φορτίο βιομηχανικού τύπου, με αυτονομία 12 λεπτά αρκετή για ελεγχόμενο σβήσιμο εξοπλισμού.",
+      "price": 953.67,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1005",
+      "category": "UPS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 1500VA / 900W αυτονομία 20 λεπτά",
+      "web_description": "Η Elektra προσφέρει 1500VA / 900W online, ώστε server ευαίσθητος σε διακυμάνσεις τάσης να μένει σταθερός με αυτονομία 20 λεπτά πριν χρειαστεί χειροκίνητη παρέμβαση.",
+      "price": 820.82,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1006",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 1500VA / 900W αυτονομία 35 λεπτά",
+      "web_description": "Με αυτονομία 35 λεπτά, το online UPS της Voltera στα 1500VA / 900W δίνει αρκετό χρόνο να ξεκινήσει γεννήτρια πριν αδειάσει η μπαταρία.",
+      "price": 306.05,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1007",
+      "category": "UPS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 3000VA / 1800W αυτονομία 35 λεπτά",
+      "web_description": "Η Delta Line συνδυάζει 3000VA / 1800W με αυτονομία 35 λεπτά σε τοπολογία line-interactive, για πίνακα εξοπλισμού που δεν μπορεί να μείνει χωρίς ρεύμα ούτε για λίγο.",
+      "price": 1223.39,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1008",
+      "category": "UPS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1500VA / 900W αυτονομία 35 λεπτά",
+      "web_description": "Στα 1500VA / 900W, η Kyma δίνει αυτονομία 35 λεπτά σε line-interactive τοπολογία, αρκετή ώστε ένα ταμείο να ολοκληρώσει τις συναλλαγές του και να κλείσει κανονικά.",
+      "price": 799.5,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1009",
+      "category": "UPS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 3000VA / 1800W αυτονομία 12 λεπτά",
+      "web_description": "Στα 3000VA / 1800W line-interactive, η Elektra κρατά αυτονομία 12 λεπτά — όσο χρειάζεται ένα σύστημα ελέγχου να αποθηκεύσει την κατάστασή του πριν σβήσει με ασφάλεια.",
+      "price": 587.49,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1010",
+      "category": "UPS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1000VA / 600W αυτονομία 20 λεπτά",
+      "web_description": "Η Delta Line δίνει 1000VA / 600W σε line-interactive τοπολογία, με αυτονομία 20 λεπτά για desktop γραφείου που θέλει χρόνο να αποθηκεύσει εργασία σε διακοπή.",
+      "price": 928.75,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1011",
+      "category": "UPS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 650VA / 390W αυτονομία 12 λεπτά",
+      "web_description": "Στα 650VA / 390W, η Kyma καλύπτει line-interactive έναν απλό υπολογιστή γραφείου, με αυτονομία 12 λεπτά αρκετή για ασφαλές κλείσιμο.",
+      "price": 770.54,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1012",
+      "category": "UPS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 2200VA / 1320W αυτονομία 35 λεπτά",
+      "web_description": "Η Nordion δίνει online τοπολογία στα 2200VA / 1320W, με αυτονομία 35 λεπτά που καλύπτει ακόμα και παρατεταμένη διακοπή σε server μικρής επιχείρησης.",
+      "price": 1340.16,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1013",
+      "category": "UPS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1500VA / 900W αυτονομία 12 λεπτά",
+      "web_description": "Στα 1500VA / 900W line-interactive, η Kyma κρατά αυτονομία 12 λεπτά, όσο για να προλάβει ένας τεχνικός να επέμβει πριν αδειάσει η μπαταρία.",
+      "price": 712.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1014",
+      "category": "UPS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 1000VA / 600W αυτονομία 35 λεπτά",
+      "web_description": "Η Kyma βάζει online τοπολογία στο 1000VA / 600W της, με αυτονομία 35 λεπτά για εξοπλισμό ασφαλείας που δεν επιτρέπεται να μείνει χωρίς ρεύμα.",
+      "price": 1253.05,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1015",
+      "category": "UPS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1000VA / 600W αυτονομία 12 λεπτά",
+      "web_description": "Το 1000VA / 600W της Kyma σε line-interactive τοπολογία δίνει αυτονομία 12 λεπτά, αρκετή για desktop γραφείου να κλείσει προγράμματα με τη σειρά.",
+      "price": 827.97,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1016",
+      "category": "UPS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1000VA / 600W αυτονομία 12 λεπτά",
+      "web_description": "Στα 1000VA / 600W, η Kyma κρατά την τοπολογία line-interactive και αυτονομία 12 λεπτά, αρκετή ώστε ένα ταμείο καταστήματος να ολοκληρώσει τη συναλλαγή σε εξέλιξη.",
+      "price": 705.19,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1017",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 650VA / 390W αυτονομία 12 λεπτά",
+      "web_description": "Η Voltera δίνει 650VA / 390W σε line-interactive τοπολογία, με αυτονομία 12 λεπτά — αρκετή για router και modem να μείνουν online σε σύντομη διακοπή.",
+      "price": 448.93,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1018",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 650VA / 390W αυτονομία 12 λεπτά",
+      "web_description": "Το online 650VA / 390W της Voltera προστατεύει εξοπλισμό ευαίσθητο σε διακυμάνσεις τάσης, με αυτονομία 12 λεπτά αρκετή για ασφαλές κλείσιμο.",
+      "price": 773.69,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1019",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 650VA / 390W αυτονομία 35 λεπτά",
+      "web_description": "Με αυτονομία 35 λεπτά, το 650VA / 390W της Voltera σε line-interactive τοπολογία δίνει στον μικρό εξοπλισμό γραφείου πολύ περιθώριο πριν αδειάσει η μπαταρία.",
+      "price": 448.42,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1020",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 3000VA / 1800W αυτονομία 35 λεπτά",
+      "web_description": "Η Voltera φτάνει τα 3000VA / 1800W σε line-interactive με αυτονομία 35 λεπτά, αρκετή για να τερματίσει με τάξη ένα rack εξοπλισμού πολλαπλών συσκευών.",
+      "price": 515.0,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": []
+    },
+    {
+      "sku": "UPS-1021",
+      "category": "UPS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 650VA / 390W αυτονομία 12 λεπτά",
+      "web_description": "Η Nordion καλύπτει με 650VA / 390W σε line-interactive τοπολογία μια μεμονωμένη θέση εργασίας, με αυτονομία 12 λεπτά για ασφαλή αποθήκευση εργασίας.",
+      "price": 103.51,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1022",
+      "category": "UPS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 2200VA / 1320W αυτονομία 8 λεπτά",
+      "web_description": "Στα 2200VA / 1320W line-interactive, η Elektra κρατά αυτονομία 8 λεπτά — όσο χρειάζεται ένα rack να τερματίσει τις διεργασίες του με ασφάλεια.",
+      "price": 1224.93,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1023",
+      "category": "UPS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1500VA / 900W αυτονομία 8 λεπτά",
+      "web_description": "Η Nordion δίνει 1500VA / 900W σε line-interactive τοπολογία, με αυτονομία 8 λεπτά — τον ελάχιστο χρόνο για να αποθηκευτεί μια εργασία σε εξέλιξη.",
+      "price": 817.15,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1024",
+      "category": "UPS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "UPS line-interactive 1500VA / 900W αυτονομία 8 λεπτά",
+      "web_description": "Η Delta Line κρατά το 1500VA / 900W της σε line-interactive με αυτονομία 8 λεπτά, αρκετή για διακοπές που συνήθως επανέρχονται μέσα σε λίγα λεπτά.",
+      "price": 611.46,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1025",
+      "category": "UPS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 2200VA / 1320W αυτονομία 8 λεπτά",
+      "web_description": "Στα 2200VA / 1320W online, η Nordion δίνει αυτονομία 8 λεπτά, τον χρόνο που χρειάζεται ένα σύστημα ελέγχου πρόσβασης να μείνει ενεργό σε στιγμιαία διακοπή.",
+      "price": 947.23,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1026",
+      "category": "UPS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 2200VA / 1320W αυτονομία 20 λεπτά",
+      "web_description": "Η Elektra φτάνει τα 2200VA / 1320W online με αυτονομία 20 λεπτά, αρκετή για server δικτύου να ολοκληρώσει ελεγχόμενο τερματισμό σε παρατεταμένη διακοπή.",
+      "price": 481.11,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "UPS-1027",
+      "category": "UPS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "UPS online 3000VA / 1800W αυτονομία 20 λεπτά",
+      "web_description": "Στο ανώτερο άκρο ισχύος, το online 3000VA / 1800W της Voltera με αυτονομία 20 λεπτά καλύπτει rack πολλαπλών server σε επιχείρηση που δεν αντέχει διακοπή.",
+      "price": 650.9,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1000",
+      "category": "NETWORK",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 100Mbps managed",
+      "web_description": "Διαχειριζόμενο switch Kyma 8 θυρών 100Mbps, managed από web interface, για μικρά δίκτυα γραφείου όπου χρειάζεται VLAN χωρίς μεγάλο rack.",
+      "price": 668.18,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1001",
+      "category": "NETWORK",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 2500Mbps unmanaged",
+      "web_description": "Switch Elektra 24 θυρών 2500Mbps, unmanaged και έτοιμο να δουλέψει χωρίς ρυθμίσεις, για συνδέσεις υψηλού throughput σε μικρά studio και εργαστήρια.",
+      "price": 102.83,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1002",
+      "category": "NETWORK",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 2500Mbps managed",
+      "web_description": "Το switch Nordion 24 θυρών 2500Mbps, managed, δίνει VLAN και monitoring σε δίκτυο γραφείου με πολλούς σταθμούς εργασίας που χρειάζονται multi-gig ταχύτητα.",
+      "price": 675.32,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1003",
+      "category": "NETWORK",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 1000Mbps unmanaged",
+      "web_description": "Η Delta Line δίνει switch 24 θυρών 1000Mbps unmanaged, έτοιμο να συνδέσει αμέσως έναν όροφο γραφείων χωρίς ρύθμιση VLAN.",
+      "price": 868.77,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1004",
+      "category": "NETWORK",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Switch 48 θυρών 2500Mbps PoE unmanaged",
+      "web_description": "Το switch Nordion 48 θυρών 2500Mbps με PoE σε κάθε θύρα είναι unmanaged, για κτίριο με πολλές κάμερες που απλά χρειάζονται τροφοδοσία και σύνδεση.",
+      "price": 489.72,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1005",
+      "category": "NETWORK",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 2500Mbps managed",
+      "web_description": "Στα 24 θυρών 2500Mbps, το managed switch της Delta Line χωρίζει το δίκτυο σε VLAN για τμήματα που δεν πρέπει να βλέπουν την κίνηση του άλλου.",
+      "price": 571.32,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1006",
+      "category": "NETWORK",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Switch 16 θυρών 2500Mbps managed",
+      "web_description": "Το switch Kyma 16 θυρών 2500Mbps, managed, ταιριάζει σε μικρό server room όπου χρειάζεται έλεγχος κίνησης χωρίς τον όγκο των 24 θυρών.",
+      "price": 47.25,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1007",
+      "category": "NETWORK",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 2500Mbps PoE unmanaged",
+      "web_description": "Το switch της Kyma, 8 θυρών στα 2500Mbps με PoE, μένει unmanaged — έτοιμο για σημείο πρόσβασης και κάμερες σε μικρό γραφείο χωρίς ρυθμίσεις.",
+      "price": 464.16,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1008",
+      "category": "NETWORK",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Switch 16 θυρών 2500Mbps managed",
+      "web_description": "Η Voltera προσφέρει switch 16 θυρών 2500Mbps managed, για δίκτυο μεσαίου μεγέθους που θέλει monitoring και έλεγχο κίνησης χωρίς την πολυπλοκότητα τροφοδοσίας στις θύρες του.",
+      "price": 413.74,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1009",
+      "category": "NETWORK",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Switch 16 θυρών 1000Mbps managed",
+      "web_description": "Το switch Nordion 16 θυρών 1000Mbps managed καλύπτει τυπικό δίκτυο γραφείου, με δυνατότητα VLAN χωρίς την ανάγκη για multi-gig ταχύτητα.",
+      "price": 821.11,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1010",
+      "category": "NETWORK",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Switch 48 θυρών 2500Mbps unmanaged",
+      "web_description": "Το switch Elektra 48 θυρών στα 2500Mbps μένει unmanaged — απλή σύνδεση πολλών συσκευών σε ένα μεγάλο rack χωρίς παραμετροποίηση.",
+      "price": 470.69,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1011",
+      "category": "NETWORK",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 2500Mbps PoE managed",
+      "web_description": "Η Delta Line δίνει switch 8 θυρών 2500Mbps, managed και με PoE, για μικρό δίκτυο καμερών που χρειάζεται και έλεγχο κίνησης.",
+      "price": 501.41,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1012",
+      "category": "NETWORK",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Switch 16 θυρών 2500Mbps PoE managed",
+      "web_description": "Το switch Elektra 16 θυρών 2500Mbps, managed και με PoE, τροφοδοτεί access points σε χώρο όπου θέλουμε να βλέπουμε την κατάσταση κάθε θύρας.",
+      "price": 643.76,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1013",
+      "category": "NETWORK",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 1000Mbps PoE unmanaged",
+      "web_description": "Στα 24 θυρών 1000Mbps με PoE, το switch της Nordion μένει unmanaged, για εγκατάσταση καμερών που απλά χρειάζονται τροφοδοσία χωρίς παραμετροποίηση.",
+      "price": 571.42,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1014",
+      "category": "NETWORK",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 100Mbps managed",
+      "web_description": "Το switch Nordion 24 θυρών 100Mbps, managed, καλύπτει παλαιότερη εγκατάσταση όπου η ταχύτητα δεν είναι το ζητούμενο αλλά ο έλεγχος VLAN ναι.",
+      "price": 92.05,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1015",
+      "category": "NETWORK",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 2500Mbps managed",
+      "web_description": "Το switch Elektra 24 θυρών 2500Mbps, managed, δίνει multi-gig ταχύτητα σε κάθε θέση εργασίας ενός δικτύου που ήδη χρησιμοποιεί VLAN.",
+      "price": 531.66,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1016",
+      "category": "NETWORK",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Switch 48 θυρών 2500Mbps managed",
+      "web_description": "Το switch Kyma 48 θυρών στα 2500Mbps μένει managed, για data center που χρειάζεται έλεγχο πάνω σε μεγάλο αριθμό συνδέσεων.",
+      "price": 862.81,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1017",
+      "category": "NETWORK",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 2500Mbps managed",
+      "web_description": "Το switch Delta Line 8 θυρών 2500Mbps, managed, ταιριάζει σε μικρό server rack όπου θέλουμε monitoring χωρίς τον όγκο μεγαλύτερου switch.",
+      "price": 421.49,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1018",
+      "category": "NETWORK",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 1000Mbps unmanaged",
+      "web_description": "Στα 24 θυρών 1000Mbps unmanaged, το switch της Delta Line είναι έτοιμο να μπει σε ένα κατάστημα λιανικής χωρίς προσωπικό IT να το ρυθμίσει.",
+      "price": 549.89,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1019",
+      "category": "NETWORK",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Switch 16 θυρών 2500Mbps unmanaged",
+      "web_description": "Το switch Nordion 16 θυρών 2500Mbps μένει unmanaged, για μικρό γραφείο που θέλει multi-gig ταχύτητα χωρίς πολυπλοκότητα ρυθμίσεων.",
+      "price": 804.88,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1020",
+      "category": "NETWORK",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Switch 48 θυρών 100Mbps PoE managed",
+      "web_description": "Το switch Elektra 48 θυρών στα 100Mbps με PoE είναι managed, για κτίριο με πολλά τηλέφωνα IP που χρειάζονται και monitoring.",
+      "price": 373.65,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1021",
+      "category": "NETWORK",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 100Mbps PoE unmanaged",
+      "web_description": "Το switch Kyma 8 θυρών 100Mbps με PoE μένει unmanaged, αρκετό για λίγες κάμερες ή τηλέφωνα σε μικρό χώρο χωρίς απαίτηση ταχύτητας.",
+      "price": 356.2,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1022",
+      "category": "NETWORK",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 1000Mbps PoE managed",
+      "web_description": "Η Voltera δίνει switch 24 θυρών 1000Mbps, managed και με PoE, για όροφο γραφείων με access points και τηλέφωνα IP που θέλουμε να παρακολουθούμε.",
+      "price": 851.65,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1023",
+      "category": "NETWORK",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 100Mbps PoE managed",
+      "web_description": "Το switch Voltera 8 θυρών στα 100Mbps με PoE είναι managed, για μικρό τμήμα δικτύου όπου θέλουμε έλεγχο ακόμα και σε λίγες συσκευές.",
+      "price": 725.8,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1024",
+      "category": "NETWORK",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 100Mbps managed",
+      "web_description": "Το switch Voltera 24 θυρών 100Mbps, managed, ταιριάζει σε βιομηχανικό εξοπλισμό παλαιότερης γενιάς που χρειάζεται μόνο VLAN, όχι ταχύτητα.",
+      "price": 455.06,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1025",
+      "category": "NETWORK",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Switch 24 θυρών 1000Mbps PoE unmanaged",
+      "web_description": "Στα 24 θυρών 1000Mbps με PoE, το switch της Kyma μένει unmanaged, για γρήγορη εγκατάσταση access points χωρίς κανέναν να ρυθμίσει VLAN.",
+      "price": 52.3,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1026",
+      "category": "NETWORK",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 2500Mbps PoE managed",
+      "web_description": "Στις 8 θυρών 2500Mbps, το switch της Voltera συνδυάζει PoE και managed λειτουργία για ένα μικρό στούντιο όπου οι κάμερες χρειάζονται σταθερή παρακολούθηση κίνησης.",
+      "price": 257.09,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1027",
+      "category": "NETWORK",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 100Mbps unmanaged",
+      "web_description": "Το switch Voltera 8 θυρών στα 100Mbps μένει unmanaged, η πιο απλή λύση για λίγες συσκευές γραφείου χωρίς απαίτηση ταχύτητας ή επιπλέον ρυθμίσεις.",
+      "price": 192.05,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1028",
+      "category": "NETWORK",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Switch 16 θυρών 2500Mbps PoE managed",
+      "web_description": "Το switch Delta Line 16 θυρών 2500Mbps, managed και με PoE, τροφοδοτεί κάμερες ασφαλείας σε χώρο όπου θέλουμε καταγραφή της κατάστασης κάθε θύρας.",
+      "price": 290.1,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "SWT-1029",
+      "category": "NETWORK",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Switch 8 θυρών 1000Mbps PoE unmanaged",
+      "web_description": "Το switch Voltera 8 θυρών στα 1000Mbps με PoE μένει unmanaged, για γρήγορη σύνδεση λίγων καμερών ή access points χωρίς ρυθμίσεις.",
+      "price": 317.21,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "CON-1000",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 32A IP44",
+      "web_description": "Ρευματολήπτης IEC C13 32A της Elektra με προστασία IP44, για συνδέσεις εξοπλισμού μέσα σε rack και σε πίνακες που μαζεύουν σκόνη.",
+      "price": 53.88,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "CON-1001",
+      "category": "CONNECTORS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 63A IP67",
+      "web_description": "Για φορτία που τραβούν πολύ ρεύμα, ο IEC C19 63A της Voltera με στεγανότητα IP67 συνδέει μηχανήματα σε υπαίθριους πίνακες και βιομηχανικούς χώρους.",
+      "price": 11.59,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "CON-1002",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης Schuko 63A IP67",
+      "web_description": "Ο Schuko 63A της Elektra με προστασία IP67 σηκώνει φορτίο πολύ πάνω από το σύνηθες οικιακό, για γεννήτρια ή compressor σε υπαίθριο εργοτάξιο.",
+      "price": 4.87,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "CON-1003",
+      "category": "CONNECTORS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 16A IP67",
+      "web_description": "Ο IEC C13 16A της Nordion, με στεγανότητα IP67, συνδέει τροφοδοτικό εξοπλισμού σε rack που στέκεται εκτεθειμένο σε υγρασία.",
+      "price": 64.16,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": []
+    },
+    {
+      "sku": "CON-1004",
+      "category": "CONNECTORS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 63A IP67",
+      "web_description": "Στα 63A, ο IEC C19 της Kyma με IP67 τροφοδοτεί PDU rack υψηλής κατανάλωσης σε εγκατάσταση όπου ένα τυχαίο πιτσίλισμα δεν πρέπει να κόψει το ρεύμα.",
+      "price": 61.6,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "CON-1005",
+      "category": "CONNECTORS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης Schuko 16A IP67",
+      "web_description": "Ο Schuko 16A της Delta Line, στεγανός κατά IP67, ταιριάζει σε εξωτερική πρίζα κήπου για εργαλεία χαμηλής κατανάλωσης που μένουν έξω όλο τον χρόνο.",
+      "price": 7.47,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "CON-1006",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης CEE 32A IP44",
+      "web_description": "Ο CEE 32A της Elektra με προστασία IP44 τροφοδοτεί μηχάνημα εργοταξίου κάτω από στέγαστρο, εκεί που η σκόνη είναι μόνιμη αλλά η βροχή όχι.",
+      "price": 46.61,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "CON-1007",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης Schuko 32A IP44",
+      "web_description": "Στα 32A, ο Schuko της Elektra με IP44 δίνει παροχή σε τροχήλατο συνεργείο που μετακινείται μέσα σε ημιυπαίθριο χώρο συνεργείου συντήρησης.",
+      "price": 40.98,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "CON-1008",
+      "category": "CONNECTORS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 16A IP67",
+      "web_description": "Ο IEC C19 16A της Nordion, στεγανός κατά IP67, συνδέει UPS με server σε χώρο όπου περνούν σωλήνες νερού από πάνω και μια διαρροή είναι πάντα πιθανή.",
+      "price": 19.75,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "CON-1009",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 32A IP44",
+      "web_description": "Στα 32A, ο IEC C13 της Elektra με IP44 τροφοδοτεί εξοπλισμό μέσα σε ημιστεγασμένο πάγκο εργασίας ενός τεχνικού τμήματος συντήρησης.",
+      "price": 9.59,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    },
+    {
+      "sku": "CON-1010",
+      "category": "CONNECTORS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 32A IP67",
+      "web_description": "Ο IEC C13 32A της Voltera, με στεγανότητα IP67, ταιριάζει σε PDU εκτεθειμένο σε υπαίθριο container εκθεσιακού χώρου όπου δεν υπάρχει μόνιμη στέγη.",
+      "price": 12.31,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 40
+        }
+      ]
+    },
+    {
+      "sku": "CON-1011",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 16A IP67",
+      "web_description": "Στα 16A, ο IEC C13 της Elektra με IP67 συνδέει μικρή συσκευή δικτύου τοποθετημένη σε σημείο που δέχεται τακτικά υγρασία από συμπύκνωση.",
+      "price": 67.11,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "CON-1012",
+      "category": "CONNECTORS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 32A IP67",
+      "web_description": "Ο IEC C19 32A της Kyma, στεγανός κατά IP67, τροφοδοτεί φωτιστικό πύργο εργοταξίου που μένει έξω σε κάθε καιρό, χειμώνα καλοκαίρι.",
+      "price": 22.33,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "CON-1013",
+      "category": "CONNECTORS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 63A IP44",
+      "web_description": "Στα 63A, ο IEC C13 της Voltera με IP44 σηκώνει φορτίο εξοπλισμού μέσα σε στεγασμένο βιομηχανικό χώρο με σκόνη στον αέρα και συνεχή λειτουργία.",
+      "price": 25.41,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "CON-1014",
+      "category": "CONNECTORS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης Schuko 32A IP67",
+      "web_description": "Ο Schuko 32A της Nordion, με προστασία IP67, δίνει παροχή σε αντλία πισίνας τοποθετημένη σε σημείο που βρέχεται τακτικά.",
+      "price": 52.47,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "CON-1015",
+      "category": "CONNECTORS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 32A IP44",
+      "web_description": "Στα 32A, ο IEC C19 της Kyma με IP44 τροφοδοτεί ψυκτικό θάλαμο καταστήματος μέσα σε στεγασμένο χώρο όπου η σκόνη είναι το μόνο πρόβλημα.",
+      "price": 2.93,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "CON-1016",
+      "category": "CONNECTORS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 32A IP67",
+      "web_description": "Ο IEC C19 32A της Voltera, στεγανός κατά IP67, ταιριάζει σε πίνακα διανομής εργοταξίου εκτεθειμένο στη βροχή καθ' όλη τη διάρκεια του έργου.",
+      "price": 54.28,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "CON-1017",
+      "category": "CONNECTORS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 63A IP67",
+      "web_description": "Ο IEC C19 της Voltera φτάνει τα 63A με πιστοποίηση IP67, αρκετός για να τροφοδοτήσει σκηνικό εξοπλισμό σε υπαίθρια εκδήλωση όπου ένα ξαφνικό μπόσικο δεν πρέπει να κόψει ρεύμα.",
+      "price": 18.24,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "CON-1018",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης Schuko 32A IP44",
+      "web_description": "Η Elektra δίνει τον Schuko της στα 32A με IP44, για καλώδιο επέκτασης βιομηχανικού τύπου μέσα σε αποθήκη με σκόνη και συνεχή διακίνηση εμπορευμάτων.",
+      "price": 18.65,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "CON-1019",
+      "category": "CONNECTORS",
+      "brand": "Voltera",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης CEE 16A IP44",
+      "web_description": "Ο CEE 16A της Voltera με προστασία IP44 ταιριάζει σε φορητό εργαλείο μικρής κατανάλωσης πάνω σε τροχήλατο πάγκο εργοταξίου.",
+      "price": 17.33,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "CON-1020",
+      "category": "CONNECTORS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 32A IP44",
+      "web_description": "Στα 32A, ο IEC C19 της Nordion με IP44 τροφοδοτεί βιομηχανικό μηχάνημα σταθερής εγκατάστασης μέσα σε χώρο με σκόνη στον αέρα.",
+      "price": 4.61,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "CON-1021",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 16A IP67",
+      "web_description": "Ο IEC C19 16A της Elektra, στεγανός κατά IP67, συνδέει εξοπλισμό δικτύου τοποθετημένο κοντά σε εξωτερική πόρτα που μένει συχνά ανοιχτή.",
+      "price": 9.35,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "CON-1022",
+      "category": "CONNECTORS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης CEE 16A IP44",
+      "web_description": "Στα 16A, ο CEE της Delta Line με IP44 δίνει παροχή σε φορητό εργαλείο μέσα σε ημιστεγασμένο εργοτάξιο μικρής κλίμακας και σύντομης διάρκειας.",
+      "price": 6.39,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-03",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 12
+        }
+      ]
+    },
+    {
+      "sku": "CON-1023",
+      "category": "CONNECTORS",
+      "brand": "Elektra",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης Schuko 16A IP44",
+      "web_description": "Ο Schuko 16A της Elektra με προστασία IP44 αρκεί για εργαλεία οικιακού τύπου πάνω σε μπαλκόνι με μερική σκέπη από τη βροχή.",
+      "price": 13.55,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-02",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "CON-1024",
+      "category": "CONNECTORS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 32A IP67",
+      "web_description": "Ο IEC C19 32A της Delta Line, στεγανός κατά IP67, τροφοδοτεί compressor εργοταξίου που μένει έξω ό,τι καιρό κι αν κάνει.",
+      "price": 61.59,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 0
+        }
+      ]
+    },
+    {
+      "sku": "CON-1025",
+      "category": "CONNECTORS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 32A IP44",
+      "web_description": "Στα 32A, ο IEC C13 της Nordion με IP44 συνδέει εξοπλισμό μέσα σε βιοτεχνικό χώρο όπου η σκόνη είναι καθημερινό ζήτημα, όχι όμως η υγρασία.",
+      "price": 34.28,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-01",
+      "stock": [
+        {
+          "warehouse": "ATH-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "CON-1026",
+      "category": "CONNECTORS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 63A IP67",
+      "web_description": "Ο IEC C19 63A της Nordion, με στεγανότητα IP67, τροφοδοτεί γεννήτρια εφεδρείας που μένει μόνιμα εγκατεστημένη σε εξωτερικό χώρο.",
+      "price": 27.17,
+      "currency": "EUR",
+      "price_updated_at": "2026-08-21",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "PAT-01",
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "sku": "CON-1027",
+      "category": "CONNECTORS",
+      "brand": "Delta Line",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης Schuko 32A IP44",
+      "web_description": "Στα 32A, ο Schuko της Delta Line με IP44 δίνει παροχή σε εργαλείο κήπου πάνω σε βεράντα με στέγαστρο απέναντι στη βροχή.",
+      "price": 13.48,
+      "currency": "EUR",
+      "price_updated_at": "2026-09-01",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 150
+        }
+      ]
+    },
+    {
+      "sku": "CON-1028",
+      "category": "CONNECTORS",
+      "brand": "Kyma",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C19 32A IP67",
+      "web_description": "Η Kyma δίνει τον IEC C19 της στα 32A με IP67, για PDU rack που στέκεται σε υπαίθριο container δικτύου μιας απομακρυσμένης βάσης κεραίας.",
+      "price": 65.3,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-03",
+      "stock": [
+        {
+          "warehouse": "ATH-02",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "sku": "CON-1029",
+      "category": "CONNECTORS",
+      "brand": "Nordion",
+      "unit": "ΤΕΜ",
+      "description": "Ρευματολήπτης IEC C13 63A IP44",
+      "web_description": "Ο IEC C13 της Nordion φτάνει τα 63A με πιστοποίηση IP44, για πάγκο δοκιμών σε εργαστήριο όπου η σκόνη είναι καθημερινή αλλά η βροχή δεν φτάνει ποτέ.",
+      "price": 18.52,
+      "currency": "EUR",
+      "price_updated_at": "2026-07-14",
+      "supplier": "SUP-04",
+      "stock": [
+        {
+          "warehouse": "THE-01",
+          "quantity": 25
+        }
+      ]
+    }
+  ]
+}

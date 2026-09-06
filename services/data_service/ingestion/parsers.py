@@ -10,9 +10,14 @@ order — is a business rule and belongs with the canonical record, not here.
 """
 
 import re
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from services.data_service.categories import Category, specs_for
+
+DATE_FORMATS = ("%d/%m/%Y", "%d-%m-%Y", "%d.%m.%Y", "%Y/%m/%d", "%m/%d/%Y")
+# Excel counts days from here, including the 1900 leap year that never happened.
+EXCEL_EPOCH = date(1899, 12, 30)
+EXCEL_SERIAL = re.compile(r"^\d{5}$")
 
 SKU_PATTERN = re.compile(r"^([A-Z]{3})(\d{4})$")
 SKU_NOISE = re.compile(r"[^A-Za-z0-9]")
@@ -91,13 +96,32 @@ def parse_quantity(raw: str) -> int | None:
 
 
 def parse_date(raw: str) -> date | None:
+    """A date however the file wrote it, spreadsheet serial numbers included.
+
+    A column somebody opened in Excel comes back as 46266 rather than 2026-09-01, because
+    the cell was a date and the format was General. That is not a corrupt file, it is a
+    spreadsheet, and it is the most common thing to arrive in one.
+    """
     if not raw:
         return None
 
+    text = raw.strip()
+
     try:
-        return date.fromisoformat(raw.strip())
+        return date.fromisoformat(text)
     except ValueError:
-        return None
+        pass
+
+    for pattern in DATE_FORMATS:
+        try:
+            return datetime.strptime(text, pattern).date()
+        except ValueError:
+            continue
+
+    if EXCEL_SERIAL.match(text):
+        return EXCEL_EPOCH + timedelta(days=int(text))
+
+    return None
 
 
 def parse_length_m(text: str) -> int | None:
@@ -162,9 +186,11 @@ def extract_specs(category: Category, description: str) -> dict:
         elif key == "watt":
             value = parse_watt(description)
         elif key == "poe":
-            value = "PoE" in description
+            value = "poe" in description.lower()
         elif key == "managed":
-            value = "unmanaged" not in description and "managed" in description
+            # "managed" sits inside "unmanaged", so the negative has to be ruled out first.
+            lowered = description.lower()
+            value = "unmanaged" not in lowered and "managed" in lowered
         else:
             pattern, convert = _SIMPLE_SPECS[key]
             match = pattern.search(description)

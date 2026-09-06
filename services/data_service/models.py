@@ -6,8 +6,11 @@ prices, and the suppliers behind them.
 """
 
 from sqlalchemy import (
+    JSON,
+    Boolean,
     Column,
     Date,
+    DateTime,
     Float,
     ForeignKey,
     Integer,
@@ -19,7 +22,12 @@ from services.data_service.database import TableBase
 
 
 class Product(TableBase):
-    """One row per SKU. The description is the ERP's own text, kept as it arrived."""
+    """One row per SKU, with both texts the ERP holds for it.
+
+    `description` is the internal line — terse, every specification written the way the
+    systems read it. `web_description` is what the shop shows a customer, and it is the
+    one worth embedding.
+    """
 
     __tablename__ = "products"
 
@@ -27,6 +35,7 @@ class Product(TableBase):
     category = Column(String, index=True)
     brand = Column(String)
     description = Column(String)
+    web_description = Column(String, nullable=True)
     unit = Column(String, default="ΤΕΜ")
     supplier_code = Column(String, ForeignKey("suppliers.code"), index=True)
 
@@ -78,3 +87,39 @@ class Supplier(TableBase):
     name = Column(String)
     lead_time_days = Column(Integer)
     reliability_score = Column(Float)
+
+
+class GenerationRun(TableBase):
+    """One row per generation request, so the catalogue can say where its rows came from."""
+
+    __tablename__ = "generation_runs"
+
+    request_id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, index=True)
+    seed = Column(Integer)
+    requested = Column(Integer)
+    products_added = Column(Integer)
+    specs_added = Column(Integer)
+    stock_rows_added = Column(Integer)
+    rejected = Column(Integer)
+    rounds = Column(Integer, default=1)
+    descriptions_rejected = Column(Integer, default=0)
+    parameters = Column(JSON)
+    skus = Column(JSON)
+
+
+class LlmCall(TableBase):
+    """One row per call to a model, so a bill can be traced back to what asked for it."""
+
+    __tablename__ = "llm_calls"
+
+    id = Column(Integer, primary_key=True, index=True)
+    called_at = Column(DateTime, index=True)
+    service = Column(String, index=True)
+    purpose = Column(String, index=True)
+    model = Column(String, index=True)
+    prompt_tokens = Column(Integer, default=0)
+    completion_tokens = Column(Integer, default=0)
+    duration_ms = Column(Integer, default=0)
+    ok = Column(Boolean, default=True)
+    detail = Column(String, nullable=True)
