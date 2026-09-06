@@ -49,8 +49,9 @@ def corpus() -> tuple[list[str], list[str]]:
 
 
 def recall(found: list[str], expected: list[str], at: int) -> float:
+    """The share of the products that should have come back which did, inside the top `at`."""
     hit = set(found[:at]) & set(expected)
-    return len(hit) / min(at, len(expected))
+    return len(hit) / len(expected)
 
 
 def run() -> None:
