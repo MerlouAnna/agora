@@ -115,6 +115,7 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
 
 
 MAX_IMPORT_ROWS = 5000
+MAX_IMPORT_BYTES = 5_000_000
 
 IMPORT_COLUMNS = [
     "item_code",

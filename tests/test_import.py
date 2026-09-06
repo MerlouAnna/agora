@@ -164,7 +164,7 @@ def test_an_unknown_supplier_costs_the_supplier_not_the_product():
     assert found[0]["supplier_code"] is None
 
 
-def test_a_file_with_too_many_lines_is_refused_before_it_is_read(monkeypatch):
+def test_a_file_with_too_many_lines_is_refused(monkeypatch):
     monkeypatch.setattr(service, "MAX_IMPORT_ROWS", 2)
     report = upload(
         {"item_code": "PWR-1506"}, {"item_code": "PWR-1507"}, {"item_code": "PWR-1508"}

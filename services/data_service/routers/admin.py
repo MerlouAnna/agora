@@ -265,9 +265,15 @@ def import_products(db: db_dependency, file: UploadFile = File(...)):
 
     The import is recorded as a run, so `request_id` can be handed to
     `DELETE /admin/runs/{request_id}` to take the whole file back out again. One file
-    carries at most 5000 lines; a larger catalogue goes in as several.
+    carries at most 5000 lines and 5 MB; a larger catalogue goes in as several.
     """
-    raw = file.file.read()
+    raw = file.file.read(service.MAX_IMPORT_BYTES + 1)
+
+    if len(raw) > service.MAX_IMPORT_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"the file is larger than {service.MAX_IMPORT_BYTES:,} bytes",
+        )
 
     try:
         rows = loader.read_upload(raw)
