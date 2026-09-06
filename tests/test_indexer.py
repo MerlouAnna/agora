@@ -1,7 +1,7 @@
 import pytest
 
 from services.offer_service.clients import catalog
-from services.offer_service.rag import embeddings, indexer, store
+from services.offer_service.rag import embeddings, indexer, store, vectors
 
 CATALOGUE = [
     {
@@ -31,9 +31,10 @@ CATALOGUE = [
 
 @pytest.fixture(autouse=True)
 def offline(tmp_path, monkeypatch):
-    """No catalogue service, no OpenAI, no real store — only the wiring between them."""
+    """No catalogue service, no OpenAI, no real store or vector file — only the wiring."""
     monkeypatch.setattr(store, "CHROMA_PATH", tmp_path / "chroma")
     monkeypatch.setattr(store, "_client", None)
+    monkeypatch.setattr(vectors, "CACHE_FILE", tmp_path / "card_vectors.npz")
     monkeypatch.setattr(catalog, "fetch_all", lambda: CATALOGUE)
     monkeypatch.setattr(
         embeddings, "embed", lambda texts, purpose: [[float(len(t)), 0.5] for t in texts]
@@ -59,6 +60,33 @@ def test_indexing_twice_leaves_one_copy_of_each_product():
     indexer.rebuild_products()
 
     assert store.counts()[store.PRODUCTS] == 2
+
+
+def test_a_second_run_pays_for_nothing():
+    first = indexer.rebuild_products()
+    second = indexer.rebuild_products()
+
+    assert (first["embedded"], first["reused"]) == (2, 0)
+    assert (second["embedded"], second["reused"]) == (0, 2)
+
+
+def test_only_the_card_that_changed_is_embedded_again(monkeypatch):
+    indexer.rebuild_products()
+    rewritten = [dict(CATALOGUE[0], web_description="Άλλο κείμενο, ίδιο καλώδιο."), CATALOGUE[1]]
+    monkeypatch.setattr(catalog, "fetch_all", lambda: rewritten)
+
+    report = indexer.rebuild_products()
+
+    assert (report["embedded"], report["reused"]) == (1, 1)
+
+
+def test_the_file_forgets_a_product_the_catalogue_no_longer_holds(monkeypatch):
+    indexer.rebuild_products()
+    monkeypatch.setattr(catalog, "fetch_all", lambda: CATALOGUE[:1])
+
+    indexer.rebuild_products()
+
+    assert sorted(vectors.load()) == ["PWR-1000"]
 
 
 def test_an_empty_catalogue_is_reported_rather_than_indexed(monkeypatch):
