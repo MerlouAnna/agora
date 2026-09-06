@@ -29,9 +29,6 @@ from services.data_service.ingestion.parsers import extract_specs, normalize_sku
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-SHORTEST = 90
-LONGEST = 200
-
 # Share of three-word runs two descriptions have in common.
 TOO_CLOSE = 0.65
 WATCH = 0.45
@@ -82,8 +79,6 @@ def run() -> int:
 
         product = catalogue[sku]
         problem = validator.check(product["category"], product["specs"], text)
-        if problem is None and len(text) < SHORTEST:
-            problem = f"only {len(text)} characters — thin for a shop page"
         if problem is not None:
             failed.append((sku, problem))
 

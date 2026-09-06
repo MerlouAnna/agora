@@ -10,6 +10,9 @@ or a sentence the model can act on.
 from services.data_service.categories import Category, is_numeric
 from services.data_service.ingestion.parsers import extract_specs
 
+# A floor, not a measure of quality: it catches an answer that is only the specifications
+# strung together. Whether the text is any good is the prompt's job, not arithmetic.
+MIN_LENGTH = 90
 MAX_LENGTH = 200
 
 
@@ -29,6 +32,12 @@ def check(category: Category, chosen: dict, text: str | None) -> str | None:
 
     if len(text) > MAX_LENGTH:
         return f"too long at {len(text)} characters — keep it under {MAX_LENGTH}"
+
+    if len(text) < MIN_LENGTH:
+        return (
+            f"too thin at {len(text)} characters — a shop page needs at least "
+            f"{MIN_LENGTH}, so say where the product fits, not only what it is"
+        )
 
     found = extract_specs(category, text)
 

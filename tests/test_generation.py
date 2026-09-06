@@ -42,7 +42,13 @@ def phrasing(monkeypatch):
     monkeypatch.setattr(
         descriptions,
         "_ask_model",
-        lambda requests: {r["sku"]: f"{r['erp']}, {r['brand']}" for r in requests},
+        lambda requests: {
+            r["sku"]: (
+                f"{r['erp']}, από τη {r['brand']}, για επαγγελματικές εγκαταστάσεις "
+                "σε βιομηχανικό και εμπορικό περιβάλλον."
+            )
+            for r in requests
+        },
     )
 
 
@@ -67,6 +73,14 @@ def test_the_same_seed_builds_the_same_products():
         runs.append([(p["description"], p["price"]) for p in products])
 
     assert runs[0] == runs[1]
+
+
+def test_the_model_s_text_reaches_the_catalogue():
+    report = client.post("/admin/generate", json={"count": 2, "seed": 41}).json()
+    products = client.post("/products/lookup", json={"skus": report["skus"]}).json()
+
+    assert all(p["web_description"] for p in products)
+    assert all(p["web_description"] != p["description"] for p in products)
 
 
 def test_a_pinned_run_stays_inside_its_band():

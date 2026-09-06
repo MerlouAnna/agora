@@ -87,10 +87,25 @@ def _create_table() -> None:
 
 def cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:
     """What those tokens are worth in dollars, or 0.0 for a model with no price on file."""
-    if model not in PRICES:
+    rate = _rate(model)
+    if rate is None:
         return 0.0
 
-    in_price, out_price = PRICES[model]
+    in_price, out_price = rate
     return round(
         (prompt_tokens * in_price + completion_tokens * out_price) / 1_000_000, 6
     )
+
+
+def _rate(model: str) -> tuple[float, float] | None:
+    """Price a model by its family.
+
+    A request for `gpt-4o-mini` is answered by `gpt-4o-mini-2024-07-18`, and it is the
+    answer we write down. Matching the longest family name first keeps `gpt-4o` from
+    claiming the calls that belong to `gpt-4o-mini`.
+    """
+    for family in sorted(PRICES, key=len, reverse=True):
+        if model.startswith(family):
+            return PRICES[family]
+
+    return None

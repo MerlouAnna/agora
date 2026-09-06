@@ -69,6 +69,14 @@ def test_a_model_with_no_price_on_file_costs_nothing():
     assert usage.cost("a-model-we-have-no-price-for", 1_000_000, 1_000_000) == 0.0
 
 
+def test_a_dated_snapshot_is_priced_as_its_family():
+    """gpt-4o-mini answers as gpt-4o-mini-2024-07-18, and must not be priced as gpt-4o."""
+    assert usage.cost("gpt-4o-mini-2024-07-18", 1_000_000, 0) == usage.cost(
+        "gpt-4o-mini", 1_000_000, 0
+    )
+    assert usage.cost("gpt-4o-mini-2024-07-18", 1_000_000, 0) == 0.15
+
+
 def test_each_model_is_priced_on_its_own_rate():
     body = client.get("/admin/usage").json()
     by_model = {line["label"]: line["estimated_cost_usd"] for line in body["by_model"]}
