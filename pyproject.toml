@@ -30,9 +30,23 @@ langchain-openai = "^1.2.1"
 # UI
 gradio = "^6.10.0"
 python-multipart = "^0.0.32"
+rank-bm25 = "^0.2.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP", "ISC"]
+
+# FastAPI puts a parameter's validation in its default — Query(...), Path(...), File(...) —
+# so B008 fires on every route it declares.
+ignore = ["B008"]
+
+# The date rules are left out on purpose. What this project stores is the local wall clock
+# of the one machine it runs on, and an aware UTC value would say less about it, not more.
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
