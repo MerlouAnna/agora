@@ -16,9 +16,8 @@ def product(sku="PWR-1042", category="POWER", **specs):
     }
 
 
-def test_every_numeric_spec_can_be_written_and_compared():
+def test_every_numeric_spec_can_be_written_out():
     numeric = {key for key, kind in SPEC_TYPES.items() if kind == NUMERIC}
-    assert numeric <= set(documents.EXTREMES)
     assert numeric <= set(documents.UNITS)
 
 
@@ -28,48 +27,26 @@ def test_the_card_carries_its_own_code():
 
 
 def test_a_switch_without_poe_never_says_poe():
-    off, on = (
-        documents.build_cards(
-            [
-                product(sku="SWT-1000", category="NETWORK", ports=24, poe="false", managed="true"),
-                product(sku="SWT-1001", category="NETWORK", ports=24, poe="true", managed="true"),
-            ]
-        )
+    off, on = documents.build_cards(
+        [
+            product(sku="SWT-1000", category="NETWORK", ports=24, poe="false", managed="true"),
+            product(sku="SWT-1001", category="NETWORK", ports=24, poe="true", managed="true"),
+        ]
     )
     assert "PoE" not in off.text
     assert "PoE" in on.text
     assert off.metadata["poe"] is False
 
 
-def test_a_flag_is_named_when_it_is_rare_and_never_named_when_it_is_off():
-    """A switch without PoE is not the one switch in ten that has it."""
-    mostly_on = {"poe": ["true"] * 9 + ["false"]}
-    mostly_off = {"poe": ["false"] * 9 + ["true"]}
+def test_a_card_reads_the_same_whatever_else_the_catalogue_holds():
+    """The card is a function of one product: nothing about its neighbours reaches it."""
+    alone = documents.build_cards([product(cores=5, length_m=50)])[0]
+    crowded = documents.build_cards(
+        [product(cores=5, length_m=50)]
+        + [product(sku=f"PWR-10{n:02d}", cores=3, length_m=5) for n in range(1, 9)]
+    )[0]
 
-    assert documents.context_line({"poe": "false"}, mostly_on) == documents.MID_RANGE
-    assert "σπάνιο PoE" in documents.context_line({"poe": "true"}, mostly_off)
-
-
-def test_an_extreme_most_of_the_category_shares_is_not_worth_saying():
-    """Three cores is the lowest we sell and also what two thirds of the shelf holds."""
-    cohort = {"cores": [3] * 8 + [5] * 4}
-    assert documents.context_line({"cores": 3}, cohort) == documents.MID_RANGE
-    assert "οι περισσότεροι αγωγοί" in documents.context_line({"cores": 5}, cohort)
-
-
-def test_a_product_that_stands_out_nowhere_gets_no_context_line():
-    plain, longest = documents.build_cards(
-        [
-            product(sku="DAT-1000", category="DATA", standard="CAT6", length_m=5),
-            product(sku="DAT-1001", category="DATA", standard="CAT6", length_m=30),
-        ]
-        + [
-            product(sku=f"DAT-10{n:02d}", category="DATA", standard="CAT6", length_m=5)
-            for n in range(2, 8)
-        ]
-    )[:2]
-    assert documents.CONTEXT_PREFIX not in plain.text
-    assert "το μεγαλύτερο μήκος" in longest.text
+    assert alone.text == crowded.text
 
 
 @pytest.mark.parametrize("field", ["price", "stock_total", "currency"])
