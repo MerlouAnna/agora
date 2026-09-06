@@ -2,11 +2,7 @@
 Product cards
 =============
 The text that goes into the vector store, one card per SKU, and the metadata a search
-filters on before it compares a single vector.
-
-A card carries the code, one line on what distinguishes the product inside its category,
-the specifications in the tokens people type, and the shop text. Never the price or the
-stock: both change without anything being reindexed.
+filters on. Never the price or the stock: both change without anything being reindexed.
 """
 
 from collections import defaultdict
@@ -117,9 +113,9 @@ def context_line(specs: dict, cohort: dict[str, list]) -> str:
         if key in EXTREMES and share <= EXTREME_SHARE:
             high, low = EXTREMES[key]
             if value == max(values):
-                notes.append(f"{high} στην κατηγορία ({measure(key, value)})")
+                notes.append(f"{high} ({measure(key, value)})")
             elif value == min(values):
-                notes.append(f"{low} στην κατηγορία ({measure(key, value)})")
+                notes.append(f"{low} ({measure(key, value)})")
         elif key not in EXTREMES and share <= RARE_SHARE:
             label = measure(key, value)
             if label:
