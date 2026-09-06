@@ -19,8 +19,7 @@ from collections.abc import Callable
 
 from pydantic import BaseModel
 
-from services import usage
-from services import config
+from services import config, usage
 from services.config import settings
 from services.data_service.generation import validator
 from services.data_service.ingestion.parsers import normalize_sku
