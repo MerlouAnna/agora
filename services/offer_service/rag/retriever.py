@@ -1,0 +1,144 @@
+"""
+Retrieval
+=========
+The products a request should be shown: narrowed by its constraints, then found twice over
+the same cards — by meaning and by word — merged, and priced from the catalogue.
+"""
+
+import logging
+from dataclasses import dataclass
+
+from services.offer_service.clients import catalog
+from services.offer_service.rag import embeddings, filters, lexical, store
+from services.offer_service.requirements import CustomerRequirements
+
+logger = logging.getLogger(__name__)
+
+PURPOSE = "customer-request"
+
+CANDIDATES = 50
+RRF_K = 60
+
+
+class IndexNotBuilt(RuntimeError):
+    """The collection holds nothing, so an empty answer would mean the wrong thing."""
+
+
+@dataclass(frozen=True)
+class Match:
+    """One product a request reached, as the catalogue prices and counts it right now."""
+
+    sku: str
+    card: str
+    metadata: dict
+    price: float | None
+    stock: int | None
+
+
+@dataclass(frozen=True)
+class Retrieval:
+    """What came back, and enough of how it was found to explain it."""
+
+    matches: list[Match]
+    trace: dict
+
+
+def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> tuple[list, dict]:
+    """The codes a request reaches, best first, without asking the catalogue anything.
+
+    Args:
+        requirements: The request, with whatever constraints were pulled out of it.
+        limit: How many codes to keep.
+
+    Returns:
+        The codes and a trace of what each half of the search proposed.
+
+    Raises:
+        IndexNotBuilt: Nothing is indexed, which is not the same as nothing matching.
+        EmbeddingsUnavailable: The request could not be embedded.
+    """
+    products = _built()
+    where = filters.where(requirements)
+    eligible = products.get(where=where, include=["documents"])
+    codes = list(eligible["ids"])
+    trace: dict = {"eligible": len(codes), "filter": where}
+
+    if not codes:
+        logger.info("nothing satisfies the constraints — the model was not asked for a vector")
+        return [], trace
+
+    by_word = lexical.ranked(requirements.request, codes, list(eligible["documents"] or []))
+    by_meaning = _by_meaning(products, requirements.request, where, len(codes))
+    ordered = _fused(by_word, by_meaning)[:limit]
+
+    trace |= {"by_word": by_word[:limit], "by_meaning": by_meaning[:limit], "fused": ordered}
+    return ordered, trace
+
+
+def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
+    """The same products, priced and counted as the catalogue has them right now.
+
+    Raises:
+        CatalogueUnavailable: What was found could not be priced.
+    """
+    ordered, trace = candidates(requirements, limit)
+    if not ordered:
+        return Retrieval([], trace)
+
+    held = _built().get(ids=ordered, include=["documents", "metadatas"])
+    cards = dict(
+        zip(
+            held["ids"],
+            zip(held["documents"] or [], held["metadatas"] or [], strict=True),
+            strict=True,
+        )
+    )
+    return Retrieval(_priced(ordered, cards), trace)
+
+
+def _built():
+    products = store.collection(store.PRODUCTS)
+    if products.count() == 0:
+        raise IndexNotBuilt("the products collection is empty — run the indexer first")
+
+    return products
+
+
+def _by_meaning(products, request: str, where: dict | None, eligible: int) -> list[str]:
+    vector = embeddings.embed([request], PURPOSE)[0]
+    found = products.query(
+        query_embeddings=[list(vector)],
+        where=where,
+        n_results=min(CANDIDATES, eligible),
+        include=[],
+    )
+    return list(found["ids"][0])
+
+
+def _fused(*rankings: list[str]) -> list[str]:
+    """A product both halves place well beats one that either half places first."""
+    scores: dict[str, float] = {}
+    for ranking in rankings:
+        for place, code in enumerate(ranking, 1):
+            scores[code] = scores.get(code, 0.0) + 1 / (RRF_K + place)
+
+    return sorted(scores, key=lambda code: (-scores[code], code))
+
+
+def _priced(codes: list[str], held: dict) -> list[Match]:
+    current = {row["sku"]: row for row in catalog.lookup(codes)}
+
+    gone = [code for code in codes if code not in current]
+    if gone:
+        logger.warning("the catalogue no longer has %s — the index is behind", ", ".join(gone))
+
+    return [
+        Match(
+            sku=code,
+            card=held[code][0],
+            metadata=dict(held[code][1]),
+            price=current.get(code, {}).get("price"),
+            stock=current.get(code, {}).get("stock_total"),
+        )
+        for code in codes
+    ]
