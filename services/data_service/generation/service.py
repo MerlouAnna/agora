@@ -318,7 +318,7 @@ def _draft(
     )
     band = (
         (request.price_min, request.price_max)
-        if request.price_min is not None
+        if request.price_min is not None and request.price_max is not None
         else None
     )
     next_number = _next_numbers(db)
