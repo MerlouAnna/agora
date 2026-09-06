@@ -12,7 +12,7 @@ built here reproduces that spread on purpose — the parsers have to survive all
 
 import random
 
-from services.data_service.categories import PRICE_BANDS, Category
+from services.data_service.categories import ORDERED_LABELS, PLAIN_LABELS, PRICE_BANDS, Category
 
 DEFAULT_BRANDS = ["Elektra", "Voltera", "Nordion", "Kyma", "Delta Line"]
 
@@ -40,26 +40,26 @@ def build_specs(category: Category, rng: random.Random) -> dict:
             "section_mm": rng.choice([1.5, 2.5, 4.0, 6.0]),
             "length_m": rng.choice([5, 10, 15, 20, 25, 30, 50]),
             "watt": rng.choice([750, 1000, 1500, 2200, 3000]),
-            "ip_rating": rng.choice(["IP44", "IP54", "IP67"]),
+            "ip_rating": rng.choice(ORDERED_LABELS["ip_rating"]),
         }
     if category == Category.DATA:
         return {
-            "standard": rng.choice(["CAT5e", "CAT6", "CAT6a", "CAT7"]),
-            "shielding": rng.choice(["UTP", "FTP", "S/FTP"]),
+            "standard": rng.choice(ORDERED_LABELS["standard"]),
+            "shielding": rng.choice(ORDERED_LABELS["shielding"]),
             "length_m": rng.choice([1, 3, 5, 10, 15, 20, 30]),
         }
     if category == Category.PSU:
         return {
             "watt": rng.choice([450, 550, 650, 750, 850, 1000]),
-            "efficiency": rng.choice(["80+ Bronze", "80+ Gold", "80+ Platinum"]),
-            "form_factor": rng.choice(["ATX", "SFX"]),
+            "efficiency": rng.choice(ORDERED_LABELS["efficiency"]),
+            "form_factor": rng.choice(PLAIN_LABELS["form_factor"]),
         }
     if category == Category.UPS:
         va = rng.choice([650, 1000, 1500, 2200, 3000])
         return {
             "va": va,
             "watt": int(va * 0.6),
-            "topology": rng.choice(["line-interactive", "online"]),
+            "topology": rng.choice(PLAIN_LABELS["topology"]),
             "autonomy_min": rng.choice([8, 12, 20, 35]),
         }
     if category == Category.NETWORK:
@@ -70,8 +70,9 @@ def build_specs(category: Category, rng: random.Random) -> dict:
             "managed": rng.choice([True, False]),
         }
     return {
-        "connector_type": rng.choice(["CEE", "Schuko", "IEC C13", "IEC C19"]),
+        "connector_type": rng.choice(PLAIN_LABELS["connector_type"]),
         "amperage": rng.choice([16, 32, 63]),
+        # Two of the three on purpose: the middle rating never appears on a connector.
         "ip_rating": rng.choice(["IP44", "IP67"]),
     }
 

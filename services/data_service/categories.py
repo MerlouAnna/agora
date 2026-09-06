@@ -80,6 +80,13 @@ ORDERED_LABELS = {
     "shielding": ["UTP", "FTP", "S/FTP"],
 }
 
+# Labels with no order to them, so a value is either in the list or it is wrong.
+PLAIN_LABELS = {
+    "form_factor": ["ATX", "SFX"],
+    "topology": ["line-interactive", "online"],
+    "connector_type": ["CEE", "Schuko", "IEC C13", "IEC C19"],
+}
+
 CATEGORY_SPECS = {
     Category.POWER: ["cores", "section_mm", "length_m", "watt", "ip_rating"],
     Category.DATA: ["standard", "shielding", "length_m"],
@@ -111,6 +118,11 @@ def is_numeric(key: str) -> bool:
 
 def is_flag(key: str) -> bool:
     return SPEC_TYPES.get(key) == BOOLEAN
+
+
+def label_values(key: str) -> list[str]:
+    """Every value a label is allowed to take."""
+    return ORDERED_LABELS.get(key) or PLAIN_LABELS[key]
 
 
 def ranked(key: str, value: str, op: str) -> list[str]:

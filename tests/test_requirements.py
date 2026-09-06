@@ -15,13 +15,20 @@ def test_a_specification_the_catalogue_does_not_carry_is_refused():
         Constraint(key="voltage", op="gte", value=400)
 
 
-def test_a_label_with_no_order_takes_no_comparison():
-    """SFX is not more than ATX, and a filter that pretended otherwise would answer anyway."""
+def test_a_plain_label_takes_neither_a_comparison_nor_a_value_of_its_own():
+    """SFX is not more than ATX, and «offline» is not a topology this catalogue sells.
+
+    The refusal carries the vocabulary, because that sentence is what the extractor is
+    handed to correct itself with.
+    """
     with pytest.raises(ValidationError, match="no order"):
         Constraint(key="form_factor", op="gte", value="SFX")
 
     with pytest.raises(ValidationError, match="no order"):
         Ordering(key="form_factor", end="max")
+
+    with pytest.raises(ValidationError, match=r"\['line-interactive', 'online'\]"):
+        Constraint(key="topology", value="offline")
 
 
 def test_a_flag_is_on_or_off_rather_than_the_word():
