@@ -1,22 +1,24 @@
 """
 Indexing
 ========
-Reads the catalogue and writes one card per product into the `products` collection.
+Reads the catalogue and the business documents and writes both collections.
 
-The index is rebuilt whole: the catalogue is small enough that working out what changed
+A collection is rebuilt whole: the catalogue is small enough that working out what changed
 would cost more than rebuilding it. The vectors are a different matter — those are asked
-for only when a card is new or has been rewritten, and the rest come off the file.
+for only when a text is new or has been rewritten, and the rest come off the file.
 """
 
 import logging
+from pathlib import Path
 
 from services.config import settings
 from services.offer_service.clients import catalog
-from services.offer_service.rag import documents, embeddings, store, vectors
+from services.offer_service.rag import documents, embeddings, policies, store, vectors
 
 logger = logging.getLogger(__name__)
 
-PURPOSE = "product-cards"
+PRODUCTS = "product-cards"
+POLICIES = "policy-passages"
 
 BATCH = 100
 
@@ -25,8 +27,8 @@ def rebuild_products() -> dict:
     """Read the catalogue, write one card per product into the `products` collection.
 
     Returns:
-        What was indexed: how many products, how many carry a distinguishing line, how
-        many cards had to be embedded and how many came off the file.
+        How many products, how many carry a distinguishing line, and how many cards had
+        to be embedded rather than read off the file.
     """
     products = catalog.fetch_all()
     if not products:
@@ -34,51 +36,110 @@ def rebuild_products() -> dict:
         return {"products": 0, "with_context": 0, "embedded": 0, "reused": 0}
 
     cards = documents.build_cards(products)
-    held = vectors.load()
-    wanted = [card for card in cards if _changed(card, held)]
+    held, embedded = _vectors(
+        [card.sku for card in cards],
+        [card.text for card in cards],
+        vectors.PRODUCT_FILE,
+        PRODUCTS,
+    )
 
-    if wanted:
-        logger.info("embedding %d cards with %s", len(wanted), settings.embedding_model)
-        fresh = embeddings.embed([card.text for card in wanted], PURPOSE)
-        for card, vector in zip(wanted, fresh, strict=True):
-            held[card.sku] = vectors.entry(card.text, vector)
-
-    # The file describes the catalogue as it stands, not everything it has ever held.
-    kept = {card.sku: held[card.sku] for card in cards}
-    if wanted or set(kept) != set(held):
-        vectors.save(kept)
-
-    collection = store.replace(store.PRODUCTS)
-    for start in range(0, len(cards), BATCH):
-        batch = cards[start : start + BATCH]
-        collection.add(
-            ids=[card.sku for card in batch],
-            documents=[card.text for card in batch],
-            metadatas=[card.metadata for card in batch],
-            embeddings=[kept[card.sku][1] for card in batch],
-        )
+    _fill(
+        store.replace(store.PRODUCTS),
+        [card.sku for card in cards],
+        [card.text for card in cards],
+        [card.metadata for card in cards],
+        held,
+    )
 
     report = {
         "products": len(cards),
         "with_context": sum(1 for card in cards if documents.CONTEXT_PREFIX in card.text),
-        "embedded": len(wanted),
-        "reused": len(cards) - len(wanted),
+        "embedded": embedded,
+        "reused": len(cards) - embedded,
     }
     logger.info(
-        "indexed %(products)d products — %(embedded)d embedded, %(reused)d off the file",
+        "products: %(products)d indexed — %(embedded)d embedded, %(reused)d off the file",
         report,
     )
     return report
 
 
-def _changed(card: documents.Card, held: dict) -> bool:
-    mark, _ = held.get(card.sku, ("", None))
-    return mark != vectors.digest(card.text)
+def rebuild_policies(folder: Path | None = None) -> dict:
+    """Read the business documents, write one passage per section into `policies`.
+
+    Returns:
+        How many documents and passages, and how many passages had to be embedded.
+    """
+    passages = policies.read_all(folder)
+    if not passages:
+        logger.warning("no readable documents in %s — nothing to index", folder or policies.DOCS_DIR)
+        return {"documents": 0, "passages": 0, "embedded": 0, "reused": 0}
+
+    held, embedded = _vectors(
+        [passage.id for passage in passages],
+        [passage.text for passage in passages],
+        vectors.POLICY_FILE,
+        POLICIES,
+    )
+
+    _fill(
+        store.replace(store.POLICIES),
+        [passage.id for passage in passages],
+        [passage.text for passage in passages],
+        [passage.metadata for passage in passages],
+        held,
+    )
+
+    report = {
+        "documents": len({passage.metadata["document"] for passage in passages}),
+        "passages": len(passages),
+        "embedded": embedded,
+        "reused": len(passages) - embedded,
+    }
+    logger.info(
+        "policies: %(passages)d passages from %(documents)d documents — "
+        "%(embedded)d embedded, %(reused)d off the file",
+        report,
+    )
+    return report
+
+
+def _vectors(codes: list[str], texts: list[str], path: Path, purpose: str) -> tuple[dict, int]:
+    """The vectors for these texts, asking the model only for the ones not already on file."""
+    held = vectors.load(path)
+    wanted = [
+        n for n, code in enumerate(codes) if held.get(code, ("", None))[0] != vectors.digest(texts[n])
+    ]
+
+    if wanted:
+        logger.info("embedding %d of %d with %s", len(wanted), len(codes), settings.embedding_model)
+        fresh = embeddings.embed([texts[n] for n in wanted], purpose)
+        for n, vector in zip(wanted, fresh, strict=True):
+            held[codes[n]] = vectors.entry(texts[n], vector)
+
+    # The file describes what there is now, not everything there has ever been.
+    kept = {code: held[code] for code in codes}
+    if wanted or set(kept) != set(held):
+        vectors.save(kept, path)
+
+    return kept, len(wanted)
+
+
+def _fill(collection, codes: list[str], texts: list[str], metadata: list[dict], held: dict) -> None:
+    for start in range(0, len(codes), BATCH):
+        stop = start + BATCH
+        collection.add(
+            ids=codes[start:stop],
+            documents=texts[start:stop],
+            metadatas=metadata[start:stop],
+            embeddings=[held[code][1] for code in codes[start:stop]],
+        )
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     try:
         rebuild_products()
+        rebuild_policies()
     except (catalog.CatalogueUnavailable, embeddings.EmbeddingsUnavailable) as exc:
         raise SystemExit(f"the index was not built: {exc}") from exc

@@ -34,7 +34,8 @@ def offline(tmp_path, monkeypatch):
     """No catalogue service, no OpenAI, no real store or vector file — only the wiring."""
     monkeypatch.setattr(store, "CHROMA_PATH", tmp_path / "chroma")
     monkeypatch.setattr(store, "_client", None)
-    monkeypatch.setattr(vectors, "CACHE_FILE", tmp_path / "card_vectors.npz")
+    monkeypatch.setattr(vectors, "PRODUCT_FILE", tmp_path / "card_vectors.npz")
+    monkeypatch.setattr(vectors, "POLICY_FILE", tmp_path / "policy_vectors.npz")
     monkeypatch.setattr(catalog, "fetch_all", lambda: CATALOGUE)
     monkeypatch.setattr(
         embeddings, "embed", lambda texts, purpose: [[float(len(t)), 0.5] for t in texts]
@@ -86,7 +87,7 @@ def test_the_file_forgets_a_product_the_catalogue_no_longer_holds(monkeypatch):
 
     indexer.rebuild_products()
 
-    assert sorted(vectors.load()) == ["PWR-1000"]
+    assert sorted(vectors.load(vectors.PRODUCT_FILE)) == ["PWR-1000"]
 
 
 def test_an_empty_catalogue_is_reported_rather_than_indexed(monkeypatch):
@@ -94,3 +95,16 @@ def test_an_empty_catalogue_is_reported_rather_than_indexed(monkeypatch):
 
     assert indexer.rebuild_products()["products"] == 0
     assert store.counts()[store.PRODUCTS] == 0
+
+
+def test_the_documents_reach_the_other_collection():
+    report = indexer.rebuild_policies()
+
+    assert report["documents"] == 10
+    assert report["passages"] == report["embedded"] > 60
+    assert store.counts()[store.POLICIES] == report["passages"]
+
+
+def test_a_folder_with_no_documents_is_reported_rather_than_indexed(tmp_path):
+    assert indexer.rebuild_policies(tmp_path)["passages"] == 0
+    assert store.counts()[store.POLICIES] == 0
