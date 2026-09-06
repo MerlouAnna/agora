@@ -66,6 +66,7 @@ def offline(tmp_path, monkeypatch):
     monkeypatch.setattr(kept, "PRODUCT_FILE", tmp_path / "card_vectors.npz")
     monkeypatch.setattr(catalog, "fetch_all", lambda: CATALOGUE)
     monkeypatch.setattr(catalog, "lookup", lambda skus: [r for r in PRICED if r["sku"] in skus])
+    monkeypatch.setattr(catalog, "stats", lambda: {"products": len(CATALOGUE)})
     monkeypatch.setattr(embeddings, "embed", lambda texts, purpose: [_aimed(t) for t in texts])
     yield
     store._client = None

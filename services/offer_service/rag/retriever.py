@@ -1,10 +1,10 @@
 """
 Retrieval
 =========
-The products a request should be shown: narrowed by its constraints — loosened by one of
-them when nothing survives — then found twice over the same cards, by meaning and by word,
-merged and priced from the catalogue. The same two halves answer a question put to the
-business documents.
+The products a request should be shown: narrowed by its constraints, or everything one
+concession away from them when nothing survives, then found twice over the same cards — by
+meaning and by word — merged and priced from the catalogue. The same two halves answer a
+question put to the business documents.
 """
 
 import logging
@@ -13,7 +13,7 @@ from itertools import zip_longest
 
 from services.data_service.categories import ORDERED_LABELS
 from services.offer_service.clients import catalog
-from services.offer_service.rag import embeddings, filters, lexical, store
+from services.offer_service.rag import embeddings, filters, indexer, lexical, store
 from services.offer_service.requirements import Constraint, CustomerRequirements, Ordering
 
 logger = logging.getLogger(__name__)
@@ -110,7 +110,10 @@ def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
     Raises:
         CatalogueUnavailable: What was found could not be priced.
     """
+    behind = _refreshed()
     ordered, trace = candidates(requirements, limit)
+    if behind:
+        trace |= {"refreshed": behind}
     if not ordered:
         return Retrieval([], trace)
 
@@ -163,6 +166,36 @@ def search_policies(question: str, limit: int = 5) -> tuple[list[Excerpt], dict]
         for code in ordered
     ]
     return found, trace
+
+
+def _refreshed() -> dict | None:
+    """Bring the index level with the catalogue when a generation or an import moved it.
+
+    A collection that was never built is left alone: paying for 226 cards is a thing
+    somebody asks for, not a side effect of one search. A stale index that answers beats no
+    answer, so a refresh that cannot be done is written down and stepped over.
+    """
+    indexed = store.collection(store.PRODUCTS).count()
+    if indexed == 0:
+        return None
+
+    try:
+        held = catalog.stats()["products"]
+    except catalog.CatalogueUnavailable as exc:
+        logger.warning("could not ask the catalogue what it holds — %s", exc)
+        return None
+
+    if held == indexed:
+        return None
+
+    logger.info("the catalogue holds %d products and the index %d — rebuilding", held, indexed)
+    try:
+        report = indexer.rebuild_products()
+    except (catalog.CatalogueUnavailable, embeddings.EmbeddingsUnavailable) as exc:
+        logger.warning("the index is behind and could not be brought level — %s", exc)
+        return {"catalogue": held, "was_indexed": indexed, "rebuilt": False}
+
+    return {"catalogue": held, "was_indexed": indexed, "embedded": report["embedded"]}
 
 
 def _relaxed(products, requirements: CustomerRequirements) -> tuple[list[str], dict]:
