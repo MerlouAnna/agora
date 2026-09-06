@@ -1,11 +1,8 @@
 """
 Indexing
 ========
-Reads the catalogue and the business documents and writes both collections.
-
-A collection is rebuilt whole: the catalogue is small enough that working out what changed
-would cost more than rebuilding it. The vectors are a different matter — those are asked
-for only when a text is new or has been rewritten, and the rest come off the file.
+Reads the catalogue and the business documents and writes both collections. A collection
+is rebuilt whole; a vector is asked for only when its text is new or has been rewritten.
 """
 
 import logging
@@ -32,21 +29,19 @@ def rebuild_products() -> dict:
     """
     products = catalog.fetch_all()
     if not products:
-        logger.warning("the catalogue returned no products — nothing to index")
+        store.replace(store.PRODUCTS)
+        logger.warning("the catalogue returned no products — the collection was emptied")
         return {"products": 0, "with_context": 0, "embedded": 0, "reused": 0}
 
     cards = documents.build_cards(products)
-    held, embedded = _vectors(
-        [card.sku for card in cards],
-        [card.text for card in cards],
-        vectors.PRODUCT_FILE,
-        PRODUCTS,
-    )
+    skus = [card.sku for card in cards]
+    texts = [card.text for card in cards]
+    held, embedded = _vectors(skus, texts, vectors.PRODUCT_FILE, PRODUCTS)
 
     _fill(
         store.replace(store.PRODUCTS),
-        [card.sku for card in cards],
-        [card.text for card in cards],
+        skus,
+        texts,
         [card.metadata for card in cards],
         held,
     )
@@ -72,20 +67,21 @@ def rebuild_policies(folder: Path | None = None) -> dict:
     """
     passages = policies.read_all(folder)
     if not passages:
-        logger.warning("no readable documents in %s — nothing to index", folder or policies.DOCS_DIR)
+        store.replace(store.POLICIES)
+        logger.warning(
+            "no readable documents in %s — the collection was emptied",
+            folder or policies.DOCS_DIR,
+        )
         return {"documents": 0, "passages": 0, "embedded": 0, "reused": 0}
 
-    held, embedded = _vectors(
-        [passage.id for passage in passages],
-        [passage.text for passage in passages],
-        vectors.POLICY_FILE,
-        POLICIES,
-    )
+    codes = [passage.id for passage in passages]
+    texts = [passage.text for passage in passages]
+    held, embedded = _vectors(codes, texts, vectors.POLICY_FILE, POLICIES)
 
     _fill(
         store.replace(store.POLICIES),
-        [passage.id for passage in passages],
-        [passage.text for passage in passages],
+        codes,
+        texts,
         [passage.metadata for passage in passages],
         held,
     )
@@ -108,7 +104,9 @@ def _vectors(codes: list[str], texts: list[str], path: Path, purpose: str) -> tu
     """The vectors for these texts, asking the model only for the ones not already on file."""
     held = vectors.load(path)
     wanted = [
-        n for n, code in enumerate(codes) if held.get(code, ("", None))[0] != vectors.digest(texts[n])
+        n
+        for n, code in enumerate(codes)
+        if held.get(code, ("", None))[0] != vectors.digest(texts[n])
     ]
 
     if wanted:

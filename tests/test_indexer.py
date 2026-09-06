@@ -90,7 +90,9 @@ def test_the_file_forgets_a_product_the_catalogue_no_longer_holds(monkeypatch):
     assert sorted(vectors.load(vectors.PRODUCT_FILE)) == ["PWR-1000"]
 
 
-def test_an_empty_catalogue_is_reported_rather_than_indexed(monkeypatch):
+def test_an_empty_catalogue_clears_what_the_index_held(monkeypatch):
+    """A store left as it was would answer with products the catalogue no longer has."""
+    indexer.rebuild_products()
     monkeypatch.setattr(catalog, "fetch_all", list)
 
     assert indexer.rebuild_products()["products"] == 0
@@ -105,6 +107,8 @@ def test_the_documents_reach_the_other_collection():
     assert store.counts()[store.POLICIES] == report["passages"]
 
 
-def test_a_folder_with_no_documents_is_reported_rather_than_indexed(tmp_path):
+def test_a_folder_with_no_documents_clears_what_the_index_held(tmp_path):
+    indexer.rebuild_policies()
+
     assert indexer.rebuild_policies(tmp_path)["passages"] == 0
     assert store.counts()[store.POLICIES] == 0
