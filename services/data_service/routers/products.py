@@ -33,7 +33,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
     summary="Search the catalogue",
     response_description="Matching products with their specs, price and availability",
 )
-async def search_products(
+def search_products(
     db: db_dependency,
     category: Category | None = Query(
         None, description="Restrict to one category. Leave empty to search all six."
@@ -93,7 +93,7 @@ async def search_products(
     response_model=list[ProductSummary],
     summary="Look up several products at once",
 )
-async def lookup_products(db: db_dependency, request: LookupRequest):
+def lookup_products(db: db_dependency, request: LookupRequest):
     """Read several products at once, or one — pass a single SKU.
 
     This is what the offer service calls once semantic search has produced candidate
@@ -109,7 +109,7 @@ async def lookup_products(db: db_dependency, request: LookupRequest):
     response_model=ProductStock,
     summary="Where a product is held, and how much of it",
 )
-async def read_stock(db: db_dependency, sku: str = Path(min_length=3)):
+def read_stock(db: db_dependency, sku: str = Path(min_length=3)):
     """Quantity per warehouse. The SKU is cleaned first, so quotes and casing do not matter."""
     sku = parsers.normalize_sku(sku) or sku
 

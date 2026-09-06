@@ -29,7 +29,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
     summary="What is in the catalogue right now",
     response_description="Totals, a breakdown per category, warehouse and supplier, and the gaps",
 )
-async def read_stats(db: db_dependency):
+def read_stats(db: db_dependency):
     """
     A single overview of the catalogue as it currently stands: how many products and
     specifications are stored, how many units sit in each warehouse and what they are
