@@ -85,7 +85,7 @@ async def search_products(
         min_stock=min_stock,
         limit=limit,
     )
-    return _summarize(db, products)
+    return repository.summarize(db, products)
 
 
 @router.post(
@@ -101,7 +101,7 @@ async def lookup_products(db: db_dependency, request: LookupRequest):
     `pwr1007` and `PWR-1007` find the same product.
     """
     wanted = [parsers.normalize_sku(sku) for sku in request.skus]
-    return _summarize(db, repository.get_products(db, [sku for sku in wanted if sku]))
+    return repository.summarize(db, repository.get_products(db, [sku for sku in wanted if sku]))
 
 
 @router.get(
@@ -128,33 +128,3 @@ async def read_stock(db: db_dependency, sku: str = Path(min_length=3)):
             StockEntry(warehouse=e.warehouse, quantity=e.quantity) for e in entries
         ],
     )
-
-
-def _summarize(db: Session, products: list[Product]) -> list[ProductSummary]:
-    """Attach specs, price and stock to each product in two extra queries, not two per row."""
-    skus = [product.sku for product in products]
-    specs = repository.get_specs(db, [str(sku) for sku in skus])
-    totals = repository.get_stock_totals(db, [str(sku) for sku in skus])
-    prices = repository.get_prices(db, [str(sku) for sku in skus])
-
-    summaries = []
-    for product in products:
-        price = prices.get(str(product.sku))
-        summaries.append(
-            ProductSummary(
-                sku=str(product.sku),
-                category=str(product.category),
-                brand=str(product.brand),
-                description=str(product.description),
-                web_description=product.web_description,
-                unit=str(product.unit),
-                supplier_code=product.supplier_code,
-                price=float(price.amount) if price else None,
-                currency=str(price.currency) if price else None,
-                price_updated_at=price.updated_at if price else None,
-                specs=specs.get(str(product.sku), {}),
-                stock_total=totals.get(str(product.sku)),
-            )
-        )
-
-    return summaries

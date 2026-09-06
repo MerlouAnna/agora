@@ -112,6 +112,10 @@ class GenerationRequest(BaseModel):
     )
     price_min: float | None = Field(None, gt=0, description="Overrides the category band")
     price_max: float | None = Field(None, gt=0, description="Overrides the category band")
+    noise: bool = Field(
+        True,
+        description="Write the rows the way the source systems write them, mistakes included",
+    )
 
     @model_validator(mode="after")
     def _check_band(self):
@@ -148,6 +152,10 @@ class GenerationReport(GenerationRunSummary):
     products_before: int
     products_after: int
     rejected_by_reason: dict[str, int] = Field(default_factory=dict)
+    products: list[ProductSummary] = Field(
+        default_factory=list,
+        description="Every product the run added, as the catalogue now holds it",
+    )
 
 
 class GenerationRemoval(BaseModel):
@@ -169,6 +177,9 @@ class LoadReport(BaseModel):
     """What one load put into the catalogue, and what it could not."""
 
     source: str = Field(..., description="Where the records came from")
+    request_id: int | None = Field(
+        None, description="Set for an import, so it can be taken back out again"
+    )
     records_read: int
     products_loaded: int
     duplicates: int
@@ -179,6 +190,10 @@ class LoadReport(BaseModel):
     products_without_stock: int
     rejected: int
     rejected_by_reason: dict[str, int] = Field(default_factory=dict)
+    products: list[ProductSummary] = Field(
+        default_factory=list,
+        description="What was added. Left out by a full rebuild, which adds everything",
+    )
 
 
 class UsageLine(BaseModel):

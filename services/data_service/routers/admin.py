@@ -8,7 +8,8 @@ from the source files.
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Path, Query, UploadFile
+from fastapi.responses import PlainTextResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from starlette import status
@@ -17,7 +18,7 @@ from services import usage
 from services.data_service import repository
 from services.data_service.database import get_db
 from services.data_service.generation import descriptions, service
-from services.data_service.ingestion import pipeline
+from services.data_service.ingestion import loader, pipeline
 from services.data_service.models import LlmCall
 from services.data_service.schemas import (
     GenerationRemoval,
@@ -214,3 +215,68 @@ def _lines(rows: list) -> list[UsageLine]:
         )
         for label, entry in sorted(folded.items())
     ]
+
+
+@router.get(
+    "/import/template",
+    response_class=PlainTextResponse,
+    summary="Download the import template",
+    response_description="A CSV with the column headings and no rows",
+)
+async def import_template():
+    """
+    The file to fill in. One line per product, and the columns are the ones the reader
+    knows: the code, the ERP line, the shop text, the category, the brand, the unit, the
+    supplier, the price with its currency and date, and one warehouse with its quantity.
+
+    Nothing here has to be tidy. The price may be written `€ 134,20`, `163.95` or
+    `145,17 EUR`; the code may be `pwr1007`, `PWR 1003` or padded with spaces; a product
+    with no warehouse line simply has unknown stock. That is what the reading is for.
+
+    Save it however your spreadsheet saves it. The file is read as UTF-8, and failing that
+    as Windows-1253 or Windows-1252, and the separator is taken from the heading line, so a
+    semicolon file from a Greek Excel is read the same as a comma file. Dates come back
+    whether they were written `2026-09-01`, `01/09/2026`, or as the serial number a
+    spreadsheet leaves behind when the cell format is General.
+    """
+    return PlainTextResponse(
+        service.template(),
+        headers={"Content-Disposition": 'attachment; filename="agora-import.csv"'},
+    )
+
+
+@router.post(
+    "/import",
+    response_model=LoadReport,
+    summary="Import a filled-in CSV",
+    response_description="What the file put into the catalogue, and what it could not",
+)
+async def import_products(db: db_dependency, file: UploadFile = File(...)):
+    """
+    Reads an uploaded CSV through exactly the checks the rest of the catalogue goes
+    through: the codes are cleaned, the prices are read whichever way they were written,
+    the categories and warehouses are matched against the registry, and the specifications
+    are pulled out of the ERP line.
+
+    A line that cannot be used is counted in `rejected_by_reason` rather than stopping the
+    file, and a product whose price cannot be read still loads — without one. Products
+    already in the catalogue are left alone.
+
+    The import is recorded as a run, so `request_id` can be handed to
+    `DELETE /admin/runs/{request_id}` to take the whole file back out again.
+    """
+    raw = await file.read()
+
+    try:
+        rows = loader.read_upload(raw)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
+
+    if not rows:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="the file has no rows"
+        )
+
+    return service.import_rows(db, rows, file.filename or "upload.csv")

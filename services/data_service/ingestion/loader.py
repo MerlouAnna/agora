@@ -24,6 +24,37 @@ def load_catalog() -> dict:
         return json.load(f)
 
 
-def read_rows(text: str, delimiter: str = ",") -> list[dict]:
+ENCODINGS = ("utf-8-sig", "cp1253", "cp1252", "latin-1")
+SEPARATORS = (",", ";", "\t")
+
+
+def read_rows(text: str, delimiter: str | None = None) -> list[dict]:
     """A CSV that arrived as text, one dict per row, every value still a string."""
-    return list(csv.DictReader(io.StringIO(text), delimiter=delimiter))
+    return list(
+        csv.DictReader(io.StringIO(text), delimiter=delimiter or _separator(text))
+    )
+
+
+def read_upload(raw: bytes) -> list[dict]:
+    """A CSV somebody attached, without asking them how they saved it.
+
+    A spreadsheet saved on a Greek Windows machine is Windows-1253 with semicolons, not
+    UTF-8 with commas, and refusing it would only mean asking the sender to do the work.
+    """
+    return read_rows(_decode(raw))
+
+
+def _decode(raw: bytes) -> str:
+    for encoding in ENCODINGS:
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+
+    raise ValueError("the file is not text in any encoding we read")
+
+
+def _separator(text: str) -> str:
+    """Whichever separator the heading line uses the most."""
+    heading = text.splitlines()[0] if text else ""
+    return max(SEPARATORS, key=heading.count)

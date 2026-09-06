@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 
 from services.data_service.categories import Category
@@ -24,6 +26,20 @@ def test_normalize_sku(raw, expected):
 )
 def test_parse_price(raw, expected):
     assert parsers.parse_price(raw) == expected
+
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("2026-09-01", date(2026, 9, 1)),
+        ("01/09/2026", date(2026, 9, 1)),
+        ("46266", date(2026, 9, 1)),
+        ("κάποτε", None),
+    ],
+)
+def test_parse_date(raw, expected):
+    """46266 is what a spreadsheet leaves behind when the cell format is General."""
+    assert parsers.parse_date(raw) == expected
 
 
 def test_parse_quantity_rejects_a_dash():

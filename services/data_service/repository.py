@@ -19,8 +19,39 @@ from services.data_service.models import (
     Stock,
     Supplier,
 )
+from services.data_service.schemas import ProductSummary
 
 DEFAULT_LIMIT = 20
+
+
+def summarize(db: Session, products: list[Product]) -> list[ProductSummary]:
+    """Attach specs, price and stock to each product in two extra queries, not two per row."""
+    skus = [product.sku for product in products]
+    specs = get_specs(db, [str(sku) for sku in skus])
+    totals = get_stock_totals(db, [str(sku) for sku in skus])
+    prices = get_prices(db, [str(sku) for sku in skus])
+
+    summaries = []
+    for product in products:
+        price = prices.get(str(product.sku))
+        summaries.append(
+            ProductSummary(
+                sku=str(product.sku),
+                category=str(product.category),
+                brand=str(product.brand),
+                description=str(product.description),
+                web_description=product.web_description,
+                unit=str(product.unit),
+                supplier_code=product.supplier_code,
+                price=float(price.amount) if price else None,
+                currency=str(price.currency) if price else None,
+                price_updated_at=price.updated_at if price else None,
+                specs=specs.get(str(product.sku), {}),
+                stock_total=totals.get(str(product.sku)),
+            )
+        )
+
+    return summaries
 
 
 def search_products(

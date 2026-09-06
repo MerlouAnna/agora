@@ -29,6 +29,7 @@ langchain-openai = "^1.2.1"
 
 # UI
 gradio = "^6.10.0"
+python-multipart = "^0.0.32"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"

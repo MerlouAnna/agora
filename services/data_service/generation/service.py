@@ -24,8 +24,8 @@ from services.data_service.categories import (
     SupplierCode,
     Warehouse,
 )
-from services.data_service.generation import builder, descriptions
-from services.data_service.ingestion import normalizer
+from services.data_service.generation import builder, descriptions, exports
+from services.data_service.ingestion import normalizer, parsers
 from services.data_service.ingestion.pipeline import spec_rows
 from services.data_service.models import (
     GenerationRun,
@@ -40,6 +40,7 @@ from services.data_service.schemas import (
     GenerationReport,
     GenerationRequest,
     GenerationRunSummary,
+    LoadReport,
 )
 
 logger = logging.getLogger(__name__)
@@ -63,6 +64,10 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
     described, unphrased, rounds = _phrase(drafts)
 
     erp_rows, pricing_rows, stock_rows = _raw_rows(described)
+    if request.noise:
+        erp_rows, pricing_rows, stock_rows = exports.scatter(
+            erp_rows, pricing_rows, stock_rows, rng
+        )
     products, rejections, _ = normalizer.normalize_products(
         erp_rows, pricing_rows, _supplier_entries(described)
     )
@@ -104,6 +109,135 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
         products_before=before,
         products_after=repository.count_products(db),
         rejected_by_reason=dict(Counter(item.reason for item in rejections)),
+        products=repository.summarize(db, repository.get_products(db, skus)),
+    )
+
+
+IMPORT_COLUMNS = [
+    "item_code",
+    "description",
+    "web_description",
+    "cat",
+    "brand",
+    "unit",
+    "supplier",
+    "list_price",
+    "currency",
+    "updated_at",
+    "qty_available",
+    "warehouse",
+]
+
+
+def template() -> str:
+    """The CSV somebody downloads to fill in: the columns and nothing else."""
+    return ",".join(IMPORT_COLUMNS) + "\n"
+
+
+def import_rows(db: Session, rows: list[dict], source: str) -> LoadReport:
+    """Load a filled-in CSV through the same reading the exports go through.
+
+    Args:
+        db: Session on the catalogue the rows are added to.
+        rows: The uploaded file, one dict per line, every value still a string.
+        source: The file's name, so the report says where the rows came from.
+
+    Returns:
+        What went in and what did not. The load is recorded as a run, so it can be
+        withdrawn the same way a generated batch can.
+    """
+    known = set(_supplier_codes(db))
+    erp, pricing, stock = [], [], []
+    supplies = defaultdict(list)
+    rejections: list[normalizer.Rejection] = []
+
+    for row in rows:
+        code = (row.get("item_code") or "").strip()
+
+        erp.append(
+            {
+                "item_code": code,
+                "description": row.get("description") or "",
+                "web_description": row.get("web_description") or "",
+                "cat": (row.get("cat") or "").strip(),
+                "brand": (row.get("brand") or "").strip(),
+                "unit": (row.get("unit") or "ΤΕΜ").strip(),
+            }
+        )
+        pricing.append(
+            {
+                "product_code": code,
+                "list_price": row.get("list_price") or "",
+                "currency": (row.get("currency") or "EUR").strip(),
+                "updated_at": row.get("updated_at") or "",
+            }
+        )
+        if (row.get("warehouse") or "").strip():
+            stock.append(
+                {
+                    "sku": code,
+                    "qty_available": row.get("qty_available") or "",
+                    "warehouse": (row.get("warehouse") or "").strip(),
+                }
+            )
+
+        supplier = (row.get("supplier") or "").strip()
+        sku = parsers.normalize_sku(code)
+        if not supplier or sku is None:
+            continue
+        if supplier not in known:
+            rejections.append(normalizer.Rejection("import", sku, "unknown supplier"))
+            continue
+        supplies[supplier].append(sku)
+
+    products, product_rejections, duplicates = normalizer.normalize_products(
+        erp,
+        pricing,
+        [{"supplier_code": code, "supplies": skus} for code, skus in supplies.items()],
+    )
+    entries, stock_rejections = normalizer.normalize_stock(
+        stock, {product.sku for product in products}
+    )
+    rejections = _once(rejections + product_rejections + stock_rejections)
+
+    added, specs_added, stock_added = _persist(db, products, entries)
+    fresh = set(added)
+
+    run = GenerationRun(
+        created_at=datetime.now(),
+        seed=0,
+        requested=len(rows),
+        products_added=len(added),
+        specs_added=specs_added,
+        stock_rows_added=stock_added,
+        rejected=len(rejections),
+        rounds=0,
+        descriptions_rejected=0,
+        parameters={"source": source},
+        skus=added,
+    )
+    db.add(run)
+    db.commit()
+    db.refresh(run)
+
+    logger.info("imported %s — %d products added", source, len(added))
+
+    return LoadReport(
+        source=source,
+        request_id=run.request_id,
+        records_read=len(rows),
+        products_loaded=len(added),
+        duplicates=duplicates,
+        specs_loaded=specs_added,
+        prices_loaded=sum(
+            1 for p in products if p.sku in fresh and p.price is not None
+        ),
+        stock_entries_read=len(stock),
+        stock_loaded=stock_added,
+        products_without_stock=len(fresh - {e.sku for e in entries}),
+        rejected=len(rejections),
+        rejected_by_reason=dict(Counter(item.reason for item in rejections)),
+        products=repository.summarize(db, repository.get_products(db, added)),
     )
 
 
@@ -328,6 +462,20 @@ def _supplier_entries(drafts: list[dict]) -> list[dict]:
     return [{"supplier_code": code, "supplies": skus} for code, skus in grouped.items()]
 
 
+def _once(rejections: list[normalizer.Rejection]) -> list[normalizer.Rejection]:
+    """One line of an upload becomes three rows, so the same complaint arrives three times."""
+    seen, kept = set(), []
+
+    for rejection in rejections:
+        key = (rejection.identifier, rejection.reason)
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(rejection)
+
+    return kept
+
+
 def _exhausted(categories: list[Category]) -> list[normalizer.Rejection]:
     return [
         normalizer.Rejection("generator", str(category), "no SKU numbers left")
@@ -363,6 +511,7 @@ def _persist(
                 category=product.category,
                 brand=product.brand,
                 description=product.description,
+                web_description=product.web_description,
                 unit=product.unit,
                 supplier_code=product.supplier_code,
             )

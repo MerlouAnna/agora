@@ -195,6 +195,9 @@ def _index_prices(pricing_rows: list[dict]) -> tuple[dict[str, dict], list[Rejec
         if sku is None:
             rejections.append(Rejection("pricing", raw_sku.strip(), "unreadable SKU"))
             continue
+        if sku in indexed:
+            # The first line for a SKU is the one that counts, here as in the ERP.
+            continue
 
         amount = parsers.parse_price(row[PRICING_FIELDS["amount"]])
         if amount is None:
@@ -245,7 +248,8 @@ def normalize_stock(
             rejections.append(Rejection("wms", sku, _first_problem(exc)))
             continue
 
-        entries[(entry.sku, entry.warehouse)] = entry
+        # First line wins, here as with the price and the product itself.
+        entries.setdefault((entry.sku, entry.warehouse), entry)
 
     return list(entries.values()), rejections
 
