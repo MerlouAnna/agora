@@ -108,6 +108,8 @@ def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
     """The same products, priced and counted as the catalogue has them right now.
 
     Raises:
+        IndexNotBuilt: Nothing is indexed, which is not the same as nothing matching.
+        EmbeddingsUnavailable: The request could not be embedded.
         CatalogueUnavailable: What was found could not be priced.
     """
     behind = _refreshed()
@@ -125,7 +127,11 @@ def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
             strict=True,
         )
     )
-    return Retrieval(_priced(ordered, cards), trace)
+    matches, withdrawn = _priced(ordered, cards)
+    if withdrawn:
+        trace |= {"withdrawn": withdrawn}
+
+    return Retrieval(matches, trace)
 
 
 def search_policies(question: str, limit: int = 5) -> tuple[list[Excerpt], dict]:
@@ -169,12 +175,7 @@ def search_policies(question: str, limit: int = 5) -> tuple[list[Excerpt], dict]
 
 
 def _refreshed() -> dict | None:
-    """Bring the index level with the catalogue when a generation or an import moved it.
-
-    A collection that was never built is left alone: paying for 226 cards is a thing
-    somebody asks for, not a side effect of one search. A stale index that answers beats no
-    answer, so a refresh that cannot be done is written down and stepped over.
-    """
+    """Bring the index level with the catalogue, unless it was never built or cannot be."""
     indexed = store.collection(store.PRODUCTS).count()
     if indexed == 0:
         return None
@@ -199,12 +200,7 @@ def _refreshed() -> dict | None:
 
 
 def _relaxed(products, requirements: CustomerRequirements) -> tuple[list[str], dict]:
-    """Everything that is one concession away, and which concession each product costs.
-
-    Choosing between them is not this service's business. A switch with fewer ports but the
-    PoE the customer asked for, and a switch with the ports but no PoE, are two offers to
-    put in front of a salesperson, not a right answer and a wrong one.
-    """
+    """Everything that is one concession away, and which concession each product costs."""
     opened: dict[str, list[str]] = {}
     for n, constraint in enumerate(requirements.constraints):
         clause = _without(requirements, n)
@@ -249,16 +245,15 @@ def _built(name: str = store.PRODUCTS):
 def _at_the_end(order: Ordering, codes: list[str], metadata: list) -> list[str]:
     """The eligible products sorted at the end of the range the request named.
 
-    "The longest cable you have" is a question the catalogue answers exactly; asking either
-    ranking to guess it is asking the wrong thing. Products with no such specification go
-    last rather than being dropped.
+    Products with no such specification go last rather than being dropped.
     """
     held = dict(zip(codes, metadata, strict=True))
     known = [code for code in codes if held[code].get(order.key) is not None]
     away = -1 if order.end == "max" else 1
 
     ranked = sorted(known, key=lambda code: (away * _place(order.key, held[code][order.key]), code))
-    return ranked + [code for code in codes if code not in set(known)]
+    placed = set(known)
+    return ranked + [code for code in codes if code not in placed]
 
 
 def _place(key: str, value) -> float:
@@ -270,11 +265,7 @@ def _place(key: str, value) -> float:
 def _by_meaning(
     products, request: str, where: dict | None, eligible: int, purpose: str = REQUEST
 ) -> list[str]:
-    """Everything eligible, nearest first — both rankings cover the same set.
-
-    The two are taken in turn, so cutting one of them short would hand its tail to the
-    other half alone rather than to both.
-    """
+    """Everything eligible, nearest first — both rankings cover the same set."""
     vector = embeddings.embed([request], purpose)[0]
     found = products.query(
         query_embeddings=[list(vector)], where=where, n_results=eligible, include=[]
@@ -283,12 +274,7 @@ def _by_meaning(
 
 
 def _merged(*rankings: list[str]) -> list[str]:
-    """One from each ranking in turn, so neither half can bury what the other put first.
-
-    Scoring the two together — reciprocal rank fusion — was measured on both collections
-    and lost a right answer each time: whenever only one half finds it, the other half's
-    near misses outscore it. Taking turns costs each half nothing better than second place.
-    """
+    """One from each ranking in turn, so neither half can bury what the other put first."""
     merged: dict[str, None] = {}
     for places in zip_longest(*rankings):
         for code in places:
@@ -298,14 +284,14 @@ def _merged(*rankings: list[str]) -> list[str]:
     return list(merged)
 
 
-def _priced(codes: list[str], held: dict) -> list[Match]:
+def _priced(codes: list[str], held: dict) -> tuple[list[Match], list[str]]:
     current = {row["sku"]: row for row in catalog.lookup(codes)}
 
     gone = [code for code in codes if code not in current]
     if gone:
         logger.warning("the catalogue no longer has %s — the index is behind", ", ".join(gone))
 
-    return [
+    found = [
         Match(
             sku=code,
             card=held[code][0],
@@ -315,3 +301,4 @@ def _priced(codes: list[str], held: dict) -> list[Match]:
         )
         for code in codes
     ]
+    return found, gone

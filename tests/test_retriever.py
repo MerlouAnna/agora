@@ -135,12 +135,13 @@ def test_a_request_with_nothing_to_search_costs_nothing(monkeypatch):
 
 
 def test_neither_half_can_bury_what_the_other_put_first():
-    """The guarantee the merge exists for: the n-th of each half lands no worse than 2n."""
-    words = [f"A{n}" for n in range(20)]
-    meaning = [f"B{n}" for n in range(20)]
+    """The n-th of each half lands no worse than 2n, and a code only one half found stays."""
+    words = ["SWT-1022", "SWT-1000", "SWT-1001", "SWT-1002", "SWT-1003"]
+    meaning = ["SWT-1000", "SWT-1001", "SWT-1002", "SWT-1003", "SWT-1004"]
 
     merged = retriever._merged(words, meaning)
 
+    assert merged[0] == "SWT-1022"
     assert all(
         merged.index(half[n]) <= 2 * n + 1 for half in (words, meaning) for n in range(len(half))
     )
@@ -183,3 +184,16 @@ def test_the_price_and_the_stock_come_from_the_catalogue():
     assert priced["PWR-1001"] == (18.4, None)
     assert priced["PWR-1002"] == (210.0, 7)
     assert all("price" not in match.metadata for match in found.matches)
+
+
+def test_a_product_the_catalogue_no_longer_has_is_named_rather_than_priced_at_nothing(monkeypatch):
+    """Withdrawn, no price on file and unknown stock are three states with one shape."""
+    indexer.rebuild_products()
+    withdrawn = "PWR-1002"
+    still_sold = [row for row in PRICED if row["sku"] != withdrawn]
+    monkeypatch.setattr(catalog, "lookup", lambda skus: [r for r in still_sold if r["sku"] in skus])
+
+    found = retriever.search(asked("καλώδιο ρεύματος"))
+
+    assert found.trace["withdrawn"] == [withdrawn]
+    assert withdrawn in [match.sku for match in found.matches]
