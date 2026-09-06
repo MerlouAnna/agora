@@ -40,8 +40,14 @@ def read_upload(raw: bytes) -> list[dict]:
 
     A spreadsheet saved on a Greek Windows machine is Windows-1253 with semicolons, not
     UTF-8 with commas, and refusing it would only mean asking the sender to do the work.
+
+    Raises:
+        ValueError: The bytes are not a CSV at all.
     """
-    return read_rows(_decode(raw))
+    try:
+        return read_rows(_decode(raw))
+    except csv.Error as exc:
+        raise ValueError(f"this does not read as a CSV: {exc}") from exc
 
 
 def _decode(raw: bytes) -> str:

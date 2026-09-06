@@ -14,7 +14,6 @@ from services.data_service import repository
 from services.data_service.categories import Category
 from services.data_service.database import get_db
 from services.data_service.ingestion import parsers
-from services.data_service.models import Product
 from services.data_service.schemas import (
     LookupRequest,
     ProductStock,
@@ -33,7 +32,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
     summary="Search the catalogue",
     response_description="Matching products with their specs, price and availability",
 )
-async def search_products(
+def search_products(
     db: db_dependency,
     category: Category | None = Query(
         None, description="Restrict to one category. Leave empty to search all six."
@@ -58,6 +57,9 @@ async def search_products(
         ),
     ),
     limit: int = Query(20, ge=1, le=100, description="How many products to return."),
+    offset: int = Query(
+        0, ge=0, description="How many matches to skip. Use it to read the catalogue in pages."
+    ),
 ):
     """
     Find products by category, technical minimums, price ceiling and availability.
@@ -75,6 +77,10 @@ async def search_products(
     A cable for a 1000 W load, at least 20 metres, under €120, with at least 5 in stock:
 
         /products/search?category=POWER&min_watt=1000&min_length_m=20&max_price=120&min_stock=5
+
+    The whole catalogue, a hundred at a time:
+
+        /products/search?limit=100&offset=0 … &offset=100 … until a page comes back short
     """
     products = repository.search_products(
         db,
@@ -84,6 +90,7 @@ async def search_products(
         max_price=max_price,
         min_stock=min_stock,
         limit=limit,
+        offset=offset,
     )
     return repository.summarize(db, products)
 
@@ -93,7 +100,7 @@ async def search_products(
     response_model=list[ProductSummary],
     summary="Look up several products at once",
 )
-async def lookup_products(db: db_dependency, request: LookupRequest):
+def lookup_products(db: db_dependency, request: LookupRequest):
     """Read several products at once, or one — pass a single SKU.
 
     This is what the offer service calls once semantic search has produced candidate
@@ -109,7 +116,7 @@ async def lookup_products(db: db_dependency, request: LookupRequest):
     response_model=ProductStock,
     summary="Where a product is held, and how much of it",
 )
-async def read_stock(db: db_dependency, sku: str = Path(min_length=3)):
+def read_stock(db: db_dependency, sku: str = Path(min_length=3)):
     """Quantity per warehouse. The SKU is cleaned first, so quotes and casing do not matter."""
     sku = parsers.normalize_sku(sku) or sku
 

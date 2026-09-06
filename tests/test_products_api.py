@@ -49,6 +49,14 @@ def test_search_applies_the_spec_minimum():
     assert [p["sku"] for p in found] == ["PWR-1001"]
 
 
+def test_paging_walks_the_catalogue_without_repeating_itself():
+    first = client.get("/products/search", params={"limit": 1, "offset": 0}).json()
+    second = client.get("/products/search", params={"limit": 1, "offset": 1}).json()
+    assert [p["sku"] for p in first] == ["PWR-1001"]
+    assert [p["sku"] for p in second] == ["PWR-1002"]
+    assert client.get("/products/search", params={"offset": 2}).json() == []
+
+
 def test_unknown_sku_is_404():
     assert client.get("/products/NOPE-9999/stock").status_code == 404
 

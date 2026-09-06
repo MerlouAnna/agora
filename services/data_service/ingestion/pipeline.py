@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 def run(db: Session | None = None) -> LoadReport:
-    """Read the four source files and rebuild the catalogue from them.
+    """Read the catalogue file and rebuild the tables from it.
 
     Args:
         db: Session to rebuild through. A session of its own is opened when none is given,
@@ -41,7 +41,9 @@ def run(db: Session | None = None) -> LoadReport:
     catalog = loader.load_catalog()
     records, suppliers = catalog["products"], catalog["suppliers"]
 
-    products, stock, rejections = normalizer.normalize_catalog(records)
+    products, stock, rejections = normalizer.normalize_catalog(
+        records, {entry["code"] for entry in suppliers}
+    )
     duplicates = sum(1 for r in rejections if r.reason == "duplicate SKU")
 
     if db is not None:
@@ -57,7 +59,7 @@ def run(db: Session | None = None) -> LoadReport:
         duplicates=duplicates,
         specs_loaded=sum(len(p.specs) for p in products),
         prices_loaded=sum(1 for p in products if p.price is not None),
-        stock_entries_read=sum(len(r.get("stock", [])) for r in records),
+        stock_entries_read=sum(len(r.get("stock") or []) for r in records),
         stock_loaded=len(stock),
         products_without_stock=len(products) - len({e.sku for e in stock}),
         rejected=len(rejections),
@@ -74,42 +76,29 @@ def _rebuild(
     stock: list[normalizer.CanonicalStock],
     suppliers: list[dict],
 ) -> None:
-    """Replace the catalogue with what the raw files currently say.
+    """Replace the catalogue with what the catalogue file currently says.
 
     Everything the generation endpoint added goes with it, history included — a rebuild
-    is a return to the four source files, and a run log pointing at SKUs that no longer
-    exist would be worse than no log at all.
+    is a return to the file, and a run log pointing at SKUs that no longer exist would be
+    worse than no log at all.
     """
     TableBase.metadata.create_all(bind=db.get_bind())
 
     for model in (ProductSpec, Stock, Price, Product, Supplier, GenerationRun):
         db.query(model).delete()
 
-    db.add_all(Supplier(**entry) for entry in suppliers)
+    db.add_all(
+        Supplier(
+            code=entry["code"],
+            name=entry.get("name"),
+            lead_time_days=entry.get("lead_time_days"),
+            reliability_score=entry.get("reliability_score"),
+        )
+        for entry in suppliers
+    )
 
     for product in products:
-        db.add(
-            Product(
-                sku=product.sku,
-                category=product.category,
-                brand=product.brand,
-                description=product.description,
-                web_description=product.web_description,
-                unit=product.unit,
-                supplier_code=product.supplier_code,
-            )
-        )
-        db.add_all(spec_rows(product))
-
-        if product.price is not None:
-            db.add(
-                Price(
-                    sku=product.sku,
-                    amount=product.price,
-                    currency=product.currency,
-                    updated_at=product.price_updated_at,
-                )
-            )
+        db.add_all(product_rows(product))
 
     db.add_all(
         Stock(sku=entry.sku, warehouse=entry.warehouse, quantity=entry.quantity)
@@ -117,6 +106,35 @@ def _rebuild(
     )
 
     db.commit()
+
+
+def product_rows(product: normalizer.CanonicalProduct) -> list:
+    """A canonical product as the rows the catalogue stores it in: the product, its
+    specifications, and its price when it has one."""
+    rows = [
+        Product(
+            sku=product.sku,
+            category=product.category,
+            brand=product.brand,
+            description=product.description,
+            web_description=product.web_description,
+            unit=product.unit,
+            supplier_code=product.supplier_code,
+        ),
+        *spec_rows(product),
+    ]
+
+    if product.price is not None:
+        rows.append(
+            Price(
+                sku=product.sku,
+                amount=product.price,
+                currency=product.currency,
+                updated_at=product.price_updated_at,
+            )
+        )
+
+    return rows
 
 
 def spec_rows(product: normalizer.CanonicalProduct) -> list[ProductSpec]:

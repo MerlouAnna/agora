@@ -13,7 +13,12 @@ from starlette import status
 
 from services.data_service import console
 from services.data_service.database import get_db
-from services.data_service.schemas import CatalogueSchema, QueryRequest, QueryResult
+from services.data_service.schemas import (
+    CatalogueSchema,
+    QueryRequest,
+    QueryResult,
+    SchemaTable,
+)
 
 router = APIRouter()
 
@@ -26,7 +31,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
     summary="What there is to query",
     response_description="Every table with its columns, keys and row count",
 )
-async def read_schema():
+def read_schema():
     """
     The shape of the catalogue as the database holds it: the tables, their columns and
     types, which column is the key, which columns point at which other table, and how many
@@ -37,7 +42,10 @@ async def read_schema():
     and `value_text` when it is a label — so a query filtering on two specifications joins
     that table twice. The examples below show it.
     """
-    return CatalogueSchema(tables=console.tables(), examples=console.EXAMPLES)
+    return CatalogueSchema(
+        tables=[SchemaTable(**table) for table in console.tables()],
+        examples=console.EXAMPLES,
+    )
 
 
 @router.post(
@@ -46,7 +54,7 @@ async def read_schema():
     summary="Run a SELECT against the catalogue",
     response_description="The columns and rows the statement returned",
 )
-async def run_query(request: QueryRequest):
+def run_query(request: QueryRequest):
     """
     Runs one statement and hands back what it found.
 

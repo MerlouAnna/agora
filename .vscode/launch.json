@@ -2,14 +2,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Generate mock data",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "tools.generate_mock_data",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
-    },
-    {
       "name": "data_service :8001",
       "type": "debugpy",
       "request": "launch",
@@ -24,6 +16,82 @@
       "request": "launch",
       "module": "uvicorn",
       "args": ["services.offer_service.main:app", "--port", "8000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Rebuild the catalogue from the file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "services.data_service.ingestion.pipeline",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Build the product index",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "services.offer_service.rag.indexer",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Measure retrieval",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tools.measure_retrieval",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Generate mock data",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tools.generate_mock_data",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Check the shop texts",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tools.check_descriptions",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Enrich two descriptions",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tools.enrich_descriptions",
+      "args": ["--limit", "2"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "All tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Tests in this file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["${file}", "-q", "-s"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Last failing test",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["--last-failed", "--exitfirst", "-q", "-s"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"
     }

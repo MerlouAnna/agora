@@ -17,16 +17,19 @@ class ProductSummary(BaseModel):
     brand: str
     description: str = Field(..., description="The ERP line, terse, specs included")
     web_description: str | None = Field(
-        None, description="What the shop shows a customer. This is the text worth embedding."
+        default=None,
+        description="What the shop shows a customer. This is the text worth embedding.",
     )
     unit: str
     supplier_code: str | None = None
-    price: float | None = Field(None, description="List price, absent if the source had none")
+    price: float | None = Field(
+        default=None, description="List price, absent if the source had none"
+    )
     currency: str | None = None
     price_updated_at: date | None = None
     specs: dict = Field(default_factory=dict)
     stock_total: int | None = Field(
-        None, description="Total across warehouses. Null means no stock record exists."
+        default=None, description="Total across warehouses. Null means no stock record exists."
     )
 
 
@@ -37,7 +40,9 @@ class StockEntry(BaseModel):
 
 class ProductStock(BaseModel):
     sku: str
-    total: int | None = Field(None, description="Null when the warehouse system has no record")
+    total: int | None = Field(
+        default=None, description="Null when the warehouse system has no record"
+    )
     entries: list[StockEntry] = Field(default_factory=list)
 
 
@@ -92,28 +97,28 @@ class CatalogueStats(BaseModel):
 class GenerationRequest(BaseModel):
     """What a generation run is allowed to vary."""
 
-    count: int = Field(10, ge=1, le=100, description="How many products to add")
+    count: int = Field(default=10, ge=1, le=100, description="How many products to add")
     seed: int | None = Field(
-        None, description="Pass a previous run's seed to reproduce it exactly"
+        default=None, description="Pass a previous run's seed to reproduce it exactly"
     )
     category: Category | None = Field(
-        None, description="Leave empty to spread the products over every category"
+        default=None, description="Leave empty to spread the products over every category"
     )
     warehouse: Warehouse | None = Field(
-        None, description="Pin the new stock to one warehouse instead of spreading it"
+        default=None, description="Pin the new stock to one warehouse instead of spreading it"
     )
     supplier_code: SupplierCode | None = Field(
-        None, description="Leave empty to spread the products over the known suppliers"
+        default=None, description="Leave empty to spread the products over the known suppliers"
     )
     brands: list[str] | None = Field(
-        None,
+        default=None,
         max_length=20,
         description="Defaults to the brands the catalogue already carries",
     )
-    price_min: float | None = Field(None, gt=0, description="Overrides the category band")
-    price_max: float | None = Field(None, gt=0, description="Overrides the category band")
+    price_min: float | None = Field(default=None, gt=0, description="Overrides the category band")
+    price_max: float | None = Field(default=None, gt=0, description="Overrides the category band")
     noise: bool = Field(
-        True,
+        default=True,
         description="Write the rows the way the source systems write them, mistakes included",
     )
 
@@ -178,7 +183,7 @@ class LoadReport(BaseModel):
 
     source: str = Field(..., description="Where the records came from")
     request_id: int | None = Field(
-        None, description="Set for an import, so it can be taken back out again"
+        default=None, description="Set for an import, so it can be taken back out again"
     )
     records_read: int
     products_loaded: int
@@ -249,7 +254,7 @@ class CatalogueSchema(BaseModel):
 
 class QueryRequest(BaseModel):
     sql: str = Field(..., min_length=1, description="One SELECT statement")
-    limit: int = Field(100, ge=1, le=500, description="How many rows to read back")
+    limit: int = Field(default=100, ge=1, le=500, description="How many rows to read back")
 
     model_config = {
         "json_schema_extra": {

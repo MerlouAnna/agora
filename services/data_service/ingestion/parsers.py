@@ -18,6 +18,9 @@ DATE_FORMATS = ("%d/%m/%Y", "%d-%m-%Y", "%d.%m.%Y", "%Y/%m/%d", "%m/%d/%Y")
 # Excel counts days from here, including the 1900 leap year that never happened.
 EXCEL_EPOCH = date(1899, 12, 30)
 EXCEL_SERIAL = re.compile(r"^\d{5}$")
+# Five digits that land outside these are a truncated number, not a date.
+SERIAL_EARLIEST = date(1990, 1, 1)
+SERIAL_LATEST = date(2100, 1, 1)
 
 SKU_PATTERN = re.compile(r"^([A-Z]{3})(\d{4})$")
 SKU_NOISE = re.compile(r"[^A-Za-z0-9]")
@@ -119,7 +122,9 @@ def parse_date(raw: str) -> date | None:
             continue
 
     if EXCEL_SERIAL.match(text):
-        return EXCEL_EPOCH + timedelta(days=int(text))
+        moment = EXCEL_EPOCH + timedelta(days=int(text))
+        if SERIAL_EARLIEST <= moment <= SERIAL_LATEST:
+            return moment
 
     return None
 

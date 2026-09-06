@@ -41,7 +41,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
     summary="Add products to the catalogue",
     response_description="What the run added, and how large the catalogue is now",
 )
-async def generate_products(db: db_dependency, request: GenerationRequest):
+def generate_products(db: db_dependency, request: GenerationRequest):
     """
     Builds new products and loads them into the live catalogue.
 
@@ -82,7 +82,7 @@ async def generate_products(db: db_dependency, request: GenerationRequest):
     summary="Previous generation runs",
     response_description="The most recent runs, newest first",
 )
-async def read_runs(
+def read_runs(
     db: db_dependency,
     limit: int = Query(20, ge=1, le=100, description="How many runs to return."),
 ):
@@ -99,7 +99,7 @@ async def read_runs(
     summary="Take a generation run back out",
     response_description="What was removed, and how large the catalogue is now",
 )
-async def delete_run(
+def delete_run(
     db: db_dependency,
     request_id: int = Path(ge=1, description="The run to undo."),
 ):
@@ -126,21 +126,22 @@ async def delete_run(
     "/rebuild",
     response_model=LoadReport,
     summary="Rebuild the catalogue from the source files",
-    response_description="What the four files put back, and what they could not",
+    response_description="What the file put back, and what it could not",
 )
-async def rebuild_catalogue(db: db_dependency):
+def rebuild_catalogue(db: db_dependency):
     """
-    Empties the catalogue and loads it again from `data/raw/` — the ERP export, the
-    warehouse stock file, the pricing export and the supplier registry.
+    Empties the catalogue and loads it again from `data/raw/catalog.json` — the supplier
+    registry and one record per SKU.
 
     **Everything added through `/admin/generate` is discarded**, the generation log
-    included, and the catalogue comes back exactly as the four files describe it: the same
+    included, and the catalogue comes back exactly as the file describes it: the same
     products, the same specifications, the same prices, every time. This is the reset, not
     a refresh — there is nothing here that merges new rows into what is already stored.
 
-    The report says how many rows each file offered and how many survived. A row that was
-    left out is counted under `rejected_by_reason`, which is where an unreadable SKU or a
-    price the source wrote as `N/A` shows up.
+    The report says how many records the file offered and how many survived. A row that
+    was left out is counted under `rejected_by_reason`, which is where an unreadable SKU
+    or a supplier the registry has never heard of shows up. A price the source wrote as
+    `N/A` is reported there too, but the product itself still loads — without one.
     """
     return pipeline.run(db)
 
@@ -151,7 +152,7 @@ async def rebuild_catalogue(db: db_dependency):
     summary="What the models have cost so far",
     response_description="Tokens and estimated spend, broken down by model, purpose and day",
 )
-async def read_usage(
+def read_usage(
     db: db_dependency,
     days: int | None = Query(
         None, ge=1, le=365, description="Look only this far back. Leave empty for everything."
@@ -223,7 +224,7 @@ def _lines(rows: list) -> list[UsageLine]:
     summary="Download the import template",
     response_description="A CSV with the column headings and no rows",
 )
-async def import_template():
+def import_template():
     """
     The file to fill in. One line per product, and the columns are the ones the reader
     knows: the code, the ERP line, the shop text, the category, the brand, the unit, the
@@ -251,7 +252,7 @@ async def import_template():
     summary="Import a filled-in CSV",
     response_description="What the file put into the catalogue, and what it could not",
 )
-async def import_products(db: db_dependency, file: UploadFile = File(...)):
+def import_products(db: db_dependency, file: UploadFile = File(...)):
     """
     Reads an uploaded CSV through exactly the checks the rest of the catalogue goes
     through: the codes are cleaned, the prices are read whichever way they were written,
@@ -259,13 +260,20 @@ async def import_products(db: db_dependency, file: UploadFile = File(...)):
     are pulled out of the ERP line.
 
     A line that cannot be used is counted in `rejected_by_reason` rather than stopping the
-    file, and a product whose price cannot be read still loads — without one. Products
-    already in the catalogue are left alone.
+    file, and a product whose price cannot be read still loads — without one. A SKU the
+    catalogue already holds is left exactly as it is, and reported the same way.
 
     The import is recorded as a run, so `request_id` can be handed to
-    `DELETE /admin/runs/{request_id}` to take the whole file back out again.
+    `DELETE /admin/runs/{request_id}` to take the whole file back out again. One file
+    carries at most 5000 lines and 5 MB; a larger catalogue goes in as several.
     """
-    raw = await file.read()
+    raw = file.file.read(service.MAX_IMPORT_BYTES + 1)
+
+    if len(raw) > service.MAX_IMPORT_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"the file is larger than {service.MAX_IMPORT_BYTES:,} bytes",
+        )
 
     try:
         rows = loader.read_upload(raw)
@@ -277,6 +285,12 @@ async def import_products(db: db_dependency, file: UploadFile = File(...)):
     if not rows:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="the file has no rows"
+        )
+
+    if len(rows) > service.MAX_IMPORT_ROWS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"the file has more than {service.MAX_IMPORT_ROWS} rows",
         )
 
     return service.import_rows(db, rows, file.filename or "upload.csv")

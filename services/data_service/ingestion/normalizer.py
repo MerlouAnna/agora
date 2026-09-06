@@ -14,6 +14,7 @@ run.
 """
 
 import logging
+import math
 from dataclasses import dataclass
 from datetime import date
 
@@ -47,7 +48,7 @@ class CanonicalProduct(BaseModel):
     sku: str
     category: Category
     brand: str
-    description: str
+    description: str = Field(min_length=1)
     web_description: str | None = None
     unit: str = "ΤΕΜ"
     specs: dict = Field(default_factory=dict)
@@ -74,20 +75,22 @@ class Rejection:
 
 
 def normalize_catalog(
-    products: list[dict],
+    products: list[dict], known_suppliers: set[str]
 ) -> tuple[list[CanonicalProduct], list[CanonicalStock], list[Rejection]]:
     """Turn the structured catalogue into canonical products and their stock entries.
 
     Args:
         products: One record per SKU, as the catalogue file holds them.
+        known_suppliers: The codes the registry carries, so a product cannot name one
+            that is not there.
 
     Returns:
         The products, their stock entries, and whatever could not be read. A record that
         fails is left out; the rest of the catalogue still loads.
     """
-    canonical: dict[str, CanonicalProduct] = {}
-    entries: list[CanonicalStock] = []
-    rejections: list[Rejection] = []
+    canonical = {}
+    entries = {}
+    rejections = []
 
     for record in products:
         raw_sku = str(record.get("sku", ""))
@@ -100,34 +103,49 @@ def normalize_catalog(
             rejections.append(Rejection("catalog", sku, "duplicate SKU"))
             continue
 
+        dropped = []
+        price, unusable = _price(record.get("price"))
+        if unusable:
+            dropped.append(unusable)
+
+        supplier = record.get("supplier")
+        if supplier and supplier not in known_suppliers:
+            dropped.append("unknown supplier")
+            supplier = None
+
         try:
             category = Category(record["category"])
+            description = _text(record["description"])
             product = CanonicalProduct(
                 sku=sku,
                 category=category,
                 brand=record["brand"],
-                description=record["description"].strip(),
-                web_description=(record.get("web_description") or "").strip() or None,
-                unit=record.get("unit", "ΤΕΜ"),
-                specs=parsers.extract_specs(category, record["description"]),
-                supplier_code=record.get("supplier"),
-                price=record.get("price"),
+                description=description,
+                web_description=_text(record.get("web_description")) or None,
+                unit=_text(record.get("unit")).upper() or "ΤΕΜ",
+                specs=parsers.extract_specs(category, description),
+                supplier_code=supplier or None,
+                price=price,
                 currency=record.get("currency", "EUR"),
-                price_updated_at=parsers.parse_date(record.get("price_updated_at", "")),
+                price_updated_at=parsers.parse_date(_text(record.get("price_updated_at"))),
             )
         except (ValidationError, ValueError, KeyError) as exc:
             rejections.append(Rejection("catalog", sku, _first_problem(exc)))
             continue
 
         canonical[sku] = product
+        rejections.extend(Rejection("catalog", sku, reason) for reason in dropped)
 
-        for held in record.get("stock", []):
+        for held in record.get("stock") or []:
             try:
-                entries.append(CanonicalStock(sku=sku, **held))
+                entry = CanonicalStock(sku=sku, **held)
             except (ValidationError, TypeError) as exc:
                 rejections.append(Rejection("catalog", sku, _first_problem(exc)))
+                continue
 
-    return list(canonical.values()), entries, rejections
+            entries.setdefault((entry.sku, entry.warehouse), entry)
+
+    return list(canonical.values()), list(entries.values()), rejections
 
 
 # ── Exported rows ─────────────────────────────────────────────────────────────
@@ -199,12 +217,9 @@ def _index_prices(pricing_rows: list[dict]) -> tuple[dict[str, dict], list[Rejec
             # The first line for a SKU is the one that counts, here as in the ERP.
             continue
 
-        amount = parsers.parse_price(row[PRICING_FIELDS["amount"]])
-        if amount is None:
-            rejections.append(Rejection("pricing", sku, "unreadable price"))
-            continue
-        if amount <= 0:
-            rejections.append(Rejection("pricing", sku, "price not above zero"))
+        amount, unusable = _usable(parsers.parse_price(row[PRICING_FIELDS["amount"]]))
+        if unusable:
+            rejections.append(Rejection("pricing", sku, unusable))
             continue
 
         indexed[sku] = {
@@ -252,6 +267,35 @@ def normalize_stock(
         entries.setdefault((entry.sku, entry.warehouse), entry)
 
     return list(entries.values()), rejections
+
+
+def _text(value) -> str:
+    """A text field the way the file left it, as text."""
+    return str(value).strip() if value is not None else ""
+
+
+def _price(value) -> tuple[float | None, str | None]:
+    """The price a catalogue record carries, however it happens to be written."""
+    if value is None or value == "":
+        return None, None
+
+    if isinstance(value, str):
+        return _usable(parsers.parse_price(value))
+
+    try:
+        return _usable(float(value))
+    except (TypeError, ValueError):
+        return None, "unreadable price"
+
+
+def _usable(amount: float | None) -> tuple[float | None, str | None]:
+    """The amount the catalogue can hold, or nothing and the reason it could not."""
+    if amount is None or not math.isfinite(amount):
+        return None, "unreadable price"
+    if amount <= 0:
+        return None, "price not above zero"
+
+    return amount, None
 
 
 def _first_problem(exc: Exception) -> str:

@@ -143,3 +143,31 @@ def test_an_import_can_be_taken_back_out():
     client.delete(f"/admin/runs/{report['request_id']}")
 
     assert client.get("/stats").json()["products"] == before - 1
+
+
+def test_a_sku_the_catalogue_already_holds_is_reported_not_silently_dropped():
+    upload({"item_code": "PWR-1504", "list_price": "20.00"})
+    report = upload({"item_code": "PWR-1504", "list_price": "99.00"})
+
+    assert report["products_loaded"] == 0
+    assert report["rejected_by_reason"] == {"already in the catalogue": 1}
+
+
+def test_an_unknown_supplier_costs_the_supplier_not_the_product():
+    report = upload(
+        {"item_code": "PWR-1505", "list_price": "30.00", "supplier": "SUP-99"}
+    )
+    found = client.post("/products/lookup", json={"skus": ["PWR-1505"]}).json()
+
+    assert report["products_loaded"] == 1
+    assert report["rejected_by_reason"] == {"unknown supplier": 1}
+    assert found[0]["supplier_code"] is None
+
+
+def test_a_file_with_too_many_lines_is_refused(monkeypatch):
+    monkeypatch.setattr(service, "MAX_IMPORT_ROWS", 2)
+    report = upload(
+        {"item_code": "PWR-1506"}, {"item_code": "PWR-1507"}, {"item_code": "PWR-1508"}
+    )
+
+    assert report["detail"] == "the file has more than 2 rows"
