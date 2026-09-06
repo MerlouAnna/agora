@@ -26,7 +26,7 @@ from services.data_service.categories import (
 )
 from services.data_service.generation import builder, descriptions, exports
 from services.data_service.ingestion import normalizer, parsers
-from services.data_service.ingestion.pipeline import spec_rows
+from services.data_service.ingestion.pipeline import product_rows
 from services.data_service.models import (
     GenerationRun,
     Price,
@@ -78,7 +78,8 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
         rejections + stock_rejections + _exhausted(exhausted) + _unphrased(unphrased)
     )
 
-    skus, specs_added, stock_added = _persist(db, products, stock)
+    skus, specs_added, stock_added, skipped = _persist(db, products, stock)
+    rejections = rejections + _already_held(skipped)
 
     run = GenerationRun(
         created_at=datetime.now(),
@@ -112,6 +113,8 @@ def generate(db: Session, request: GenerationRequest) -> GenerationReport:
         products=repository.summarize(db, repository.get_products(db, skus)),
     )
 
+
+MAX_IMPORT_ROWS = 5000
 
 IMPORT_COLUMNS = [
     "item_code",
@@ -153,6 +156,12 @@ def import_rows(db: Session, rows: list[dict], source: str) -> LoadReport:
 
     for row in rows:
         code = (row.get("item_code") or "").strip()
+        supplier = (row.get("supplier") or "").strip()
+        sku = parsers.normalize_sku(code)
+
+        if supplier and sku is not None and supplier not in known:
+            rejections.append(normalizer.Rejection("import", sku, "unknown supplier"))
+            supplier = ""
 
         erp.append(
             {
@@ -181,14 +190,8 @@ def import_rows(db: Session, rows: list[dict], source: str) -> LoadReport:
                 }
             )
 
-        supplier = (row.get("supplier") or "").strip()
-        sku = parsers.normalize_sku(code)
-        if not supplier or sku is None:
-            continue
-        if supplier not in known:
-            rejections.append(normalizer.Rejection("import", sku, "unknown supplier"))
-            continue
-        supplies[supplier].append(sku)
+        if supplier and sku is not None:
+            supplies[supplier].append(sku)
 
     products, product_rejections, duplicates = normalizer.normalize_products(
         erp,
@@ -198,9 +201,10 @@ def import_rows(db: Session, rows: list[dict], source: str) -> LoadReport:
     entries, stock_rejections = normalizer.normalize_stock(
         stock, {product.sku for product in products}
     )
-    rejections = _once(rejections + product_rejections + stock_rejections)
-
-    added, specs_added, stock_added = _persist(db, products, entries)
+    added, specs_added, stock_added, skipped = _persist(db, products, entries)
+    rejections = _once(
+        rejections + product_rejections + stock_rejections + _already_held(skipped)
+    )
     fresh = set(added)
 
     run = GenerationRun(
@@ -487,6 +491,12 @@ def _unphrased(skus: list[str]) -> list[normalizer.Rejection]:
     return [normalizer.Rejection("model", sku, "no usable description") for sku in skus]
 
 
+def _already_held(skus: list[str]) -> list[normalizer.Rejection]:
+    return [
+        normalizer.Rejection("catalogue", sku, "already in the catalogue") for sku in skus
+    ]
+
+
 # ── Loading ──────────────────────────────────────────────────────────────────
 
 
@@ -494,41 +504,28 @@ def _persist(
     db: Session,
     products: list[normalizer.CanonicalProduct],
     stock: list[normalizer.CanonicalStock],
-) -> tuple[list[str], int, int]:
-    """Add what is new. A SKU the catalogue already holds is left alone."""
-    known = {sku for (sku,) in db.query(Product.sku).all()}
+) -> tuple[list[str], int, int, list[str]]:
+    """Add what is new.
 
-    added: list[str] = []
+    Returns:
+        The SKUs added, the specification and stock rows that went with them, and the
+        SKUs the catalogue already held.
+    """
+    wanted = [product.sku for product in products]
+    known = {
+        sku for (sku,) in db.query(Product.sku).filter(Product.sku.in_(wanted)).all()
+    }
+
+    added, skipped = [], []
     specs_added = 0
 
     for product in products:
         if product.sku in known:
+            skipped.append(product.sku)
             continue
 
-        db.add(
-            Product(
-                sku=product.sku,
-                category=product.category,
-                brand=product.brand,
-                description=product.description,
-                web_description=product.web_description,
-                unit=product.unit,
-                supplier_code=product.supplier_code,
-            )
-        )
-        rows = spec_rows(product)
-        db.add_all(rows)
-        specs_added += len(rows)
-
-        if product.price is not None:
-            db.add(
-                Price(
-                    sku=product.sku,
-                    amount=product.price,
-                    currency=product.currency,
-                    updated_at=product.price_updated_at,
-                )
-            )
+        db.add_all(product_rows(product))
+        specs_added += len(product.specs)
         added.append(product.sku)
 
     fresh = set(added)
@@ -540,4 +537,4 @@ def _persist(
         stock_added += 1
 
     db.commit()
-    return added, specs_added, stock_added
+    return added, specs_added, stock_added, skipped

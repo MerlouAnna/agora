@@ -38,7 +38,9 @@ def record(
     """Write one call down.
 
     A failure to record is logged and swallowed: the usage log exists to be read later,
-    and losing a row is never a reason to fail the work that was actually asked for.
+    and losing a row is never a reason to fail the work that was actually asked for. The
+    tools can also run before the catalogue exists, so a missing table is built rather
+    than reported.
     """
     from services.data_service.database import DB_PATH
 
@@ -55,15 +57,11 @@ def record(
     )
 
     try:
-        _insert(call)
-    except OperationalError:
-        # The tools can run before the catalogue has been built, and a run that is about
-        # to spend money should not be the one that finds the log has nowhere to go.
-        _create_table()
         try:
             _insert(call)
-        except Exception as exc:
-            logger.warning("could not record model usage in %s: %s", DB_PATH, exc)
+        except OperationalError:
+            _create_table()
+            _insert(call)
     except Exception as exc:
         logger.warning("could not record model usage in %s: %s", DB_PATH, exc)
 
