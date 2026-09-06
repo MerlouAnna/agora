@@ -14,6 +14,7 @@ Nothing here goes through SQLAlchemy: the point is to run the caller's own SQL.
 import logging
 import sqlite3
 import time
+from contextlib import closing
 
 from services.data_service.database import DB_PATH
 
@@ -48,7 +49,7 @@ EXAMPLES = [
 
 def tables() -> list[dict]:
     """Every table, its columns, what it points at, and how many rows it holds."""
-    with _connect() as db:
+    with closing(_connect()) as db:
         found = []
 
         for (name,) in db.execute(
@@ -101,7 +102,7 @@ def run(sql: str, limit: int = 100) -> dict:
     limit = max(1, min(limit, MAX_ROWS))
     started = time.monotonic()
 
-    with _connect() as db:
+    with closing(_connect()) as db:
         deadline = started + TIMEOUT_SECONDS
         db.set_progress_handler(lambda: time.monotonic() > deadline, 2000)
         db.set_authorizer(_reads_only)
