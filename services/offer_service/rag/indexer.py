@@ -1,12 +1,10 @@
 """
 Indexing
 ========
-Building the collections: product cards from the catalogue, business documents from
-`data/docs`.
+Reads the catalogue and writes one card per product into the `products` collection.
 
-Both are rebuilt whole. The catalogue is small enough that working out what changed would
-cost more than embedding everything again, and a stale card is a product the salesperson
-is offered after it has been withdrawn.
+The index is rebuilt whole: the catalogue is small enough that working out what changed
+would cost more than embedding it again.
 """
 
 import logging
