@@ -2,11 +2,7 @@
 Vector store
 ============
 The two Chroma collections and the rules that hold for both: cosine distance, and no
-embedding function of their own.
-
-A collection built without an embedding function cannot quietly embed anything — it
-accepts vectors and refuses to invent them, which is what keeps `embeddings.py` the only
-route to a model.
+embedding function of their own, so that `embeddings.py` stays the only route to a model.
 """
 
 import logging
@@ -44,10 +40,8 @@ def client() -> ClientAPI:
 def collection(name: str):
     """One collection, created on first use.
 
-    `embedding_function=None` has to be passed as an argument. Declaring it inside the
-    configuration instead looks tidier and does the opposite: the collection falls back
-    to Chroma's own model, downloads it, and fills the store with vectors from a model
-    nobody chose.
+    `embedding_function=None` has to be passed as an argument — declared inside the
+    configuration it is ignored and Chroma falls back to a model of its own.
     """
     return client().get_or_create_collection(
         name, configuration=CONFIGURATION, embedding_function=None
@@ -55,12 +49,7 @@ def collection(name: str):
 
 
 def replace(name: str):
-    """The same collection, emptied first.
-
-    Indexing rebuilds rather than updates: a card whose product was deleted from the
-    catalogue would otherwise stay searchable forever, and nothing here is expensive
-    enough to justify working out the difference.
-    """
+    """The same collection, emptied first, so a withdrawn product cannot stay searchable."""
     try:
         client().delete_collection(name)
     except NotFoundError:
