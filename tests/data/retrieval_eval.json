@@ -1,0 +1,115 @@
+{
+  "cases": [
+    {
+      "id": "power-cable-thresholds",
+      "request": "Χρειάζομαι 15 καλώδια ρεύματος 3x2.5mm, τουλάχιστον 20 μέτρα, για εξωτερικό χώρο.",
+      "trap": "three cores, that section, and long enough — the length is a floor, not an equality",
+      "expected": [
+        "PWR-1008",
+        "PWR-1045",
+        "PWR-1053",
+        "PWR-1054"
+      ]
+    },
+    {
+      "id": "switch-ports-poe",
+      "request": "Θέλω switch με τουλάχιστον 24 θύρες και PoE σε κάθε θύρα.",
+      "trap": "a numeric floor and a boolean label together",
+      "expected": [
+        "SWT-1004",
+        "SWT-1013",
+        "SWT-1020",
+        "SWT-1022",
+        "SWT-1025"
+      ]
+    },
+    {
+      "id": "data-cable-shielded",
+      "request": "Θωρακισμένο καλώδιο δικτύου CAT6a, 10 μέτρα ή παραπάνω.",
+      "trap": "two labels the dense vector blurs — CAT6a is not CAT6, S/FTP is not FTP",
+      "expected": [
+        "DAT-1002",
+        "DAT-1013",
+        "DAT-1037"
+      ]
+    },
+    {
+      "id": "ups-autonomy-budget",
+      "request": "UPS για ταμειακό σύστημα, να κρατάει τουλάχιστον 20 λεπτά, μέχρι 900 ευρώ.",
+      "trap": "a spec floor and a budget ceiling — the price is not in the index",
+      "expected": [
+        "UPS-1005",
+        "UPS-1006",
+        "UPS-1008",
+        "UPS-1019",
+        "UPS-1020",
+        "UPS-1026",
+        "UPS-1027"
+      ]
+    },
+    {
+      "id": "psu-platinum-sfx",
+      "request": "Τροφοδοτικό 80+ Platinum σε SFX, πάνω από 700W.",
+      "trap": "two labels and a strict inequality",
+      "expected": [
+        "PSU-1014",
+        "PSU-1016",
+        "PSU-1020",
+        "PSU-1027",
+        "PSU-1029"
+      ]
+    },
+    {
+      "id": "connector-iec-63a",
+      "request": "Ρευματολήπτης IEC C19 63A για βιομηχανική παροχή.",
+      "trap": "a connector type written with a space, which a tokenizer will split",
+      "expected": [
+        "CON-1001",
+        "CON-1004",
+        "CON-1017",
+        "CON-1026"
+      ]
+    },
+    {
+      "id": "bare-sku",
+      "request": "PWR-1042 έχουμε;",
+      "trap": "a code pasted on its own — nothing for a dense vector to hold on to",
+      "expected": [
+        "PWR-1042"
+      ]
+    },
+    {
+      "id": "vague-no-numbers",
+      "request": "Θέλω κάτι για να μη σβήνει ο server όταν πέφτει το ρεύμα.",
+      "trap": "no number anywhere — the semantic side has to carry this one alone",
+      "expected": [
+        "UPS-1005",
+        "UPS-1006",
+        "UPS-1012",
+        "UPS-1014",
+        "UPS-1026",
+        "UPS-1027"
+      ]
+    },
+    {
+      "id": "data-cable-in-stock",
+      "request": "Χρειάζομαι 40 τεμάχια CAT6a από το ίδιο καλώδιο, άμεσα.",
+      "trap": "availability is the constraint, and stock is never in the index",
+      "expected": [
+        "DAT-1011",
+        "DAT-1028",
+        "DAT-1029",
+        "DAT-1037",
+        "DAT-1041"
+      ]
+    },
+    {
+      "id": "english-managed-gigabit",
+      "request": "Need a managed 24-port gigabit switch.",
+      "trap": "English against a Greek catalogue, and 1000Mbps is 'gigabit' nowhere in the text",
+      "expected": [
+        "SWT-1022"
+      ]
+    }
+  ]
+}
