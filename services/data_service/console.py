@@ -3,16 +3,15 @@ SQL console
 ===========
 Read-only access to the catalogue, for the questions the API does not answer.
 
-Two things stand between a request and the database, because one of them is not enough.
-The statement is read first and refused unless it is a single SELECT; then it runs on a
-connection SQLite itself opened read-only, so a statement that talks its way past the
-reader still cannot write. Keyword checks alone are a habit of being outsmarted.
+Three things stand between a request and the database: the statement has to open as a
+SELECT, the connection is one SQLite itself opened read-only, and SQLite is told to
+authorize reads and nothing else while the statement runs. What comes back is bounded
+twice, by the number of rows and by the size of a single value.
 
 Nothing here goes through SQLAlchemy: the point is to run the caller's own SQL.
 """
 
 import logging
-import re
 import sqlite3
 import time
 
@@ -21,24 +20,14 @@ from services.data_service.database import DB_PATH
 logger = logging.getLogger(__name__)
 
 MAX_ROWS = 500
+MAX_VALUE_BYTES = 100_000
 TIMEOUT_SECONDS = 5
 
-FORBIDDEN = (
-    "insert",
-    "update",
-    "delete",
-    "drop",
-    "alter",
-    "create",
-    "replace",
-    "attach",
-    "detach",
-    "pragma",
-    "vacuum",
-    "reindex",
-    "begin",
-    "commit",
-    "rollback",
+ALLOWED = (
+    sqlite3.SQLITE_SELECT,
+    sqlite3.SQLITE_READ,
+    sqlite3.SQLITE_FUNCTION,
+    sqlite3.SQLITE_RECURSIVE,
 )
 
 EXAMPLES = [
@@ -111,6 +100,7 @@ def run(sql: str, limit: int = 100) -> dict:
     with _connect() as db:
         deadline = started + TIMEOUT_SECONDS
         db.set_progress_handler(lambda: time.monotonic() > deadline, 2000)
+        db.set_authorizer(_reads_only)
 
         cursor = db.execute(statement)
         columns = [column[0] for column in cursor.description or []]
@@ -133,25 +123,25 @@ def _read(sql: str) -> str:
     if not statement:
         raise ValueError("there is no statement here")
 
-    if ";" in statement:
-        raise ValueError("one statement at a time")
-
-    lowered = statement.lower()
-    if not lowered.startswith(("select", "with")):
+    if not statement.lower().startswith(("select", "with")):
         raise ValueError("only SELECT is allowed, and WITH when it ends in one")
 
-    for word in FORBIDDEN:
-        if re.search(rf"\b{word}\b", lowered):
-            raise ValueError(f"{word.upper()} is not allowed here")
-
     return statement
+
+
+def _reads_only(action, *_):
+    """What SQLite is allowed to do while the caller's statement runs."""
+    return sqlite3.SQLITE_OK if action in ALLOWED else sqlite3.SQLITE_DENY
 
 
 def _connect() -> sqlite3.Connection:
     if not DB_PATH.exists():
         raise ValueError("there is no catalogue database yet — run the ingestion first")
 
-    return sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    db = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    # A row limit bounds how many values come back, not how large one of them is.
+    db.setlimit(sqlite3.SQLITE_LIMIT_LENGTH, MAX_VALUE_BYTES)
+    return db
 
 
 def _plain(value):
