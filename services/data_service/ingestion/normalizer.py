@@ -217,12 +217,9 @@ def _index_prices(pricing_rows: list[dict]) -> tuple[dict[str, dict], list[Rejec
             # The first line for a SKU is the one that counts, here as in the ERP.
             continue
 
-        amount = parsers.parse_price(row[PRICING_FIELDS["amount"]])
-        if amount is None:
-            rejections.append(Rejection("pricing", sku, "unreadable price"))
-            continue
-        if amount <= 0:
-            rejections.append(Rejection("pricing", sku, "price not above zero"))
+        amount, unusable = _usable(parsers.parse_price(row[PRICING_FIELDS["amount"]]))
+        if unusable:
+            rejections.append(Rejection("pricing", sku, unusable))
             continue
 
         indexed[sku] = {
@@ -278,16 +275,22 @@ def _text(value) -> str:
 
 
 def _price(value) -> tuple[float | None, str | None]:
-    """The price, or nothing and the reason it could not be used."""
-    if value is None:
+    """The price a catalogue record carries, however it happens to be written."""
+    if value is None or value == "":
         return None, None
 
+    if isinstance(value, str):
+        return _usable(parsers.parse_price(value))
+
     try:
-        amount = float(value)
+        return _usable(float(value))
     except (TypeError, ValueError):
         return None, "unreadable price"
 
-    if not math.isfinite(amount):
+
+def _usable(amount: float | None) -> tuple[float | None, str | None]:
+    """The amount the catalogue can hold, or nothing and the reason it could not."""
+    if amount is None or not math.isfinite(amount):
         return None, "unreadable price"
     if amount <= 0:
         return None, "price not above zero"
