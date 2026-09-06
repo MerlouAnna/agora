@@ -1,17 +1,8 @@
 """
 Embedded texts, kept
 ====================
-The vectors the embedding model produced — one file for the product cards, one for the
-passages of the business documents — stored in version control beside the catalogue and
-the documents they describe.
-
-They are here for the same reason the shop texts are: they were paid for, and nothing
-reproduces them for free. The index built on top of them is a different matter — that is
-derived, and rebuilding it costs seconds.
-
-Each vector is filed under its own code — a SKU, or a document and section — with a digest
-of the text it came from, so a text that has been rewritten is embedded again and every
-other one is not.
+The vectors the model produced, kept in version control because they were paid for. Each
+is filed under its code with a digest of its text, so only a rewritten text is paid twice.
 """
 
 import logging
