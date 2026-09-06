@@ -8,9 +8,10 @@ the same cards — by meaning and by word — merged, and priced from the catalo
 import logging
 from dataclasses import dataclass
 
+from services.data_service.categories import ORDERED_LABELS
 from services.offer_service.clients import catalog
 from services.offer_service.rag import embeddings, filters, lexical, store
-from services.offer_service.requirements import CustomerRequirements
+from services.offer_service.requirements import CustomerRequirements, Ordering
 
 logger = logging.getLogger(__name__)
 
@@ -59,13 +60,19 @@ def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> t
     """
     products = _built()
     where = filters.where(requirements)
-    eligible = products.get(where=where, include=["documents"])
+    eligible = products.get(where=where, include=["documents", "metadatas"])
     codes = list(eligible["ids"])
     trace: dict = {"eligible": len(codes), "filter": where}
 
     if not codes:
         logger.info("nothing satisfies the constraints — the model was not asked for a vector")
         return [], trace
+
+    if requirements.order is not None:
+        ordered = _at_the_end(requirements.order, codes, eligible["metadatas"] or [])[:limit]
+        order = requirements.order
+        trace |= {"ordered_by": f"{order.key} {order.end}", "fused": ordered}
+        return ordered, trace
 
     by_word = lexical.ranked(requirements.request, codes, list(eligible["documents"] or []))
     by_meaning = _by_meaning(products, requirements.request, where, len(codes))
@@ -104,13 +111,36 @@ def _built():
     return products
 
 
+def _at_the_end(order: Ordering, codes: list[str], metadata: list) -> list[str]:
+    """The eligible products sorted at the end of the range the request named.
+
+    "The longest cable you have" is a question the catalogue answers exactly; asking either
+    ranking to guess it is asking the wrong thing. Products with no such specification go
+    last rather than being dropped.
+    """
+    held = dict(zip(codes, metadata, strict=True))
+    known = [code for code in codes if held[code].get(order.key) is not None]
+    away = -1 if order.end == "max" else 1
+
+    ranked = sorted(known, key=lambda code: (away * _place(order.key, held[code][order.key]), code))
+    return ranked + [code for code in codes if code not in set(known)]
+
+
+def _place(key: str, value) -> float:
+    if key in ORDERED_LABELS:
+        return float(ORDERED_LABELS[key].index(value))
+    return float(value)
+
+
 def _by_meaning(products, request: str, where: dict | None, eligible: int) -> list[str]:
+    """Every eligible product, nearest first — both rankings have to cover the same set.
+
+    A product missing from one of them scores nothing from that half, which is a heavier
+    penalty than being placed last in it.
+    """
     vector = embeddings.embed([request], PURPOSE)[0]
     found = products.query(
-        query_embeddings=[list(vector)],
-        where=where,
-        n_results=min(CANDIDATES, eligible),
-        include=[],
+        query_embeddings=[list(vector)], where=where, n_results=eligible, include=[]
     )
     return list(found["ids"][0])
 

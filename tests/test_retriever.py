@@ -125,6 +125,21 @@ def test_both_halves_of_the_search_decide_the_order():
     assert set(ordered[:2]) == {"PWR-1001", "PWR-1002"}
 
 
+def test_the_end_of_a_range_is_sorted_rather_than_ranked(monkeypatch):
+    """The catalogue answers "the longest one" exactly, so neither half is asked to guess."""
+    indexer.rebuild_products()
+    monkeypatch.setattr(
+        embeddings, "embed", lambda texts, purpose: pytest.fail("the request was embedded")
+    )
+
+    found = retriever.search(
+        asked("το πιο μακρύ καλώδιο", category="POWER", order={"key": "length_m", "end": "max"})
+    )
+
+    assert [match.sku for match in found.matches] == ["PWR-1002", "PWR-1000", "PWR-1001"]
+    assert found.trace["ordered_by"] == "length_m max"
+
+
 def test_the_price_and_the_stock_come_from_the_catalogue():
     """Neither is in the card, and neither may be: both change without a reindex."""
     indexer.rebuild_products()
