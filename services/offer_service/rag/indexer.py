@@ -24,14 +24,14 @@ def rebuild_products() -> dict:
     """Read the catalogue, write one card per product into the `products` collection.
 
     Returns:
-        How many products, how many carry a distinguishing line, and how many cards had
-        to be embedded rather than read off the file.
+        How many products, and how many cards had to be embedded rather than read off
+        the file.
     """
     products = catalog.fetch_all()
     if not products:
         store.replace(store.PRODUCTS)
         logger.warning("the catalogue returned no products — the collection was emptied")
-        return {"products": 0, "with_context": 0, "embedded": 0, "reused": 0}
+        return {"products": 0, "embedded": 0, "reused": 0}
 
     cards = documents.build_cards(products)
     skus = [card.sku for card in cards]
@@ -48,7 +48,6 @@ def rebuild_products() -> dict:
 
     report = {
         "products": len(cards),
-        "with_context": sum(1 for card in cards if documents.CONTEXT_PREFIX in card.text),
         "embedded": embedded,
         "reused": len(cards) - embedded,
     }

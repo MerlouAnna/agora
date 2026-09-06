@@ -49,6 +49,7 @@ SKU_PREFIXES = {
 
 NUMERIC = "numeric"
 LABEL = "label"
+BOOLEAN = "boolean"
 
 SPEC_TYPES = {
     "cores": NUMERIC,
@@ -67,8 +68,16 @@ SPEC_TYPES = {
     "form_factor": LABEL,
     "topology": LABEL,
     "connector_type": LABEL,
-    "poe": LABEL,
-    "managed": LABEL,
+    "poe": BOOLEAN,
+    "managed": BOOLEAN,
+}
+
+# Labels that carry an order, weakest first.
+ORDERED_LABELS = {
+    "ip_rating": ["IP44", "IP54", "IP67"],
+    "efficiency": ["80+ Bronze", "80+ Gold", "80+ Platinum"],
+    "standard": ["CAT5e", "CAT6", "CAT6a", "CAT7"],
+    "shielding": ["UTP", "FTP", "S/FTP"],
 }
 
 CATEGORY_SPECS = {
@@ -98,3 +107,21 @@ def specs_for(category: Category) -> list[str]:
 
 def is_numeric(key: str) -> bool:
     return SPEC_TYPES.get(key) == NUMERIC
+
+
+def is_flag(key: str) -> bool:
+    return SPEC_TYPES.get(key) == BOOLEAN
+
+
+def ranked(key: str, value: str, op: str) -> list[str]:
+    """The values of an ordered label that satisfy this comparison. IP54 or better is IP54, IP67."""
+    order = ORDERED_LABELS[key]
+    at = order.index(value)
+    spans = {
+        "eq": slice(at, at + 1),
+        "gte": slice(at, None),
+        "gt": slice(at + 1, None),
+        "lte": slice(None, at + 1),
+        "lt": slice(None, at),
+    }
+    return order[spans[op]]
