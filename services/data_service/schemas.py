@@ -222,3 +222,48 @@ class UsageReport(BaseModel):
     by_model: list[UsageLine] = Field(default_factory=list)
     by_purpose: list[UsageLine] = Field(default_factory=list)
     by_day: list[UsageLine] = Field(default_factory=list)
+
+
+class SchemaColumn(BaseModel):
+    name: str
+    type: str
+    nullable: bool
+    primary_key: bool
+
+
+class SchemaTable(BaseModel):
+    name: str
+    rows: int
+    columns: list[SchemaColumn]
+    references: dict[str, str] = Field(
+        default_factory=dict, description="Column to the table.column it points at"
+    )
+
+
+class CatalogueSchema(BaseModel):
+    """What there is to query, and a few queries to start from."""
+
+    tables: list[SchemaTable]
+    examples: list[str]
+
+
+class QueryRequest(BaseModel):
+    sql: str = Field(..., min_length=1, description="One SELECT statement")
+    limit: int = Field(100, ge=1, le=500, description="How many rows to read back")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "sql": "select category, count(*) as products from products group by category",
+                "limit": 100,
+            }
+        }
+    }
+
+
+class QueryResult(BaseModel):
+    columns: list[str]
+    rows: list[list] = Field(default_factory=list)
+    row_count: int
+    truncated: bool = Field(..., description="There were more rows than the limit asked for")
+    elapsed_ms: int
