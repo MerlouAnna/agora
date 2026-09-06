@@ -4,6 +4,25 @@
       "id": "power-cable-thresholds",
       "request": "Χρειάζομαι 15 καλώδια ρεύματος 3x2.5mm, τουλάχιστον 20 μέτρα, για εξωτερικό χώρο.",
       "trap": "three cores, that section, and long enough — the length is a floor, not an equality",
+      "requirements": {
+        "category": "POWER",
+        "quantity": 15,
+        "constraints": [
+          {
+            "key": "cores",
+            "value": 3
+          },
+          {
+            "key": "section_mm",
+            "value": 2.5
+          },
+          {
+            "key": "length_m",
+            "op": "gte",
+            "value": 20
+          }
+        ]
+      },
       "expected": [
         "PWR-1008",
         "PWR-1045",
@@ -15,6 +34,20 @@
       "id": "switch-ports-poe",
       "request": "Θέλω switch με τουλάχιστον 24 θύρες και PoE σε κάθε θύρα.",
       "trap": "a numeric floor and a boolean label together",
+      "requirements": {
+        "category": "NETWORK",
+        "constraints": [
+          {
+            "key": "ports",
+            "op": "gte",
+            "value": 24
+          },
+          {
+            "key": "poe",
+            "value": true
+          }
+        ]
+      },
       "expected": [
         "SWT-1004",
         "SWT-1013",
@@ -27,6 +60,24 @@
       "id": "data-cable-shielded",
       "request": "Θωρακισμένο καλώδιο δικτύου CAT6a, 10 μέτρα ή παραπάνω.",
       "trap": "two labels the dense vector blurs — CAT6a is not CAT6, S/FTP is not FTP",
+      "requirements": {
+        "category": "DATA",
+        "constraints": [
+          {
+            "key": "standard",
+            "value": "CAT6a"
+          },
+          {
+            "key": "shielding",
+            "value": "S/FTP"
+          },
+          {
+            "key": "length_m",
+            "op": "gte",
+            "value": 10
+          }
+        ]
+      },
       "expected": [
         "DAT-1002",
         "DAT-1013",
@@ -37,6 +88,17 @@
       "id": "ups-autonomy-budget",
       "request": "UPS για ταμειακό σύστημα, να κρατάει τουλάχιστον 20 λεπτά, μέχρι 900 ευρώ.",
       "trap": "a spec floor and a budget ceiling — the price is not in the index",
+      "requirements": {
+        "category": "UPS",
+        "price_max": 900,
+        "constraints": [
+          {
+            "key": "autonomy_min",
+            "op": "gte",
+            "value": 20
+          }
+        ]
+      },
       "expected": [
         "UPS-1005",
         "UPS-1006",
@@ -51,6 +113,25 @@
       "id": "psu-platinum-sfx",
       "request": "Τροφοδοτικό 80+ Platinum σε SFX, πάνω από 700W.",
       "trap": "two labels and a strict inequality",
+      "requirements": {
+        "category": "PSU",
+        "constraints": [
+          {
+            "key": "efficiency",
+            "op": "gte",
+            "value": "80+ Platinum"
+          },
+          {
+            "key": "form_factor",
+            "value": "SFX"
+          },
+          {
+            "key": "watt",
+            "op": "gt",
+            "value": 700
+          }
+        ]
+      },
       "expected": [
         "PSU-1014",
         "PSU-1016",
@@ -63,6 +144,19 @@
       "id": "connector-iec-63a",
       "request": "Ρευματολήπτης IEC C19 63A για βιομηχανική παροχή.",
       "trap": "a connector type written with a space, which a tokenizer will split",
+      "requirements": {
+        "category": "CONNECTORS",
+        "constraints": [
+          {
+            "key": "connector_type",
+            "value": "IEC C19"
+          },
+          {
+            "key": "amperage",
+            "value": 63
+          }
+        ]
+      },
       "expected": [
         "CON-1001",
         "CON-1004",
@@ -74,6 +168,7 @@
       "id": "bare-sku",
       "request": "PWR-1042 έχουμε;",
       "trap": "a code pasted on its own — nothing for a dense vector to hold on to",
+      "requirements": {},
       "expected": [
         "PWR-1042"
       ]
@@ -82,6 +177,9 @@
       "id": "vague-no-numbers",
       "request": "Θέλω κάτι για να μη σβήνει ο server όταν πέφτει το ρεύμα.",
       "trap": "no number anywhere — the semantic side has to carry this one alone",
+      "requirements": {
+        "category": "UPS"
+      },
       "expected": [
         "UPS-1005",
         "UPS-1006",
@@ -95,6 +193,17 @@
       "id": "data-cable-in-stock",
       "request": "Χρειάζομαι 40 τεμάχια CAT6a από το ίδιο καλώδιο, άμεσα.",
       "trap": "availability is the constraint, and stock is never in the index",
+      "requirements": {
+        "category": "DATA",
+        "quantity": 40,
+        "immediate": true,
+        "constraints": [
+          {
+            "key": "standard",
+            "value": "CAT6a"
+          }
+        ]
+      },
       "expected": [
         "DAT-1011",
         "DAT-1028",
@@ -107,6 +216,23 @@
       "id": "english-managed-gigabit",
       "request": "Need a managed 24-port gigabit switch.",
       "trap": "English against a Greek catalogue, and 1000Mbps is 'gigabit' nowhere in the text",
+      "requirements": {
+        "category": "NETWORK",
+        "constraints": [
+          {
+            "key": "managed",
+            "value": true
+          },
+          {
+            "key": "ports",
+            "value": 24
+          },
+          {
+            "key": "speed_mbps",
+            "value": 1000
+          }
+        ]
+      },
       "expected": [
         "SWT-1022"
       ]
@@ -115,6 +241,13 @@
       "id": "longest-power-cable",
       "request": "Ποιο είναι το πιο μακρύ καλώδιο ρεύματος που έχετε;",
       "trap": "no threshold and no label — the answer is which products sit at the end of a range",
+      "requirements": {
+        "category": "POWER",
+        "order": {
+          "key": "length_m",
+          "end": "max"
+        }
+      },
       "expected": [
         "PWR-1008",
         "PWR-1011",

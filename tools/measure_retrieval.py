@@ -1,13 +1,12 @@
 """
 Retrieval measurement
 =====================
-Runs the requests in tests/data/retrieval_eval.json and reports how many of the products
-that should have come back actually did, at two cut-offs, for each half of the search and
-for the two of them fused.
+Runs the requests in tests/data/retrieval_eval.json twice: once on the ranking alone, to
+say what each half of the search is worth, and once with the request's constraints as
+well, which is what the system actually does.
 
 The expected answers were computed with SQL against the catalogue, not chosen by eye, so
 the number this prints is a fact about the retriever and not about anyone's judgement.
-No constraints are applied: this measures the ranking, and the filter is measured apart.
 
 Run from the repository root:  python -m tools.measure_retrieval
 """
@@ -18,7 +17,7 @@ from pathlib import Path
 
 from services.data_service import repository
 from services.data_service.database import SessionLocal
-from services.data_service.models import Product
+from services.data_service.models import Price, Product, Stock
 from services.offer_service.rag import embeddings, lexical, retriever
 from services.offer_service.rag.documents import build_cards
 from services.offer_service.requirements import CustomerRequirements
@@ -29,6 +28,7 @@ logger = logging.getLogger(__name__)
 EVAL_FILE = Path(__file__).resolve().parent.parent / "tests" / "data" / "retrieval_eval.json"
 CUTOFFS = (5, 10)
 COLUMNS = ("words", "meaning", "fused")
+KEYS = ("by_word", "by_meaning", "fused")
 
 
 def corpus() -> tuple[list[str], list[str]]:
@@ -43,47 +43,78 @@ def corpus() -> tuple[list[str], list[str]]:
     return [card.sku for card in cards], [card.text for card in cards]
 
 
+def current() -> tuple[dict, dict]:
+    """Price and total stock per SKU. The service reads these over HTTP; here they are read
+    straight from the database, so the measurement needs nothing running."""
+    with SessionLocal() as db:
+        prices = {row.sku: row.amount for row in db.query(Price).all()}
+        stock: dict[str, int] = {}
+        for row in db.query(Stock).all():
+            stock[row.sku] = stock.get(row.sku, 0) + row.quantity
+
+    return prices, stock
+
+
 def recall(found: list[str], expected: list[str], at: int) -> float:
     """The share of the products that should have come back which did, inside the top `at`."""
     hit = set(found[:at]) & set(expected)
     return len(hit) / len(expected)
 
 
-def rankings(request: str, skus: list[str], documents: list[str], whole: bool) -> dict:
-    """One ordering per column, from the index when it can be reached and BM25 when not."""
-    if not whole:
-        return {"words": lexical.ranked(request, skus, documents)}
-
-    _, trace = retriever.candidates(CustomerRequirements(request=request), limit=max(CUTOFFS))
-    keys = ("by_word", "by_meaning", "fused")
-    return {name: trace[key] for name, key in zip(COLUMNS, keys, strict=True)}
-
-
 def reachable() -> bool:
-    """Whether the meaning side can be measured at all, asked once rather than per request."""
+    """Whether the index can be searched at all, asked once rather than per request."""
     try:
         retriever.candidates(CustomerRequirements(request="καλώδιο"), limit=1)
     except (retriever.IndexNotBuilt, embeddings.EmbeddingsUnavailable) as exc:
-        logger.info("the meaning side is not being measured — %s", exc)
+        logger.info("only the words can be measured — %s", exc)
         return False
 
     return True
 
 
-def run() -> None:
-    cases = json.loads(EVAL_FILE.read_text(encoding="utf-8"))["cases"]
-    skus, documents = corpus()
-    whole = reachable()
-    columns = COLUMNS if whole else COLUMNS[:1]
+def rankings(case: dict, corpus_: tuple, whole: bool, constrained: bool, held: tuple) -> tuple:
+    """One ordering per column for one request, and whether the range decided it."""
+    asked = CustomerRequirements(
+        request=case["request"], **(case["requirements"] if constrained else {})
+    )
+    if not whole:
+        return {"words": lexical.ranked(asked.request, *corpus_)}, False
 
-    logger.info("%d products, %d requests", len(skus), len(cases))
+    _, trace = retriever.candidates(asked, limit=retriever.CANDIDATES)
+    if "ordered_by" in trace:
+        found = dict.fromkeys(COLUMNS, list(trace["fused"]))
+    else:
+        found = {name: list(trace.get(key, [])) for name, key in zip(COLUMNS, KEYS, strict=True)}
+
+    return {name: _affordable(codes, asked, held) for name, codes in found.items()}, (
+        "ordered_by" in trace
+    )
+
+
+def _affordable(codes: list[str], asked: CustomerRequirements, held: tuple) -> list[str]:
+    """What the request's budget and its urgency leave, in the order the ranking put them."""
+    prices, stock = held
+    if asked.price_max is not None:
+        codes = [c for c in codes if prices.get(c) is not None and prices[c] <= asked.price_max]
+    if asked.immediate and asked.quantity:
+        codes = [c for c in codes if stock.get(c, 0) >= asked.quantity]
+
+    return codes
+
+
+def table(title: str, cases: list, corpus_: tuple, whole: bool, constrained: bool, held: tuple):
+    columns = COLUMNS if whole else COLUMNS[:1]
+    totals = {(name, at): 0.0 for name in columns for at in CUTOFFS}
+
     logger.info("")
+    logger.info("%s", title)
     logger.info("%-28s" + " %-12s" * len(columns), "request", *columns)
     logger.info("%-28s" + " %-12s" * len(columns), "", *["@5   @10"] * len(columns))
 
-    totals = {(name, at): 0.0 for name in columns for at in CUTOFFS}
+    sorted_any = False
     for case in cases:
-        found = rankings(case["request"], skus, documents, whole)
+        found, by_range = rankings(case, corpus_, whole, constrained, held)
+        sorted_any = sorted_any or by_range
         scored = {
             (name, at): recall(found[name], case["expected"], at)
             for name in columns
@@ -94,16 +125,28 @@ def run() -> None:
 
         logger.info(
             "%-28s" + " %-12s" * len(columns),
-            case["id"],
+            case["id"] + (" *" if by_range else ""),
             *[_pair(scored, name) for name in columns],
         )
 
-    logger.info("")
+    means = {key: value / len(cases) for key, value in totals.items()}
     logger.info(
-        "%-28s" + " %-12s" * len(columns),
-        "MEAN",
-        *[_pair({k: v / len(cases) for k, v in totals.items()}, name) for name in columns],
+        "%-28s" + " %-12s" * len(columns), "MEAN", *[_pair(means, name) for name in columns]
     )
+    if sorted_any:
+        logger.info("* answered by sorting the range, so neither ranking was asked")
+
+
+def run() -> None:
+    cases = json.loads(EVAL_FILE.read_text(encoding="utf-8"))["cases"]
+    corpus_ = corpus()
+    held = current()
+    whole = reachable()
+
+    logger.info("%d products, %d requests", len(corpus_[0]), len(cases))
+    table("the ranking alone", cases, corpus_, whole, False, held)
+    if whole:
+        table("the constraints and the ranking together", cases, corpus_, whole, True, held)
 
 
 def _pair(scored: dict, name: str) -> str:
