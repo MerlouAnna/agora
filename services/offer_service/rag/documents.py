@@ -4,11 +4,9 @@ Product cards
 The text that goes into the vector store, one card per SKU, and the metadata a search
 filters on before it compares a single vector.
 
-A card carries four things: the code and where the product sits in the catalogue, one
-line saying what distinguishes it from the products around it, its specifications
-written out in the tokens people actually type, and the shop text. Price and stock are
-deliberately missing — both change without anything being reindexed, and an offer quoted
-from a stale number is worse than no offer at all.
+A card carries the code, one line on what distinguishes the product inside its category,
+the specifications in the tokens people type, and the shop text. Never the price or the
+stock: both change without anything being reindexed.
 """
 
 from collections import defaultdict
@@ -16,8 +14,7 @@ from dataclasses import dataclass
 
 from services.data_service.categories import Category, specs_for
 
-# Above this share of the category, being the highest or the lowest says nothing: three
-# cores is the smallest cable we sell and also what most of the shelf holds.
+# Being the lowest says nothing when most of the shelf shares it: three cores, 35 of 58 cables.
 EXTREME_SHARE = 1 / 3
 RARE_SHARE = 1 / 5
 
@@ -86,9 +83,7 @@ def build_cards(products: list[dict]) -> list[Card]:
 def card_text(product: dict, cohort: dict[str, list]) -> str:
     """The lines that get embedded, for one product.
 
-    A product that stands out nowhere gets no context line at all: the same sentence
-    repeated across half the catalogue is a constant, and a constant tells a search
-    nothing.
+    A product that stands out nowhere gets no context line at all.
     """
     specs = product.get("specs") or {}
     context = context_line(specs, cohort)
@@ -108,8 +103,7 @@ def card_text(product: dict, cohort: dict[str, list]) -> str:
 def context_line(specs: dict, cohort: dict[str, list]) -> str:
     """Where this product's specifications sit among the products it competes with.
 
-    Only the ends of a range and the values almost nobody else carries are worth saying;
-    a product that is unremarkable everywhere is described as exactly that.
+    Only the ends of a range and the values almost nobody else carries are worth saying.
     """
     notes = []
 
@@ -127,7 +121,9 @@ def context_line(specs: dict, cohort: dict[str, list]) -> str:
             elif value == min(values):
                 notes.append(f"{low} στην κατηγορία ({measure(key, value)})")
         elif key not in EXTREMES and share <= RARE_SHARE:
-            notes.append(f"σπάνιο {value}, {values.count(value)} από {len(values)} προϊόντα")
+            label = measure(key, value)
+            if label:
+                notes.append(f"σπάνιο {label}, {values.count(value)} από {len(values)} προϊόντα")
 
     return " · ".join(notes) if notes else MID_RANGE
 
@@ -156,12 +152,7 @@ def measure(key: str, value) -> str | None:
 
 
 def metadata_for(product: dict) -> dict:
-    """What the search filters on: the category, who supplies it, and every specification.
-
-    Prices and stock are left out on purpose — they are read from the catalogue when an
-    offer is built, so that no answer is ever assembled from a number the index happened
-    to be holding.
-    """
+    """What the search filters on: the category, who supplies it, and every specification."""
     metadata = {
         "sku": product["sku"],
         "category": product["category"],
@@ -188,7 +179,9 @@ def _cohorts(products: list[dict]) -> dict[str, dict[str, list]]:
 
 
 def _true(value) -> bool:
-    return str(value).strip().lower() == "true" if not isinstance(value, bool) else value
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() == "true"
 
 
 def _number(value) -> str:

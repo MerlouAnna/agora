@@ -41,6 +41,15 @@ def test_a_switch_without_poe_never_says_poe():
     assert off.metadata["poe"] is False
 
 
+def test_a_flag_is_named_when_it_is_rare_and_never_named_when_it_is_off():
+    """A switch without PoE is not the one switch in ten that has it."""
+    mostly_on = {"poe": ["true"] * 9 + ["false"]}
+    mostly_off = {"poe": ["false"] * 9 + ["true"]}
+
+    assert documents.context_line({"poe": "false"}, mostly_on) == documents.MID_RANGE
+    assert "σπάνιο PoE" in documents.context_line({"poe": "true"}, mostly_off)
+
+
 def test_an_extreme_most_of_the_category_shares_is_not_worth_saying():
     """Three cores is the lowest we sell and also what two thirds of the shelf holds."""
     cohort = {"cores": [3] * 8 + [5] * 4}
@@ -54,7 +63,10 @@ def test_a_product_that_stands_out_nowhere_gets_no_context_line():
             product(sku="DAT-1000", category="DATA", standard="CAT6", length_m=5),
             product(sku="DAT-1001", category="DATA", standard="CAT6", length_m=30),
         ]
-        + [product(sku=f"DAT-10{n:02d}", category="DATA", standard="CAT6", length_m=5) for n in range(2, 8)]
+        + [
+            product(sku=f"DAT-10{n:02d}", category="DATA", standard="CAT6", length_m=5)
+            for n in range(2, 8)
+        ]
     )[:2]
     assert documents.CONTEXT_PREFIX not in plain.text
     assert "το μεγαλύτερο μήκος" in longest.text
