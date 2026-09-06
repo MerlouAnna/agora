@@ -98,22 +98,54 @@ def test_a_product_the_constraints_exclude_never_reaches_either_ranking():
     assert found.trace["eligible"] == 2
 
 
-def test_constraints_nothing_satisfies_cost_nothing(monkeypatch):
-    """The model is asked for a vector after the filter, never before it."""
+def test_a_request_nothing_satisfies_comes_back_with_what_each_concession_costs():
+    """No three-core cable reaches 2500W. Both ways of bending are offers, not mistakes."""
+    indexer.rebuild_products()
+
+    found = retriever.search(
+        asked(
+            "τριπολικό καλώδιο 2.5kW",
+            category="POWER",
+            constraints=[
+                Constraint(key="cores", value=3),
+                Constraint(key="watt", op="gte", value=2500),
+            ],
+        )
+    )
+
+    assert sorted(match.sku for match in found.matches) == ["PWR-1000", "PWR-1001", "PWR-1002"]
+    assert found.trace["concessions"] == {
+        "cores eq 3": ["PWR-1002"],
+        "watt gte 2500": ["PWR-1000", "PWR-1001"],
+    }
+
+
+def test_a_request_with_nothing_to_search_costs_nothing(monkeypatch):
+    """No switches in the catalogue and no constraint to loosen: do not pay for a vector."""
     indexer.rebuild_products()
     monkeypatch.setattr(
         embeddings, "embed", lambda texts, purpose: pytest.fail("the request was embedded")
     )
 
-    found = retriever.search(
-        asked("καλώδιο", category="POWER", constraints=[Constraint(key="cores", value=9)])
-    )
+    found = retriever.search(asked("switch", category="NETWORK"))
 
     assert found.matches == []
     assert found.trace["eligible"] == 0
 
 
 def test_neither_half_can_bury_what_the_other_put_first():
+    """The guarantee the merge exists for: the n-th of each half lands no worse than 2n."""
+    words = [f"A{n}" for n in range(20)]
+    meaning = [f"B{n}" for n in range(20)]
+
+    merged = retriever._merged(words, meaning)
+
+    assert all(
+        merged.index(half[n]) <= 2 * n + 1 for half in (words, meaning) for n in range(len(half))
+    )
+
+
+def test_both_halves_of_the_search_reach_the_merge():
     """The word side is handed a code, the meaning side is aimed elsewhere: both survive."""
     indexer.rebuild_products()
 

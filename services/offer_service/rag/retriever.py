@@ -1,9 +1,10 @@
 """
 Retrieval
 =========
-The products a request should be shown: narrowed by its constraints, then found twice over
-the same cards — by meaning and by word — merged, and priced from the catalogue. The same
-two halves answer a question put to the business documents.
+The products a request should be shown: narrowed by its constraints — loosened by one of
+them when nothing survives — then found twice over the same cards, by meaning and by word,
+merged and priced from the catalogue. The same two halves answer a question put to the
+business documents.
 """
 
 import logging
@@ -13,7 +14,7 @@ from itertools import zip_longest
 from services.data_service.categories import ORDERED_LABELS
 from services.offer_service.clients import catalog
 from services.offer_service.rag import embeddings, filters, lexical, store
-from services.offer_service.requirements import CustomerRequirements, Ordering
+from services.offer_service.requirements import Constraint, CustomerRequirements, Ordering
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +76,18 @@ def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> t
     codes = list(eligible["ids"])
     trace: dict = {"eligible": len(codes), "filter": where}
 
+    if not codes and requirements.constraints:
+        reached, given = _relaxed(products, requirements)
+        where = {"sku": {"$in": reached}} if reached else where
+        eligible = products.get(where=where, include=["documents", "metadatas"])
+        codes = list(eligible["ids"])
+        trace |= {"eligible": len(codes), "filter": where} | given
+        logger.info(
+            "nothing satisfied the request — %d products are one concession away", len(codes)
+        )
+
     if not codes:
-        logger.info("nothing satisfies the constraints — the model was not asked for a vector")
+        logger.info("nothing to search — the model was not asked for a vector")
         return [], trace
 
     if requirements.order is not None:
@@ -152,6 +163,46 @@ def search_policies(question: str, limit: int = 5) -> tuple[list[Excerpt], dict]
         for code in ordered
     ]
     return found, trace
+
+
+def _relaxed(products, requirements: CustomerRequirements) -> tuple[list[str], dict]:
+    """Everything that is one concession away, and which concession each product costs.
+
+    Choosing between them is not this service's business. A switch with fewer ports but the
+    PoE the customer asked for, and a switch with the ports but no PoE, are two offers to
+    put in front of a salesperson, not a right answer and a wrong one.
+    """
+    opened: dict[str, list[str]] = {}
+    for n, constraint in enumerate(requirements.constraints):
+        clause = _without(requirements, n)
+        opened[_written(constraint)] = list(products.get(where=clause, include=[])["ids"])
+
+    reached: dict[str, None] = {}
+    for found in opened.values():
+        for code in found:
+            reached.setdefault(code)
+
+    if reached:
+        return list(reached), {"concessions": {c: f for c, f in opened.items() if f}}
+
+    everything = range(len(requirements.constraints))
+    clause = _without(requirements, *everything)
+    found = list(products.get(where=clause, include=[])["ids"])
+    return found, {"concessions": {"every constraint": found} if found else {}}
+
+
+def _without(requirements: CustomerRequirements, *dropped: int) -> dict | None:
+    kept = [c for n, c in enumerate(requirements.constraints) if n not in dropped]
+    return filters.where(requirements.model_copy(update={"constraints": kept}))
+
+
+def _written(constraint: Constraint) -> str:
+    """The constraint as the trace shows it, and as an explanation would read it out."""
+    value = constraint.value
+    if isinstance(value, float) and value.is_integer():
+        value = int(value)
+
+    return f"{constraint.key} {constraint.op} {value}"
 
 
 def _built(name: str = store.PRODUCTS):
