@@ -110,6 +110,20 @@
       "expected": [
         "SWT-1022"
       ]
+    },
+    {
+      "id": "longest-power-cable",
+      "request": "Ποιο είναι το πιο μακρύ καλώδιο ρεύματος που έχετε;",
+      "trap": "no threshold and no label — the answer is which products sit at the end of a range",
+      "expected": [
+        "PWR-1008",
+        "PWR-1011",
+        "PWR-1030",
+        "PWR-1036",
+        "PWR-1039",
+        "PWR-1041",
+        "PWR-1054"
+      ]
     }
   ]
 }
