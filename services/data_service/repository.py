@@ -8,7 +8,7 @@ nowhere else.
 
 from datetime import datetime
 
-from sqlalchemy import case, func
+from sqlalchemy import Row, case, func
 from sqlalchemy.orm import Session, aliased
 
 from services.data_service.models import (
@@ -62,6 +62,7 @@ def search_products(
     max_price: float | None = None,
     min_stock: int | None = None,
     limit: int = DEFAULT_LIMIT,
+    offset: int = 0,
 ) -> list[Product]:
     """Products matching every condition given. Conditions left out are not applied.
 
@@ -75,6 +76,8 @@ def search_products(
             record at all are left out when this is set, since their stock is unknown
             rather than sufficient.
         limit: How many rows at most.
+        offset: How many matching rows to skip, so a caller reading the whole catalogue
+            can walk it a page at a time.
 
     Returns:
         The matching products, ordered by SKU.
@@ -96,7 +99,7 @@ def search_products(
             totals.c.total >= min_stock
         )
 
-    return query.order_by(Product.sku).limit(limit).all()
+    return query.order_by(Product.sku).offset(offset).limit(limit).all()
 
 
 def get_product(db: Session, sku: str) -> Product | None:
@@ -252,7 +255,7 @@ def _stock_totals_subquery(db: Session):
 # ── Model usage ───────────────────────────────────────────────────────────────
 
 
-def usage_totals(db: Session, since: datetime | None = None) -> tuple:
+def usage_totals(db: Session, since: datetime | None = None) -> Row:
     """Calls, failures, tokens either way, and the window the log covers."""
     return _since(
         db.query(
