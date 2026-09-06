@@ -13,7 +13,12 @@ from starlette import status
 
 from services.data_service import console
 from services.data_service.database import get_db
-from services.data_service.schemas import CatalogueSchema, QueryRequest, QueryResult
+from services.data_service.schemas import (
+    CatalogueSchema,
+    QueryRequest,
+    QueryResult,
+    SchemaTable,
+)
 
 router = APIRouter()
 
@@ -37,7 +42,10 @@ def read_schema():
     and `value_text` when it is a label — so a query filtering on two specifications joins
     that table twice. The examples below show it.
     """
-    return CatalogueSchema(tables=console.tables(), examples=console.EXAMPLES)
+    return CatalogueSchema(
+        tables=[SchemaTable(**table) for table in console.tables()],
+        examples=console.EXAMPLES,
+    )
 
 
 @router.post(

@@ -32,13 +32,17 @@ ALLOWED = (
 
 EXAMPLES = [
     "select category, count(*) as products from products group by category order by 2 desc",
-    "select p.sku, p.brand, pr.amount from products p"
-    " join prices pr on pr.sku = p.sku order by pr.amount desc limit 10",
+    (
+        "select p.sku, p.brand, pr.amount from products p"
+        " join prices pr on pr.sku = p.sku order by pr.amount desc limit 10"
+    ),
     "select key, count(*) as used from product_specs group by key order by 2 desc",
     "select warehouse, count(*) as skus, sum(quantity) as units from stock group by warehouse",
     "select sku from products where sku not in (select sku from stock)",
-    "select p.sku, s.value_num as watt from products p join product_specs s on s.sku = p.sku"
-    " where s.key = 'watt' and s.value_num >= 1500 order by 2 desc",
+    (
+        "select p.sku, s.value_num as watt from products p join product_specs s on s.sku = p.sku"
+        " where s.key = 'watt' and s.value_num >= 1500 order by 2 desc"
+    ),
 ]
 
 
