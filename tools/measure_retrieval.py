@@ -27,8 +27,8 @@ logger = logging.getLogger(__name__)
 
 EVAL_FILE = Path(__file__).resolve().parent.parent / "tests" / "data" / "retrieval_eval.json"
 CUTOFFS = (5, 10)
-COLUMNS = ("words", "meaning", "fused")
-KEYS = ("by_word", "by_meaning", "fused")
+COLUMNS = ("words", "meaning", "merged")
+KEYS = ("by_word", "by_meaning", "merged")
 
 
 def corpus() -> tuple[list[str], list[str]]:
@@ -82,7 +82,7 @@ def rankings(case: dict, corpus_: tuple, whole: bool, constrained: bool, held: t
 
     _, trace = retriever.candidates(asked, limit=retriever.CANDIDATES)
     if "ordered_by" in trace:
-        found = dict.fromkeys(COLUMNS, list(trace["fused"]))
+        found = dict.fromkeys(COLUMNS, list(trace["merged"]))
     else:
         found = {name: list(trace.get(key, [])) for name, key in zip(COLUMNS, KEYS, strict=True)}
 

@@ -8,6 +8,7 @@ two halves answer a question put to the business documents.
 
 import logging
 from dataclasses import dataclass
+from itertools import zip_longest
 
 from services.data_service.categories import ORDERED_LABELS
 from services.offer_service.clients import catalog
@@ -20,7 +21,6 @@ REQUEST = "customer-request"
 QUESTION = "policy-question"
 
 CANDIDATES = 50
-RRF_K = 60
 
 
 class IndexNotBuilt(RuntimeError):
@@ -82,14 +82,14 @@ def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> t
     if requirements.order is not None:
         ordered = _at_the_end(requirements.order, codes, eligible["metadatas"] or [])[:limit]
         order = requirements.order
-        trace |= {"ordered_by": f"{order.key} {order.end}", "fused": ordered}
+        trace |= {"ordered_by": f"{order.key} {order.end}", "merged": ordered}
         return ordered, trace
 
     by_word = lexical.ranked(requirements.request, codes, list(eligible["documents"] or []))
     by_meaning = _by_meaning(products, requirements.request, where, len(codes))
-    ordered = _fused(by_word, by_meaning)[:limit]
+    ordered = _merged(by_word, by_meaning)[:limit]
 
-    trace |= {"by_word": by_word[:limit], "by_meaning": by_meaning[:limit], "fused": ordered}
+    trace |= {"by_word": by_word[:limit], "by_meaning": by_meaning[:limit], "merged": ordered}
     return ordered, trace
 
 
@@ -138,14 +138,14 @@ def search_policies(question: str, limit: int = 5) -> tuple[list[Excerpt], dict]
 
     by_word = lexical.ranked(question, codes, texts)
     by_meaning = _by_meaning(passages, question, None, len(codes), QUESTION)
-    ordered = _fused(by_word, by_meaning)[:limit]
+    ordered = _merged(by_word, by_meaning)[:limit]
 
     sections = dict(zip(codes, zip(texts, held["metadatas"] or [], strict=True), strict=True))
     trace = {
         "passages": len(codes),
         "by_word": by_word[:limit],
         "by_meaning": by_meaning[:limit],
-        "fused": ordered,
+        "merged": ordered,
     }
     found = [
         Excerpt(id=code, text=sections[code][0], metadata=dict(sections[code][1]))
@@ -186,10 +186,10 @@ def _place(key: str, value) -> float:
 def _by_meaning(
     products, request: str, where: dict | None, eligible: int, purpose: str = REQUEST
 ) -> list[str]:
-    """Everything eligible, nearest first — both rankings have to cover the same set.
+    """Everything eligible, nearest first — both rankings cover the same set.
 
-    A document missing from one of them scores nothing from that half, which is a heavier
-    penalty than being placed last in it.
+    The two are taken in turn, so cutting one of them short would hand its tail to the
+    other half alone rather than to both.
     """
     vector = embeddings.embed([request], purpose)[0]
     found = products.query(
@@ -198,14 +198,20 @@ def _by_meaning(
     return list(found["ids"][0])
 
 
-def _fused(*rankings: list[str]) -> list[str]:
-    """A product both halves place well beats one that either half places first."""
-    scores: dict[str, float] = {}
-    for ranking in rankings:
-        for place, code in enumerate(ranking, 1):
-            scores[code] = scores.get(code, 0.0) + 1 / (RRF_K + place)
+def _merged(*rankings: list[str]) -> list[str]:
+    """One from each ranking in turn, so neither half can bury what the other put first.
 
-    return sorted(scores, key=lambda code: (-scores[code], code))
+    Scoring the two together — reciprocal rank fusion — was measured on both collections
+    and lost a right answer each time: whenever only one half finds it, the other half's
+    near misses outscore it. Taking turns costs each half nothing better than second place.
+    """
+    merged: dict[str, None] = {}
+    for places in zip_longest(*rankings):
+        for code in places:
+            if code is not None:
+                merged.setdefault(code)
+
+    return list(merged)
 
 
 def _priced(codes: list[str], held: dict) -> list[Match]:

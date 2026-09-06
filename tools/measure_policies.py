@@ -22,8 +22,8 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 EVAL_FILE = Path(__file__).resolve().parent.parent / "tests" / "data" / "policy_eval.json"
-COLUMNS = ("words", "meaning", "fused")
-KEYS = ("by_word", "by_meaning", "fused")
+COLUMNS = ("words", "meaning", "merged")
+KEYS = ("by_word", "by_meaning", "merged")
 
 
 def corpus() -> tuple[list[str], list[str]]:

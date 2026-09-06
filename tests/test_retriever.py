@@ -113,7 +113,7 @@ def test_constraints_nothing_satisfies_cost_nothing(monkeypatch):
     assert found.trace["eligible"] == 0
 
 
-def test_both_halves_of_the_search_decide_the_order():
+def test_neither_half_can_bury_what_the_other_put_first():
     """The word side is handed a code, the meaning side is aimed elsewhere: both survive."""
     indexer.rebuild_products()
 
