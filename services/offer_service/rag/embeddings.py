@@ -1,11 +1,8 @@
 """
 Embeddings
 ==========
-The one place text becomes a vector.
-
-Chroma will happily embed for us, and we do it here instead: every model call in this
-project is written down, and a call made inside the store is a call nobody sees on the
-usage report. The store is handed finished vectors and never talks to OpenAI at all.
+The one place text becomes a vector, so that every model call lands on the usage report.
+The store is handed finished vectors and never talks to OpenAI itself.
 """
 
 import logging
@@ -95,7 +92,7 @@ def _ask_model(texts: list[str], purpose: str) -> list[list[float]]:
         duration_ms=_elapsed(started),
     )
 
-    return [item.embedding for item in answer.data]
+    return [item.embedding for item in sorted(answer.data, key=lambda item: item.index)]
 
 
 def _elapsed(started: float) -> int:
