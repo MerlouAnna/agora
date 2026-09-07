@@ -86,12 +86,12 @@ def rankings(case: dict, corpus_: tuple, whole: bool, constrained: bool, held: t
     else:
         found = {name: list(trace.get(key, [])) for name, key in zip(COLUMNS, KEYS, strict=True)}
 
-    return {name: _affordable(codes, asked, held) for name, codes in found.items()}, (
+    return {name: affordable(codes, asked, held) for name, codes in found.items()}, (
         "ordered_by" in trace
     )
 
 
-def _affordable(codes: list[str], asked: CustomerRequirements, held: tuple) -> list[str]:
+def affordable(codes: list[str], asked: CustomerRequirements, held: tuple) -> list[str]:
     """What the request's budget and its urgency leave, in the order the ranking put them."""
     prices, stock = held
     if asked.price_max is not None:

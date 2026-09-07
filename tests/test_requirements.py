@@ -31,6 +31,12 @@ def test_a_plain_label_takes_neither_a_comparison_nor_a_value_of_its_own():
         Constraint(key="topology", value="offline")
 
 
+def test_a_number_the_catalogue_never_holds_is_refused():
+    """`watt eq 0` is well formed and matches nothing. It came out of a real extraction."""
+    with pytest.raises(ValidationError, match="never 0 or less"):
+        Constraint(key="watt", value=0)
+
+
 def test_a_flag_is_on_or_off_rather_than_the_word():
     """The card metadata holds a boolean, so the string "true" would match nothing at all."""
     with pytest.raises(ValidationError, match="on or off"):

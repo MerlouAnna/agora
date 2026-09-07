@@ -48,6 +48,8 @@ class Constraint(BaseModel):
         if is_numeric(self.key):
             if not isinstance(self.value, float | int) or isinstance(self.value, bool):
                 raise ValueError(f"{self.key} is a number, not {self.value!r}")
+            if self.value <= 0:
+                raise ValueError(f"{self.key} is never 0 or less, so {self.value} filters nothing")
         elif is_flag(self.key):
             if not isinstance(self.value, bool):
                 raise ValueError(f"{self.key} is on or off, not {self.value!r}")
