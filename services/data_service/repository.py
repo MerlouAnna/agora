@@ -19,7 +19,7 @@ from services.data_service.models import (
     Stock,
     Supplier,
 )
-from services.data_service.schemas import ProductSummary
+from services.data_service.schemas import ProductSummary, StockEntry
 
 DEFAULT_LIMIT = 20
 
@@ -29,6 +29,7 @@ def summarize(db: Session, products: list[Product]) -> list[ProductSummary]:
     skus = [product.sku for product in products]
     specs = get_specs(db, [str(sku) for sku in skus])
     totals = get_stock_totals(db, [str(sku) for sku in skus])
+    held = get_stock_by_warehouse(db, [str(sku) for sku in skus])
     prices = get_prices(db, [str(sku) for sku in skus])
 
     summaries = []
@@ -48,6 +49,10 @@ def summarize(db: Session, products: list[Product]) -> list[ProductSummary]:
                 price_updated_at=price.updated_at if price else None,
                 specs=specs.get(str(product.sku), {}),
                 stock_total=totals.get(str(product.sku)),
+                warehouses=[
+                    StockEntry(warehouse=str(row.warehouse), quantity=int(row.quantity))
+                    for row in held.get(str(product.sku), [])
+                ],
             )
         )
 
@@ -130,6 +135,22 @@ def get_specs(db: Session, skus: list[str]) -> dict[str, dict]:
     return specs
 
 
+def get_stock_by_warehouse(db: Session, skus: list[str]) -> dict[str, list[Stock]]:
+    """Which warehouse holds what, per SKU. An offer cannot be dated without this."""
+    rows = (
+        db.query(Stock)
+        .filter(Stock.sku.in_(skus))
+        .order_by(Stock.sku, Stock.warehouse)
+        .all()
+    )
+
+    held: dict[str, list[Stock]] = {}
+    for row in rows:
+        held.setdefault(str(row.sku), []).append(row)
+
+    return held
+
+
 def get_stock_totals(db: Session, skus: list[str]) -> dict[str, int]:
     """Total quantity per SKU. A SKU with no stock record is absent from the result."""
     rows = (
@@ -139,6 +160,10 @@ def get_stock_totals(db: Session, skus: list[str]) -> dict[str, int]:
         .all()
     )
     return {sku: int(total) for sku, total in rows}
+
+
+def get_suppliers(db: Session) -> list[Supplier]:
+    return db.query(Supplier).order_by(Supplier.code).all()
 
 
 def get_prices(db: Session, skus: list[str]) -> dict[str, Price]:

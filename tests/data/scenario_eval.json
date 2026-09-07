@@ -1,0 +1,452 @@
+{
+  "ground_truth": "derived by hand from data/catalog.db with SQL and the delivery terms tables, never by running the builder",
+  "cases": [
+    {
+      "id": "psu-gold-atx-thessaloniki",
+      "request": "Θέλω 10 τροφοδοτικά 80+ Gold σε ATX, τουλάχιστον 750W.",
+      "requirements": {
+        "category": "PSU",
+        "quantity": 10,
+        "constraints": [
+          {
+            "key": "efficiency",
+            "value": "80+ Gold"
+          },
+          {
+            "key": "form_factor",
+            "value": "ATX"
+          },
+          {
+            "key": "watt",
+            "op": "gte",
+            "value": 750
+          }
+        ]
+      },
+      "store": "THESSALONIKI",
+      "candidates": [
+        "PSU-1018",
+        "PSU-1002",
+        "PSU-1012",
+        "PSU-1032",
+        "PSU-1006"
+      ],
+      "trap": "the cheapest is not the closest: PSU-1018 undercuts everything at 1000W where 750W was asked",
+      "scenarios": [
+        {
+          "sku": "PSU-1018",
+          "strategies": [
+            "cheapest-acceptable",
+            "best-availability"
+          ],
+          "allocation": [
+            [
+              "PAT-01",
+              10
+            ]
+          ],
+          "availability": "transfer",
+          "days": 2,
+          "risk": "low",
+          "fit": 0.6667,
+          "net": 565.7,
+          "shipping": 0.0,
+          "total": 565.7,
+          "transfer_cost": 15.0
+        },
+        {
+          "sku": "PSU-1002",
+          "strategies": [
+            "best-technical",
+            "best-budget"
+          ],
+          "allocation": [
+            [
+              null,
+              10
+            ]
+          ],
+          "availability": "ordered",
+          "days": 16,
+          "risk": "medium",
+          "fit": 1.0,
+          "net": 702.2,
+          "shipping": 0.0,
+          "total": 702.2,
+          "transfer_cost": 0.0
+        },
+        {
+          "sku": "PSU-1006",
+          "strategies": [
+            "premium-alternative"
+          ],
+          "allocation": [
+            [
+              "ATH-02",
+              4
+            ],
+            [
+              null,
+              6
+            ]
+          ],
+          "availability": "ordered",
+          "days": 7,
+          "risk": "medium",
+          "fit": 1.0,
+          "net": 2311.0,
+          "shipping": 0.0,
+          "total": 2311.0,
+          "transfer_cost": 15.0
+        }
+      ]
+    },
+    {
+      "id": "psu-platinum-sfx-athens",
+      "request": "Πέντε τροφοδοτικά 80+ Platinum σε SFX, τουλάχιστον 750W.",
+      "requirements": {
+        "category": "PSU",
+        "quantity": 5,
+        "constraints": [
+          {
+            "key": "efficiency",
+            "value": "80+ Platinum"
+          },
+          {
+            "key": "form_factor",
+            "value": "SFX"
+          },
+          {
+            "key": "watt",
+            "op": "gte",
+            "value": 750
+          }
+        ]
+      },
+      "store": "ATHENS",
+      "candidates": [
+        "PSU-1020",
+        "PSU-1016",
+        "PSU-1027",
+        "PSU-1029",
+        "PSU-1014"
+      ],
+      "trap": "a stock row of zero is not an unknown one, same-day out of ATH-01, and one net under 300 pays carriage",
+      "scenarios": [
+        {
+          "sku": "PSU-1020",
+          "strategies": [
+            "cheapest-acceptable",
+            "best-technical",
+            "best-budget"
+          ],
+          "allocation": [
+            [
+              null,
+              5
+            ]
+          ],
+          "availability": "ordered",
+          "days": 9,
+          "risk": "medium",
+          "fit": 1.0,
+          "net": 228.9,
+          "shipping": 5.0,
+          "total": 233.9,
+          "transfer_cost": 0.0
+        },
+        {
+          "sku": "PSU-1029",
+          "strategies": [
+            "best-availability"
+          ],
+          "allocation": [
+            [
+              "ATH-01",
+              5
+            ]
+          ],
+          "availability": "same-day",
+          "days": 0,
+          "risk": "low",
+          "fit": 0.6667,
+          "net": 1175.85,
+          "shipping": 0.0,
+          "total": 1175.85,
+          "transfer_cost": 0.0
+        },
+        {
+          "sku": "PSU-1014",
+          "strategies": [
+            "premium-alternative"
+          ],
+          "allocation": [
+            [
+              "THE-01",
+              4
+            ],
+            [
+              null,
+              1
+            ]
+          ],
+          "availability": "ordered",
+          "days": 7,
+          "risk": "medium",
+          "fit": 0.8667,
+          "net": 1195.4,
+          "shipping": 0.0,
+          "total": 1195.4,
+          "transfer_cost": 15.0
+        }
+      ]
+    },
+    {
+      "id": "data-cat6a-urgent-athens",
+      "request": "Σαράντα καλώδια CAT6a θωρακισμένα, τουλάχιστον 20 μέτρα, τα θέλουμε άμεσα.",
+      "requirements": {
+        "category": "DATA",
+        "quantity": 40,
+        "immediate": true,
+        "constraints": [
+          {
+            "key": "standard",
+            "value": "CAT6a"
+          },
+          {
+            "key": "shielding",
+            "value": "S/FTP"
+          },
+          {
+            "key": "length_m",
+            "op": "gte",
+            "value": 20
+          }
+        ]
+      },
+      "store": "ATHENS",
+      "candidates": [
+        "DAT-1002",
+        "DAT-1013",
+        "DAT-1037"
+      ],
+      "trap": "ATH-02 serves Attica as much as ATH-01 does, and an urgent order on SUP-03 is refused a date",
+      "scenarios": [
+        {
+          "sku": "DAT-1037",
+          "strategies": [
+            "cheapest-acceptable",
+            "best-availability"
+          ],
+          "allocation": [
+            [
+              "ATH-02",
+              40
+            ]
+          ],
+          "availability": "same-day",
+          "days": 0,
+          "risk": "low",
+          "fit": 0.6667,
+          "net": 2333.2,
+          "shipping": 0.0,
+          "total": 2333.2,
+          "transfer_cost": 0.0
+        },
+        {
+          "sku": "DAT-1002",
+          "strategies": [
+            "best-technical",
+            "best-budget"
+          ],
+          "allocation": [
+            [
+              null,
+              40
+            ]
+          ],
+          "availability": "ordered",
+          "days": 16,
+          "risk": "high",
+          "fit": 1.0,
+          "net": 2343.6,
+          "shipping": 0.0,
+          "total": 2343.6,
+          "transfer_cost": 0.0
+        },
+        {
+          "sku": "DAT-1013",
+          "strategies": [
+            "premium-alternative"
+          ],
+          "allocation": [
+            [
+              "PAT-01",
+              25
+            ],
+            [
+              null,
+              15
+            ]
+          ],
+          "availability": "ordered",
+          "days": 5,
+          "risk": "medium",
+          "fit": 0.6667,
+          "net": 2438.0,
+          "shipping": 0.0,
+          "total": 2438.0,
+          "transfer_cost": 15.0
+        }
+      ]
+    },
+    {
+      "id": "psu-unknown-stock-athens",
+      "request": "Ένα τροφοδοτικό, ό,τι έχετε.",
+      "requirements": {
+        "category": "PSU",
+        "quantity": 2
+      },
+      "store": "ATHENS",
+      "candidates": [
+        "PSU-1000",
+        "PSU-1020",
+        "PSU-1016"
+      ],
+      "trap": "PSU-1000 is one of the five the warehouse system has never heard of: it gets no date at all",
+      "scenarios": [
+        {
+          "sku": "PSU-1020",
+          "strategies": [
+            "cheapest-acceptable",
+            "best-technical",
+            "best-budget"
+          ],
+          "allocation": [
+            [
+              null,
+              2
+            ]
+          ],
+          "availability": "ordered",
+          "days": 9,
+          "risk": "medium",
+          "fit": 1.0,
+          "net": 91.56,
+          "shipping": 5.0,
+          "total": 96.56,
+          "transfer_cost": 0.0
+        },
+        {
+          "sku": "PSU-1016",
+          "strategies": [
+            "best-availability"
+          ],
+          "allocation": [
+            [
+              "THE-01",
+              2
+            ]
+          ],
+          "availability": "transfer",
+          "days": 2,
+          "risk": "low",
+          "fit": 1.0,
+          "net": 208.02,
+          "shipping": 5.0,
+          "total": 213.02,
+          "transfer_cost": 15.0
+        },
+        {
+          "sku": "PSU-1000",
+          "strategies": [
+            "premium-alternative"
+          ],
+          "allocation": [
+            [
+              null,
+              2
+            ]
+          ],
+          "availability": "unknown",
+          "days": null,
+          "risk": "medium",
+          "fit": 1.0,
+          "net": 249.7,
+          "shipping": 5.0,
+          "total": 254.7,
+          "transfer_cost": 0.0
+        }
+      ]
+    },
+    {
+      "id": "con-schuko-heraklion",
+      "request": "Είκοσι ρευματολήπτες Schuko 16A για το Ηράκλειο.",
+      "requirements": {
+        "category": "CONNECTORS",
+        "quantity": 20,
+        "constraints": [
+          {
+            "key": "connector_type",
+            "value": "Schuko"
+          },
+          {
+            "key": "amperage",
+            "value": 16
+          }
+        ]
+      },
+      "store": "HERAKLION",
+      "candidates": [
+        "CON-1005",
+        "CON-1023"
+      ],
+      "trap": "an island order under 300 € pays 14 € carriage, and the transfer to an island costs two days",
+      "scenarios": [
+        {
+          "sku": "CON-1005",
+          "strategies": [
+            "cheapest-acceptable",
+            "best-technical",
+            "best-budget",
+            "best-availability"
+          ],
+          "allocation": [
+            [
+              "THE-01",
+              20
+            ]
+          ],
+          "availability": "transfer",
+          "days": 5,
+          "risk": "low",
+          "fit": 1.0,
+          "net": 149.4,
+          "shipping": 14.0,
+          "total": 163.4,
+          "transfer_cost": 15.0
+        },
+        {
+          "sku": "CON-1023",
+          "strategies": [
+            "premium-alternative"
+          ],
+          "allocation": [
+            [
+              "ATH-02",
+              20
+            ]
+          ],
+          "availability": "transfer",
+          "days": 5,
+          "risk": "low",
+          "fit": 1.0,
+          "net": 271.0,
+          "shipping": 14.0,
+          "total": 285.0,
+          "transfer_cost": 15.0
+        }
+      ]
+    }
+  ]
+}
