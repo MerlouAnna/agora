@@ -20,7 +20,7 @@ import sys
 from services.offer_service import extraction
 from services.offer_service.rag import embeddings, retriever
 from services.offer_service.requirements import CustomerRequirements
-from tools.measure_retrieval import CUTOFFS, EVAL_FILE, affordable, current, recall
+from tools.measure_retrieval import CUTOFFS, EVAL_FILE, affordable, current, recall, scorable
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -36,7 +36,10 @@ def measured(case: dict, held: tuple, by_hand: dict) -> dict:
     try:
         found = extraction.extract(case["request"])
     except extraction.ExtractionFailed as exc:
-        return row | {"differs": [f"handed back after three rounds — {exc}"], "rounds": 3}
+        return row | {
+            "differs": [f"handed back after {extraction.MAX_ROUNDS} rounds — {exc}"],
+            "rounds": extraction.MAX_ROUNDS,
+        }
 
     got = found.requirements
     return row | {
@@ -49,6 +52,7 @@ def measured(case: dict, held: tuple, by_hand: dict) -> dict:
 
 def scored(requirements: CustomerRequirements, case: dict, held: tuple) -> dict:
     """What these requirements find, at both cut-offs."""
+    scorable(requirements)
     codes, _ = retriever.candidates(requirements, limit=retriever.CANDIDATES)
     reached = affordable(codes, requirements, held)
 
@@ -140,14 +144,17 @@ def stability(seen: dict[str, list[str]]) -> None:
     """A request that answers differently on two identical runs is not a measurement yet."""
     logger.info("")
     logger.info("the same request, run again")
+    asked = {name: answers for name, answers in seen.items() if answers}
     steady = 0
-    for name, answers in seen.items():
+    for name, answers in asked.items():
         distinct = len(set(answers))
         steady += distinct == 1
         if distinct > 1:
             logger.info("   %-28s %d different answers in %d runs", name, distinct, len(answers))
 
-    logger.info("   %d of %d requests answered the same way every time", steady, len(seen))
+    logger.info("   %d of %d requests answered the same way every time", steady, len(asked))
+    if len(asked) < len(seen):
+        logger.info("   %d were never asked — the run stopped early", len(seen) - len(asked))
 
 
 def run(runs: int = 1) -> None:
@@ -169,12 +176,27 @@ def run(runs: int = 1) -> None:
 
     seen: dict[str, list[str]] = {case["id"]: [] for case in cases}
     for attempt in range(1, runs + 1):
-        rows = [measured(case, held, by_hand) for case in cases]
+        rows = []
+        for case in cases:
+            try:
+                rows.append(measured(case, held, by_hand))
+            except extraction.ModelUnavailable as exc:
+                logger.error(
+                    "the model stopped answering after %d of %d requests — %s",
+                    len(rows),
+                    len(cases),
+                    exc,
+                )
+                break
+
         logger.info("")
         logger.info("run %d of %d", attempt, runs)
-        table(rows)
+        if rows:
+            table(rows)
         for row in rows:
             seen[row["id"]].append(row.get("fingerprint", "handed back"))
+        if len(rows) < len(cases):
+            break
 
     if runs > 1:
         stability(seen)

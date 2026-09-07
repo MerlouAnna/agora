@@ -13,6 +13,7 @@ Run from the repository root:  python -m tools.measure_retrieval
 
 import json
 import logging
+import sys
 from pathlib import Path
 
 from services.data_service import repository
@@ -20,7 +21,7 @@ from services.data_service.database import SessionLocal
 from services.data_service.models import Price, Product, Stock
 from services.offer_service.rag import embeddings, lexical, retriever
 from services.offer_service.rag.documents import build_cards
-from services.offer_service.requirements import CustomerRequirements
+from services.offer_service.requirements import PRICE, CustomerRequirements
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -61,6 +62,16 @@ def recall(found: list[str], expected: list[str], at: int) -> float:
     return len(hit) / len(expected)
 
 
+def scorable(asked: CustomerRequirements) -> None:
+    """Refuse what `candidates` cannot answer, rather than score the order it came back in.
+
+    A request ordered on price leaves `candidates` eligible but unsorted, because the price
+    is not in the index. Only `search` can order it, and neither tool calls `search`.
+    """
+    if asked.order is not None and asked.order.key == PRICE:
+        sys.exit(f"{asked.request!r} is ordered on price, which only search() can answer")
+
+
 def reachable() -> bool:
     """Whether the index can be searched at all, asked once rather than per request."""
     try:
@@ -80,6 +91,7 @@ def rankings(case: dict, corpus_: tuple, whole: bool, constrained: bool, held: t
     if not whole:
         return {"words": lexical.ranked(asked.request, *corpus_)}, False
 
+    scorable(asked)
     _, trace = retriever.candidates(asked, limit=retriever.CANDIDATES)
     if "ordered_by" in trace:
         found = dict.fromkeys(COLUMNS, list(trace["merged"]))

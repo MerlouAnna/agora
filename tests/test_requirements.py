@@ -36,6 +36,9 @@ def test_a_number_the_catalogue_never_holds_is_refused():
     with pytest.raises(ValidationError, match="never 0 or less"):
         Constraint(key="watt", value=0)
 
+    with pytest.raises(ValidationError, match="never inf"):
+        Constraint(key="watt", op="gte", value=float("inf"))
+
 
 def test_a_flag_is_on_or_off_rather_than_the_word():
     """The card metadata holds a boolean, so the string "true" would match nothing at all."""

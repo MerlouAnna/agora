@@ -5,6 +5,7 @@ What a salesperson's request comes down to once the specifics are pulled out of 
 the only shape the retriever and the scenario builder read.
 """
 
+import math
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -48,6 +49,8 @@ class Constraint(BaseModel):
         if is_numeric(self.key):
             if not isinstance(self.value, float | int) or isinstance(self.value, bool):
                 raise ValueError(f"{self.key} is a number, not {self.value!r}")
+            if not math.isfinite(self.value):
+                raise ValueError(f"{self.key} is never {self.value}, so it filters nothing")
             if self.value <= 0:
                 raise ValueError(f"{self.key} is never 0 or less, so {self.value} filters nothing")
         elif is_flag(self.key):

@@ -22,9 +22,16 @@ from pydantic import BaseModel, Field, ValidationError
 
 from services import config, usage
 from services.config import settings
-from services.data_service.categories import SPEC_TYPES, Category, is_flag, is_numeric
+from services.data_service.categories import (
+    ORDERED_LABELS,
+    SPEC_TYPES,
+    Category,
+    is_flag,
+    is_numeric,
+)
 from services.offer_service.prompts import extraction as prompt
 from services.offer_service.requirements import (
+    PRICE,
     Constraint,
     CustomerRequirements,
     Operator,
@@ -36,13 +43,19 @@ MAX_ROUNDS = 3
 SERVICE = "offer_service"
 PURPOSE = "requirement-extraction"
 
-# Reading a request is not a creative task, and a measurement of one has to repeat.
 TEMPERATURE = 0.0
 
 # The specifications the model is allowed to name, straight from the registry.
 SpecKey = StrEnum("SpecKey", {key.upper(): key for key in SPEC_TYPES})
 
-# What the model is asked to call each end, kept clear of any word for a bound.
+# And the ones it can order on: whatever compares, plus the price.
+OrderKey = StrEnum(
+    "OrderKey",
+    {key.upper(): key for key in SPEC_TYPES if is_numeric(key) or key in ORDERED_LABELS}
+    | {"PRICE": PRICE},
+)
+
+# What the model is asked to call each end of a range.
 ENDS = {"highest": "max", "lowest": "min"}
 
 TRUE = ("true", "yes", "ναι", "1")
@@ -70,7 +83,7 @@ class ExtractedConstraint(BaseModel):
 class ExtractedOrdering(BaseModel):
     """Only for a request built on a superlative: «το πιο μακρύ», «the cheapest»."""
 
-    key: str = Field(..., description="A specification that can be compared, or `price`")
+    key: OrderKey = Field(..., description="What the range is measured on")
     end: Literal["highest", "lowest"]
 
 
@@ -142,7 +155,7 @@ def extract(
         answer = ask(request, refused[-1] if refused else None)
         try:
             requirements = _requirements(request, answer)
-        except (ValidationError, ValueError) as exc:
+        except ValueError as exc:
             refused.append(_readable(exc))
             logger.info("round %d — the extraction was sent back: %s", used, refused[-1])
             continue
@@ -152,7 +165,7 @@ def extract(
             trace |= {"refused": refused}
         return Extraction(requirements, trace)
 
-    raise ExtractionFailed(refused[-1])
+    raise ExtractionFailed(refused[-1] if refused else "no round was allowed to run")
 
 
 def _requirements(request: str, answer: Extracted) -> CustomerRequirements:
@@ -170,7 +183,7 @@ def _requirements(request: str, answer: Extracted) -> CustomerRequirements:
 
 
 def _ordering(written: ExtractedOrdering | None) -> dict | None:
-    return None if written is None else {"key": written.key, "end": ENDS[written.end]}
+    return None if written is None else {"key": written.key.value, "end": ENDS[written.end]}
 
 
 def _constraint(written: ExtractedConstraint) -> Constraint:
@@ -194,7 +207,7 @@ def _typed(key: str, value: str):
             return False
         raise ValueError(f"{key} is on or off, not {value!r}")
 
-    return value
+    return value.strip()
 
 
 def _readable(exc: Exception) -> str:

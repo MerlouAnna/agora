@@ -71,7 +71,9 @@ def candidates(
         limit: How many codes to keep, or None for every one that qualifies.
 
     Returns:
-        The codes and a trace of what each half of the search proposed.
+        The codes and a trace of what each half of the search proposed. A request ordered
+        on price comes back eligible but unordered, and its trace carries no `merged`:
+        that number arrives with the lookup, so only `search` can put them in order.
 
     Raises:
         IndexNotBuilt: Nothing is indexed, which is not the same as nothing matching.
@@ -99,11 +101,12 @@ def candidates(
 
     if requirements.order is not None:
         order = requirements.order
-        ranged = (
-            codes if order.key == PRICE else _at_the_end(order, codes, eligible["metadatas"] or [])
-        )
-        ordered = ranged[:limit]
-        trace |= {"ordered_by": f"{order.key} {order.end}", "merged": ordered}
+        trace |= {"ordered_by": f"{order.key} {order.end}"}
+        if order.key == PRICE:
+            return codes[:limit], trace
+
+        ordered = _at_the_end(order, codes, eligible["metadatas"] or [])[:limit]
+        trace |= {"merged": ordered}
         return ordered, trace
 
     by_word = lexical.ranked(requirements.request, codes, list(eligible["documents"] or []))

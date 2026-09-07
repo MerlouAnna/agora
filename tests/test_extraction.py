@@ -32,8 +32,14 @@ def replies(*answers):
 def test_a_refused_value_goes_back_with_the_vocabulary_and_the_next_round_lands():
     """The refusal is the whole repair prompt: it names the field and lists what it takes."""
     ask, told = replies(
-        answer(category="PSU", constraints=[ExtractedConstraint(key="efficiency", op="eq", value="Platinum")]),
-        answer(category="PSU", constraints=[ExtractedConstraint(key="efficiency", op="eq", value="80+ Platinum")]),
+        answer(
+            category="PSU",
+            constraints=[ExtractedConstraint(key="efficiency", op="eq", value="Platinum")],
+        ),
+        answer(
+            category="PSU",
+            constraints=[ExtractedConstraint(key="efficiency", op="eq", value="80+ Platinum")],
+        ),
     )
 
     found = extraction.extract("τροφοδοτικό Platinum", ask=ask)
@@ -46,7 +52,9 @@ def test_a_refused_value_goes_back_with_the_vocabulary_and_the_next_round_lands(
 
 def test_a_request_that_never_validates_is_handed_back_rather_than_guessed_at():
     """Searching the whole catalogue on a request nobody could read is not a lesser answer."""
-    wrong = answer(category="PSU", constraints=[ExtractedConstraint(key="length_m", op="eq", value="10")])
+    wrong = answer(
+        category="PSU", constraints=[ExtractedConstraint(key="length_m", op="eq", value="10")]
+    )
     ask, told = replies(wrong, wrong, wrong)
 
     with pytest.raises(extraction.ExtractionFailed, match="PSU products have no length_m"):
@@ -82,8 +90,11 @@ def test_a_request_the_catalogue_cannot_be_filtered_on_is_a_correct_answer():
 def test_the_end_of_a_range_survives_the_round_trip():
     """`price` is not a specification, so it is the one ordering the category check waives."""
     ask, _ = replies(
-        answer(category="NETWORK", order=ExtractedOrdering(key="price", end="lowest"),
-               constraints=[ExtractedConstraint(key="managed", op="eq", value="true")])
+        answer(
+            category="NETWORK",
+            order=ExtractedOrdering(key="price", end="lowest"),
+            constraints=[ExtractedConstraint(key="managed", op="eq", value="true")],
+        )
     )
 
     found = extraction.extract("το πιο φθηνό managed switch", ask=ask)

@@ -116,9 +116,7 @@ def describe(category: Category, specs: dict, rng: random.Random) -> str:
     if category == Category.NETWORK:
         extras = " PoE" if specs["poe"] else ""
         extras += " managed" if specs["managed"] else " unmanaged"
-        return "Switch {} θυρών {}Mbps{}".format(
-            specs["ports"], specs["speed_mbps"], extras
-        )
+        return "Switch {} θυρών {}Mbps{}".format(specs["ports"], specs["speed_mbps"], extras)
     return "Ρευματολήπτης {} {}A {}".format(
         specs["connector_type"], specs["amperage"], specs["ip_rating"]
     )
