@@ -52,13 +52,13 @@ TRANSIT = {
 }
 
 # Ours, not the document's: it names an "αποθήκη εξυπηρέτησης" per destination and never
-# says which. These are the choices that reproduce its own worked example. Attica has two,
-# because the terms treat them as one — the same transit row and the same same-day rule.
+# says which. These reproduce its own worked example. The two Attica warehouses count as
+# one wherever they appear — the same transit row, and no transfer between them.
 SERVES = {
     Zone.ATTICA: (Warehouse.ATH_01, Warehouse.ATH_02),
     Zone.THESSALONIKI: (Warehouse.THE_01,),
     Zone.MAINLAND: (Warehouse.PAT_01,),
-    Zone.ISLANDS: (Warehouse.ATH_01,),
+    Zone.ISLANDS: (Warehouse.ATH_01, Warehouse.ATH_02),
 }
 
 TRANSFER_DAYS = 1
@@ -101,16 +101,15 @@ def working_days(
     Raises:
         ValueError: There is no stock and no lead time to order against.
     """
-    direct = TRANSIT[SERVES[zone][0]][zone]
-
     if held_in is None:
         if lead_time is None:
             raise ValueError("a product in no warehouse needs its supplier's lead time")
-        return lead_time + RECEIVING_DAYS + direct
+        return lead_time + RECEIVING_DAYS + TRANSIT[SERVES[zone][0]][zone]
 
     if same_day(zone, held_in, before_cut_off):
         return 0
 
+    direct = TRANSIT[held_in][zone]
     if serves(zone, held_in):
         return direct
 
@@ -120,11 +119,7 @@ def working_days(
 
 def same_day(zone: Zone, held_in: Warehouse | None, before_cut_off: bool = True) -> bool:
     """Whether this counts as άμεση παράδοση, which is narrower than being in stock."""
-    return (
-        zone == SAME_DAY_ZONE
-        and held_in in SAME_DAY_FROM
-        and before_cut_off
-    )
+    return zone == SAME_DAY_ZONE and held_in in SAME_DAY_FROM and before_cut_off
 
 
 def serves(zone: Zone, warehouse: Warehouse) -> bool:

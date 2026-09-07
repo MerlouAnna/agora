@@ -70,13 +70,8 @@ class OfferScenario:
     """One offer, complete enough to be put in front of a customer or refused.
 
     `days` counts working days, where 0 is the same working day and None means the order
-    cannot be dated at all — the warehouse system has no record for the product, and a
-    guess would read as a promise. `transfer_cost` is the company's own, never the
-    customer's, and is here because a scenario that quietly moves stock across the country
-    is not free to anyone.
-
-    `strategies` is a list because one product is often the answer to more than one
-    question, and saying so once beats offering it three times.
+    cannot be dated. `transfer_cost` is the company's own and never the customer's, and
+    `strategies` holds every reading that landed on this offer.
     """
 
     strategies: list[Strategy]

@@ -6,6 +6,7 @@ for the money, soonest in the customer's hands, and one step up. No model is cal
 nothing is fetched — everything here is arithmetic over rows the caller already has.
 """
 
+import logging
 from dataclasses import dataclass
 
 from services.data_service.categories import ORDERED_LABELS, Warehouse, is_numeric
@@ -29,6 +30,8 @@ from services.offer_service.domain.models import (
     Strategy,
 )
 from services.offer_service.requirements import Constraint, CustomerRequirements
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -62,7 +65,10 @@ def build(
     store: Store,
     before_cut_off: bool = True,
 ) -> list[OfferScenario]:
-    """Five offers over the same candidates, or fewer when they keep landing on one product.
+    """Five offers over the same candidates, or fewer when several land on the same one.
+
+    Fewer as well when nothing can be dated, since best-availability then picks nothing,
+    and a candidate the catalogue holds no price for is left out altogether.
 
     Args:
         requirements: What was asked for, as the extractor read it.
@@ -75,12 +81,19 @@ def build(
         One scenario per distinct offer, each carrying every strategy that chose it.
     """
     zone = zone_of(store)
-    spreads = _spreads(requirements, products)
+    offerable = []
+    for product in products:
+        if product.get("price") is None:
+            logger.warning("%s carries no price, so no offer can be made from it", product["sku"])
+            continue
+        offerable.append(product)
+
+    spreads = _spreads(requirements, offerable)
     quantity = requirements.quantity or 1
 
     priced = [
         _price(product, requirements, spreads, suppliers, zone, quantity, before_cut_off)
-        for product in products
+        for product in offerable
     ]
     whole = [one for one in priced if not one.missing]
 
@@ -129,12 +142,7 @@ def compare(scenarios: list[OfferScenario]) -> list[dict]:
 
 
 def _spreads(requirements: CustomerRequirements, products: list[dict]) -> dict[str, float]:
-    """The range each named specification covers across these candidates.
-
-    Overshoot has to be measured against something, and the candidates on the table are
-    the only honest yardstick: it makes the score comparable within one request, which is
-    the only place it is ever used.
-    """
+    """The range each named specification covers across these candidates."""
     spreads = {}
     for constraint in requirements.constraints:
         if not is_numeric(constraint.key):
@@ -154,8 +162,7 @@ def _fit(
 ) -> tuple[float, list[str]]:
     """How close a product sits to what was asked, and what it fails outright.
 
-    A request that names nothing fits everything equally, and the retrieval order is left
-    to speak for itself.
+    A request naming no constraint scores every candidate 1.0.
     """
     if not requirements.constraints:
         return 1.0, []
@@ -182,12 +189,20 @@ def _satisfies(constraint: Constraint, held) -> bool:
         return _compare(constraint.op, order.index(held), order.index(constraint.value))
 
     if isinstance(constraint.value, bool):
-        return bool(held) == constraint.value
+        return _flag(held) == constraint.value
 
     if isinstance(held, str) or isinstance(constraint.value, str):
         return held == constraint.value
 
     return _compare(constraint.op, held, constraint.value)
+
+
+def _flag(held) -> bool:
+    """A flag the way the catalogue stores it, which is the text `true` or `false`."""
+    if isinstance(held, bool):
+        return held
+
+    return str(held).strip().lower() == "true"
 
 
 def _compare(op: str, held, wanted) -> bool:
@@ -205,8 +220,7 @@ def _compare(op: str, held, wanted) -> bool:
 def _overshoot(constraint: Constraint, held, spread: float) -> float:
     """How far past the floor a product sits, as a share of what the candidates cover.
 
-    A ceiling is not overshot by being comfortably under it, and `eq` leaves no room to
-    overshoot at all, so both cost nothing.
+    Ceilings and `eq` cost nothing.
     """
     if constraint.op not in ("gte", "gt"):
         return 0.0
@@ -269,15 +283,15 @@ def _allocate(
 ) -> tuple[list[Allocation], Availability, list[str]]:
     """Where the quantity comes from: a serving warehouse first, then wherever else.
 
-    Filling an order out of two warehouses is the one combination this builder makes. It
-    is the only one the catalogue's own data supports — quantities add up across
-    warehouses, lengths and wattages do not add up across products.
+    A quantity may be split across warehouses. Nothing else is ever combined.
     """
     held = product.get("warehouses") or []
     if not held:
-        return [Allocation(warehouse=None, quantity=quantity)], Availability.UNKNOWN, [
-            "the warehouse system has no record for this product"
-        ]
+        return (
+            [Allocation(warehouse=None, quantity=quantity)],
+            Availability.UNKNOWN,
+            ["the warehouse system has no record for this product"],
+        )
 
     ordered = sorted(held, key=lambda entry: _first(entry, zone))
 
@@ -311,9 +325,7 @@ def _first(entry: dict, zone: Zone) -> tuple:
     )
 
 
-def _availability(
-    sources: list[Allocation], zone: Zone, before_cut_off: bool
-) -> Availability:
+def _availability(sources: list[Allocation], zone: Zone, before_cut_off: bool) -> Availability:
     if any(source.warehouse is None for source in sources):
         return Availability.ORDERED
     if all(serves(zone, source.warehouse) for source in sources):
@@ -329,12 +341,14 @@ def _days(
 ) -> int | None:
     """The slowest part of the order sets the date: it ships when all of it is there.
 
-    A product the warehouse system has never heard of gets no date. Reading its silence as
-    an empty shelf and quoting the supplier's lead time would turn a gap in the data into
-    a promise.
+    None where no date can be given at all: a product no warehouse has a record for, or a
+    part being ordered from a supplier whose lead time is not known.
     """
+    if not dated:
+        return None
+
     lead = supplier.get("lead_time_days")
-    if not dated or lead is None:
+    if lead is None and any(source.warehouse is None for source in sources):
         return None
 
     return max(
@@ -347,12 +361,13 @@ def _risk(
     availability: Availability, supplier: dict, requirements: CustomerRequirements
 ) -> tuple[Risk, list[str]]:
     """What the promise rests on beyond a warehouse shelf."""
-    reliability = float(supplier.get("reliability_score") or 1.0)
+    reliability = supplier.get("reliability_score")
+    committed = reliability is not None and promises_urgent(float(reliability))
 
     if availability == Availability.ORDERED:
-        if requirements.immediate and not promises_urgent(reliability):
+        if requirements.immediate and not committed:
             return Risk.HIGH, [
-                f"{supplier.get('code', 'the supplier')} does not commit to urgent orders"
+                f"{supplier.get('code') or 'the supplier'} is not committed to urgent orders"
             ]
         return Risk.MEDIUM, [f"part of the quantity is ordered from {supplier.get('code', '?')}"]
 
@@ -414,7 +429,7 @@ def _most_for_the_money(
 def _soonest(candidates: list[Priced], requirements: CustomerRequirements) -> Priced | None:
     """In the customer's hands first, and cheapest among those that arrive together.
 
-    A candidate with no date is not the soonest. It is the one nobody can promise.
+    A candidate with no date is left out rather than ranked last.
     """
     datable = [one for one in candidates if one.days is not None]
     return min(
@@ -456,6 +471,10 @@ def _taken(source: Allocation) -> tuple:
 
 
 def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
+    notes = list(one.notes)
+    if one.missing:
+        notes.append("does not meet " + ", ".join(one.missing))
+
     return OfferScenario(
         strategies=strategies,
         lines=one.lines,
@@ -465,5 +484,5 @@ def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
         days=one.days,
         risk=one.risk,
         transfer_cost=one.transfer,
-        notes=list(one.notes),
+        notes=notes,
     )

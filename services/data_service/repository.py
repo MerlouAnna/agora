@@ -100,9 +100,7 @@ def search_products(
 
     if min_stock is not None:
         totals = _stock_totals_subquery(db)
-        query = query.join(totals, totals.c.sku == Product.sku).filter(
-            totals.c.total >= min_stock
-        )
+        query = query.join(totals, totals.c.sku == Product.sku).filter(totals.c.total >= min_stock)
 
     return query.order_by(Product.sku).offset(offset).limit(limit).all()
 
@@ -137,12 +135,7 @@ def get_specs(db: Session, skus: list[str]) -> dict[str, dict]:
 
 def get_stock_by_warehouse(db: Session, skus: list[str]) -> dict[str, list[Stock]]:
     """Which warehouse holds what, per SKU. An offer cannot be dated without this."""
-    rows = (
-        db.query(Stock)
-        .filter(Stock.sku.in_(skus))
-        .order_by(Stock.sku, Stock.warehouse)
-        .all()
-    )
+    rows = db.query(Stock).filter(Stock.sku.in_(skus)).order_by(Stock.sku, Stock.warehouse).all()
 
     held: dict[str, list[Stock]] = {}
     for row in rows:
@@ -250,12 +243,7 @@ def gaps(db: Session) -> tuple[int, int, int]:
         .scalar()
     )
     totals = _stock_totals_subquery(db)
-    out_of_stock = (
-        db.query(func.count())
-        .select_from(totals)
-        .filter(totals.c.total == 0)
-        .scalar()
-    )
+    out_of_stock = db.query(func.count()).select_from(totals).filter(totals.c.total == 0).scalar()
     return without_stock, without_price, out_of_stock
 
 

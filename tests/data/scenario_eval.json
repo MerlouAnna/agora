@@ -46,7 +46,7 @@
             ]
           ],
           "availability": "transfer",
-          "days": 2,
+          "days": 4,
           "risk": "low",
           "fit": 0.6667,
           "net": 565.7,
@@ -349,7 +349,7 @@
             ]
           ],
           "availability": "transfer",
-          "days": 2,
+          "days": 3,
           "risk": "low",
           "fit": 1.0,
           "net": 208.02,
@@ -401,15 +401,14 @@
         "CON-1005",
         "CON-1023"
       ],
-      "trap": "an island order under 300 € pays 14 € carriage, and the transfer to an island costs two days",
+      "trap": "an island order under 300 € pays 14 € carriage, and the dearer one arrives sooner: ATH-02 serves the islands, THE-01 does not",
       "scenarios": [
         {
           "sku": "CON-1005",
           "strategies": [
             "cheapest-acceptable",
             "best-technical",
-            "best-budget",
-            "best-availability"
+            "best-budget"
           ],
           "allocation": [
             [
@@ -429,6 +428,7 @@
         {
           "sku": "CON-1023",
           "strategies": [
+            "best-availability",
             "premium-alternative"
           ],
           "allocation": [
@@ -437,14 +437,14 @@
               20
             ]
           ],
-          "availability": "transfer",
-          "days": 5,
+          "availability": "in-stock",
+          "days": 3,
           "risk": "low",
           "fit": 1.0,
           "net": 271.0,
           "shipping": 14.0,
           "total": 285.0,
-          "transfer_cost": 15.0
+          "transfer_cost": 0.0
         }
       ]
     }

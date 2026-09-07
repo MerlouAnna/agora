@@ -33,8 +33,12 @@ logger = logging.getLogger(__name__)
 
 EVAL_FILE = Path(__file__).resolve().parent.parent / "tests" / "data" / "scenario_eval.json"
 ZONES = (Zone.ATTICA, Zone.THESSALONIKI, Zone.MAINLAND, Zone.ISLANDS)
-COLUMNS = {"Αττική": Zone.ATTICA, "Θεσσαλονίκη": Zone.THESSALONIKI,
-           "Υπόλοιπη ηπειρωτική Ελλάδα": Zone.MAINLAND, "Νησιά": Zone.ISLANDS}
+COLUMNS = {
+    "Αττική": Zone.ATTICA,
+    "Θεσσαλονίκη": Zone.THESSALONIKI,
+    "Υπόλοιπη ηπειρωτική Ελλάδα": Zone.MAINLAND,
+    "Νησιά": Zone.ISLANDS,
+}
 
 
 def as_printed() -> dict:
@@ -98,8 +102,13 @@ def registry(printed: dict) -> list[tuple]:
     ]
     for warehouse, row in printed["transit"].items():
         for zone, days in row.items():
-            checks.append((f"transit {warehouse.value} → {zone.value}", days,
-                           delivery.TRANSIT[warehouse][zone]))
+            checks.append(
+                (
+                    f"transit {warehouse.value} → {zone.value}",
+                    days,
+                    delivery.TRANSIT[warehouse][zone],
+                )
+            )
     for zone, cost in printed["shipping"].items():
         checks.append((f"carriage {zone.value}", cost, delivery.SHIPPING[zone]))
     for code, days in printed["lead"].items():
@@ -129,20 +138,29 @@ def dates(printed: dict) -> list[tuple]:
         direct = printed["transit"][served[0]][zone]
         moved = printed["to_island"] if zone == Zone.ISLANDS else printed["transfer"]
 
-        for warehouse in printed["transit"]:
+        for warehouse, row in printed["transit"].items():
             if zone == delivery.SAME_DAY_ZONE and warehouse in delivery.SAME_DAY_FROM:
                 wanted = 0
             elif warehouse in served:
-                wanted = direct
+                wanted = row[zone]
             else:
-                wanted = moved + direct
-            checks.append((f"{zone.value} from {warehouse.value}", wanted,
-                           delivery.working_days(zone, warehouse)))
+                wanted = moved + row[zone]
+            checks.append(
+                (
+                    f"{zone.value} from {warehouse.value}",
+                    wanted,
+                    delivery.working_days(zone, warehouse),
+                )
+            )
 
         for code, lead in printed["lead"].items():
-            checks.append((f"{zone.value} ordered from {code}",
-                           lead + printed["receiving"] + direct,
-                           delivery.working_days(zone, None, lead_time=lead)))
+            checks.append(
+                (
+                    f"{zone.value} ordered from {code}",
+                    lead + printed["receiving"] + direct,
+                    delivery.working_days(zone, None, lead_time=lead),
+                )
+            )
 
     return checks
 
@@ -166,16 +184,23 @@ def offers() -> int:
 
     with SessionLocal() as db:
         suppliers = {
-            str(row.code): {"code": str(row.code), "lead_time_days": int(row.lead_time_days),
-                            "reliability_score": float(row.reliability_score)}
+            str(row.code): {
+                "code": str(row.code),
+                "lead_time_days": int(row.lead_time_days),
+                "reliability_score": float(row.reliability_score),
+            }
             for row in repository.get_suppliers(db)
         }
-        rows = {row.sku: row.model_dump()
-                for row in repository.summarize(db, db.query(Product).all())}
+        rows = {
+            row.sku: row.model_dump() for row in repository.summarize(db, db.query(Product).all())
+        }
 
     logger.info("")
-    logger.info("the scenario eval — %d requests, %d scenarios derived by hand",
-                len(cases), sum(len(case["scenarios"]) for case in cases))
+    logger.info(
+        "the scenario eval — %d requests, %d scenarios derived by hand",
+        len(cases),
+        sum(len(case["scenarios"]) for case in cases),
+    )
     logger.info("%-28s %-8s %s", "request", "built", "differences")
 
     wrong = 0
@@ -186,8 +211,12 @@ def offers() -> int:
         differs = _differences(case, built)
         wrong += len(differs)
 
-        logger.info("%-28s %-8s %s", case["id"], f"{len(built)}/{len(case['scenarios'])}",
-                    "—" if not differs else f"{len(differs)}")
+        logger.info(
+            "%-28s %-8s %s",
+            case["id"],
+            f"{len(built)}/{len(case['scenarios'])}",
+            "—" if not differs else f"{len(differs)}",
+        )
         for said in differs:
             logger.info("      ✘ %s", said)
 
@@ -221,9 +250,9 @@ def _differences(case: dict, built: list) -> list[str]:
             "total": made.total,
             "transfer_cost": made.transfer_cost,
         }
-        for field, expected in ((key, wanted[key]) for key in held):
-            if held[field] != expected:
-                said.append(f"{wanted['sku']} {field}: {held[field]} not {expected}")
+        for field in held:
+            if held[field] != wanted[field]:
+                said.append(f"{wanted['sku']} {field}: {held[field]} not {wanted[field]}")
 
     return said
 
