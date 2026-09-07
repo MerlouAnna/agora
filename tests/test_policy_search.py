@@ -50,8 +50,8 @@ def test_a_question_about_the_terms_reaches_the_policy_that_answers_it(monkeypat
 
     found, trace = retriever.search_policies("Τι έκπτωση έχει παραγγελία 12.000 ευρώ;")
 
-    assert found[0].metadata["document"] == "politiki-ekptoseon"
-    assert "15.000 € και άνω | 8%" in " ".join(excerpt.text for excerpt in found)
+    assert found[0].metadata["document"] == "politiki-ekptoseon", trace
+    assert "15.000 € και άνω | 8%" in " ".join(excerpt.text for excerpt in found), trace
     assert trace["passages"] == 66
 
 

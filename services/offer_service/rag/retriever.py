@@ -14,7 +14,12 @@ from itertools import zip_longest
 from services.data_service.categories import ORDERED_LABELS
 from services.offer_service.clients import catalog
 from services.offer_service.rag import embeddings, filters, indexer, lexical, store
-from services.offer_service.requirements import Constraint, CustomerRequirements, Ordering
+from services.offer_service.requirements import (
+    PRICE,
+    Constraint,
+    CustomerRequirements,
+    Ordering,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -56,15 +61,19 @@ class Excerpt:
     metadata: dict
 
 
-def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> tuple[list, dict]:
+def candidates(
+    requirements: CustomerRequirements, limit: int | None = CANDIDATES
+) -> tuple[list, dict]:
     """The codes a request reaches, best first, without asking the catalogue anything.
 
     Args:
         requirements: The request, with whatever constraints were pulled out of it.
-        limit: How many codes to keep.
+        limit: How many codes to keep, or None for every one that qualifies.
 
     Returns:
-        The codes and a trace of what each half of the search proposed.
+        The codes and a trace of what each half of the search proposed. A request ordered
+        on price comes back eligible but unordered, and its trace carries no `merged`:
+        that number arrives with the lookup, so only `search` can put them in order.
 
     Raises:
         IndexNotBuilt: Nothing is indexed, which is not the same as nothing matching.
@@ -91,9 +100,13 @@ def candidates(requirements: CustomerRequirements, limit: int = CANDIDATES) -> t
         return [], trace
 
     if requirements.order is not None:
-        ordered = _at_the_end(requirements.order, codes, eligible["metadatas"] or [])[:limit]
         order = requirements.order
-        trace |= {"ordered_by": f"{order.key} {order.end}", "merged": ordered}
+        trace |= {"ordered_by": f"{order.key} {order.end}"}
+        if order.key == PRICE:
+            return codes[:limit], trace
+
+        ordered = _at_the_end(order, codes, eligible["metadatas"] or [])[:limit]
+        trace |= {"merged": ordered}
         return ordered, trace
 
     by_word = lexical.ranked(requirements.request, codes, list(eligible["documents"] or []))
@@ -113,7 +126,8 @@ def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
         CatalogueUnavailable: What was found could not be priced.
     """
     behind = _refreshed()
-    ordered, trace = candidates(requirements, limit)
+    on_price = requirements.order is not None and requirements.order.key == PRICE
+    ordered, trace = candidates(requirements, None if on_price else limit)
     if behind:
         trace |= {"refreshed": behind}
     if not ordered:
@@ -130,6 +144,9 @@ def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
     matches, withdrawn = _priced(ordered, cards)
     if withdrawn:
         trace |= {"withdrawn": withdrawn}
+    if on_price:
+        matches = _at_the_price(matches, requirements.order.end)[:limit]
+        trace |= {"merged": [match.sku for match in matches]}
 
     return Retrieval(matches, trace)
 
@@ -254,6 +271,19 @@ def _at_the_end(order: Ordering, codes: list[str], metadata: list) -> list[str]:
     ranked = sorted(known, key=lambda code: (away * _place(order.key, held[code][order.key]), code))
     placed = set(known)
     return ranked + [code for code in codes if code not in placed]
+
+
+def _at_the_price(found: list[Match], end: str) -> list[Match]:
+    """The eligible products sorted at one end of what the catalogue charges today.
+
+    The price is not in the card and must not be, so this end is found after the lookup
+    rather than in the index. Products it could not price go last.
+    """
+    away = -1 if end == "max" else 1
+    priced = [match for match in found if match.price is not None]
+    ranked = sorted(priced, key=lambda match: (away * match.price, match.sku))
+
+    return ranked + [match for match in found if match.price is None]
 
 
 def _place(key: str, value) -> float:

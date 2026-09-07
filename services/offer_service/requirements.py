@@ -5,6 +5,7 @@ What a salesperson's request comes down to once the specifics are pulled out of 
 the only shape the retriever and the scenario builder read.
 """
 
+import math
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -15,12 +16,16 @@ from services.data_service.categories import (
     Category,
     is_flag,
     is_numeric,
+    label_values,
     specs_for,
 )
 
 Operator = Literal["eq", "gte", "lte", "gt", "lt"]
 
 COMPARISONS = ("gte", "lte", "gt", "lt")
+
+# The one thing a request can be ordered on that is not a specification.
+PRICE = "price"
 
 
 class Constraint(BaseModel):
@@ -44,29 +49,40 @@ class Constraint(BaseModel):
         if is_numeric(self.key):
             if not isinstance(self.value, float | int) or isinstance(self.value, bool):
                 raise ValueError(f"{self.key} is a number, not {self.value!r}")
+            if not math.isfinite(self.value):
+                raise ValueError(f"{self.key} is never {self.value}, so it filters nothing")
+            if self.value <= 0:
+                raise ValueError(f"{self.key} is never 0 or less, so {self.value} filters nothing")
         elif is_flag(self.key):
             if not isinstance(self.value, bool):
                 raise ValueError(f"{self.key} is on or off, not {self.value!r}")
             if self.op != "eq":
                 raise ValueError(f"{self.key} is on or off, so only eq applies")
-        elif self.key in ORDERED_LABELS:
-            if self.value not in ORDERED_LABELS[self.key]:
-                raise ValueError(f"{self.value!r} is not one of {ORDERED_LABELS[self.key]}")
-        elif self.op in COMPARISONS:
-            raise ValueError(f"{self.key} has no order, so only eq applies")
+        else:
+            allowed = label_values(self.key)
+            if self.value not in allowed:
+                raise ValueError(f"{self.value!r} is not one of {allowed}")
+            if self.op in COMPARISONS and self.key not in ORDERED_LABELS:
+                raise ValueError(f"{self.key} has no order, so only eq applies")
         return self
 
 
 class Ordering(BaseModel):
-    """Which end of a specification's range the request is asking for."""
+    """Which end of a range the request is asking for.
 
-    key: str = Field(..., description="A specification that can be compared, such as `length_m`")
+    `price` sits here alongside the specifications, and is the one end the index cannot
+    find: it is read from the catalogue once the products are in hand.
+    """
+
+    key: str = Field(
+        ..., description="Something that can be compared, such as `length_m` or `price`"
+    )
     end: Literal["max", "min"]
 
     @field_validator("key")
     @classmethod
     def _comparable(cls, key: str) -> str:
-        if not is_numeric(key) and key not in ORDERED_LABELS:
+        if key != PRICE and not is_numeric(key) and key not in ORDERED_LABELS:
             raise ValueError(f"{key} has no order to sit at the end of")
         return key
 
@@ -100,7 +116,7 @@ class CustomerRequirements(BaseModel):
         if self.category is not None:
             carried = specs_for(self.category)
             named = [c.key for c in self.constraints]
-            if self.order is not None:
+            if self.order is not None and self.order.key != PRICE:
                 named.append(self.order.key)
             stray = [key for key in named if key not in carried]
             if stray:
