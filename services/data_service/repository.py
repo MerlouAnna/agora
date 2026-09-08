@@ -25,16 +25,16 @@ DEFAULT_LIMIT = 20
 
 
 def summarize(db: Session, products: list[Product]) -> list[ProductSummary]:
-    """Attach specs, price and stock to each product in two extra queries, not two per row."""
-    skus = [product.sku for product in products]
-    specs = get_specs(db, [str(sku) for sku in skus])
-    totals = get_stock_totals(db, [str(sku) for sku in skus])
-    held = get_stock_by_warehouse(db, [str(sku) for sku in skus])
-    prices = get_prices(db, [str(sku) for sku in skus])
+    """Attach specs, price and stock to each product in three extra queries, not three per row."""
+    skus = [str(product.sku) for product in products]
+    specs = get_specs(db, skus)
+    held = get_stock_by_warehouse(db, skus)
+    prices = get_prices(db, skus)
 
     summaries = []
     for product in products:
         price = prices.get(str(product.sku))
+        rows = held.get(str(product.sku))
         summaries.append(
             ProductSummary(
                 sku=str(product.sku),
@@ -48,10 +48,10 @@ def summarize(db: Session, products: list[Product]) -> list[ProductSummary]:
                 currency=str(price.currency) if price else None,
                 price_updated_at=price.updated_at if price else None,
                 specs=specs.get(str(product.sku), {}),
-                stock_total=totals.get(str(product.sku)),
+                stock_total=sum(int(row.quantity) for row in rows) if rows else None,
                 warehouses=[
                     StockEntry(warehouse=str(row.warehouse), quantity=int(row.quantity))
-                    for row in held.get(str(product.sku), [])
+                    for row in rows or []
                 ],
             )
         )
@@ -142,17 +142,6 @@ def get_stock_by_warehouse(db: Session, skus: list[str]) -> dict[str, list[Stock
         held.setdefault(str(row.sku), []).append(row)
 
     return held
-
-
-def get_stock_totals(db: Session, skus: list[str]) -> dict[str, int]:
-    """Total quantity per SKU. A SKU with no stock record is absent from the result."""
-    rows = (
-        db.query(Stock.sku, func.sum(Stock.quantity))
-        .filter(Stock.sku.in_(skus))
-        .group_by(Stock.sku)
-        .all()
-    )
-    return {sku: int(total) for sku, total in rows}
 
 
 def get_suppliers(db: Session) -> list[Supplier]:

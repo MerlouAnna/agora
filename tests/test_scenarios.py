@@ -100,7 +100,11 @@ def test_same_day_is_narrower_than_being_in_stock():
 
 
 def test_a_product_with_more_than_was_asked_for_loses_to_one_that_matches():
-    """Both satisfy the floor: the closer one is the match, the dearer one is the step up."""
+    """Both satisfy the floor: the closer one is the match, the dearer one is the step up.
+
+    On a graded label the floor moves with the comparison: under `gt CAT6` the nearest
+    grade that qualifies is CAT6a, and the nearest grade costs nothing.
+    """
     close = ups("UPS-A", 20, 320.0, [("ATH-01", 40)])
     over = ups("UPS-C", 35, 1380.0, [("ATH-01", 40)])
     wanted = asked(quantity=5, constraints=[Constraint(key="autonomy_min", op="gte", value=20)])
@@ -112,6 +116,9 @@ def test_a_product_with_more_than_was_asked_for_loses_to_one_that_matches():
 
     assert picked[Strategy.BEST_TECHNICAL] == "UPS-A"
     assert picked[Strategy.PREMIUM] == "UPS-C"
+    assert builder._overshoot(Constraint(key="standard", op="gt", value="CAT6"), "CAT6a", 0.0) == 0
+    assert builder._overshoot(Constraint(key="standard", op="gt", value="CAT6"), "CAT7", 0.0) == 1
+    assert builder._overshoot(Constraint(key="standard", op="gte", value="CAT6"), "CAT6", 0.0) == 0
 
 
 def test_one_product_that_answers_several_criteria_is_offered_once():
@@ -125,6 +132,12 @@ def test_one_product_that_answers_several_criteria_is_offered_once():
     assert [scenario.lines[0].sku for scenario in built] == ["UPS-A", "UPS-C"]
     assert Strategy.CHEAPEST in built[0].strategies
     assert Strategy.BEST_TECHNICAL in built[0].strategies
+
+    table = builder.compare(built)
+    assert [row["skus"] for row in table] == [["UPS-A"], ["UPS-C"]]
+    assert table[0]["strategies"] == [strategy.value for strategy in built[0].strategies]
+    assert table[0]["quantity"] == 5
+    assert table[0]["total"] == built[0].total
 
 
 def test_a_flag_the_catalogue_stores_as_text_is_read_as_a_flag():

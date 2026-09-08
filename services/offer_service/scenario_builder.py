@@ -38,7 +38,6 @@ logger = logging.getLogger(__name__)
 class Priced:
     """One candidate with everything the strategies compare it on."""
 
-    product: dict
     zone: Zone
     fit: float
     missing: list[str]
@@ -227,9 +226,9 @@ def _overshoot(constraint: Constraint, held, spread: float) -> float:
 
     if constraint.key in ORDERED_LABELS:
         order = ORDERED_LABELS[constraint.key]
-        above = len(order) - 1 - order.index(constraint.value)
-        steps = order.index(held) - order.index(constraint.value)
-        return steps / above if above else 0.0
+        floor = order.index(constraint.value) + (1 if constraint.op == "gt" else 0)
+        room = len(order) - 1 - floor
+        return (order.index(held) - floor) / room if room else 0.0
 
     if not spread:
         return 0.0
@@ -259,13 +258,12 @@ def _price(
         sku=product["sku"],
         description=product["description"],
         quantity=quantity,
-        unit_price=float(product.get("price") or 0.0),
+        unit_price=float(product["price"]),
         sources=sources,
     )
     risk, told = _risk(availability, supplier, requirements)
 
     return Priced(
-        product=product,
         zone=zone,
         fit=fit,
         missing=missing,
@@ -273,7 +271,7 @@ def _price(
         availability=availability,
         days=days,
         risk=risk,
-        transfer=max(transfer_cost(zone, _from(source)) for source in sources),
+        transfer=max(transfer_cost(zone, source.warehouse) for source in sources),
         notes=notes + told,
     )
 
@@ -352,7 +350,7 @@ def _days(
         return None
 
     return max(
-        working_days(zone, _from(source), lead_time=lead, before_cut_off=before_cut_off)
+        working_days(zone, source.warehouse, lead_time=lead, before_cut_off=before_cut_off)
         for source in sources
     )
 
@@ -361,15 +359,14 @@ def _risk(
     availability: Availability, supplier: dict, requirements: CustomerRequirements
 ) -> tuple[Risk, list[str]]:
     """What the promise rests on beyond a warehouse shelf."""
-    reliability = supplier.get("reliability_score")
-    committed = reliability is not None and promises_urgent(float(reliability))
-
     if availability == Availability.ORDERED:
-        if requirements.immediate and not committed:
-            return Risk.HIGH, [
-                f"{supplier.get('code') or 'the supplier'} is not committed to urgent orders"
-            ]
-        return Risk.MEDIUM, [f"part of the quantity is ordered from {supplier.get('code', '?')}"]
+        reliability = supplier.get("reliability_score")
+        named = supplier.get("code") or "the supplier"
+        if requirements.immediate and not (
+            reliability is not None and promises_urgent(float(reliability))
+        ):
+            return Risk.HIGH, [f"{named} is not committed to urgent orders"]
+        return Risk.MEDIUM, [f"ordered from {named}"]
 
     if availability == Availability.UNKNOWN:
         return Risk.MEDIUM, ["stock is unknown, which is not the same as none"]
@@ -378,10 +375,6 @@ def _risk(
         return Risk.LOW, ["stock moves between warehouses before it ships"]
 
     return Risk.LOW, []
-
-
-def _from(source: Allocation) -> Warehouse | None:
-    return source.warehouse
 
 
 # ── The five readings ─────────────────────────────────────────────────────────
@@ -461,13 +454,9 @@ def _weight(risk: Risk) -> int:
 def _mark(one: Priced) -> tuple:
     """What makes two picks the same offer rather than two."""
     return tuple(
-        (line.sku, line.quantity, tuple(_taken(source) for source in line.sources))
+        (line.sku, line.quantity, tuple((s.warehouse, s.quantity) for s in line.sources))
         for line in one.lines
     )
-
-
-def _taken(source: Allocation) -> tuple:
-    return source.warehouse, source.quantity
 
 
 def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
