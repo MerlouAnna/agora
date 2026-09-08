@@ -58,6 +58,18 @@ def stats() -> dict:
     return answer.json()
 
 
+def suppliers() -> list[dict]:
+    """The supplier registry, for the lead time and the reliability an offer date needs."""
+    with _http() as http:
+        try:
+            answer = http.get("/suppliers")
+            answer.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise CatalogueUnavailable(f"the supplier registry did not answer: {exc}") from exc
+
+    return answer.json()
+
+
 def lookup(skus: list[str]) -> list[dict]:
     """The current state of several products, priced and counted as of right now."""
     if not skus:

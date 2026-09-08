@@ -11,6 +11,11 @@ from pydantic import BaseModel, Field, model_validator
 from services.data_service.categories import Category, SupplierCode, Warehouse
 
 
+class StockEntry(BaseModel):
+    warehouse: str
+    quantity: int
+
+
 class ProductSummary(BaseModel):
     sku: str
     category: str
@@ -31,11 +36,19 @@ class ProductSummary(BaseModel):
     stock_total: int | None = Field(
         default=None, description="Total across warehouses. Null means no stock record exists."
     )
+    warehouses: list[StockEntry] = Field(
+        default_factory=list,
+        description="Which warehouse holds what. Empty when there is no stock record.",
+    )
 
 
-class StockEntry(BaseModel):
-    warehouse: str
-    quantity: int
+class SupplierSummary(BaseModel):
+    code: str
+    name: str
+    lead_time_days: int = Field(..., description="Working days to receive a product not in stock")
+    reliability_score: float = Field(
+        ..., description="Below 0.80 the supplier is never committed to for an urgent order"
+    )
 
 
 class ProductStock(BaseModel):

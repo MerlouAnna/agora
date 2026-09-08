@@ -6,7 +6,7 @@ from sqlalchemy.pool import StaticPool
 
 from services.data_service.database import get_db
 from services.data_service.main import app
-from services.data_service.models import Price, Product, ProductSpec, Stock, TableBase
+from services.data_service.models import Price, Product, ProductSpec, Stock, Supplier, TableBase
 
 # One shared connection, otherwise the test client's thread opens its own empty database.
 engine = create_engine(
@@ -31,6 +31,9 @@ def catalogue():
             Price(sku="PWR-1001", amount=96.20, currency="EUR"),
             Stock(sku="PWR-1001", warehouse="ATH-01", quantity=12),
             Stock(sku="PWR-1001", warehouse="THE-01", quantity=8),
+            Supplier(
+                code="SUP-03", name="Balkan Cables", lead_time_days=14, reliability_score=0.74
+            ),
         ]
     )
     db.commit()
@@ -70,6 +73,18 @@ def test_stock_totals_the_warehouses():
 def test_a_product_with_no_stock_record_reports_null():
     found = client.post("/products/lookup", json={"skus": ["PWR-1002"]}).json()
     assert found[0]["stock_total"] is None
+
+
+def test_the_supplier_registry_carries_the_two_numbers_a_date_needs():
+    found = client.get("/suppliers").json()
+    assert found == [
+        {
+            "code": "SUP-03",
+            "name": "Balkan Cables",
+            "lead_time_days": 14,
+            "reliability_score": 0.74,
+        }
+    ]
 
 
 def test_stats_add_up():
