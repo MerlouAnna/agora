@@ -52,6 +52,7 @@
           "net": 565.7,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 565.7,
           "transfer_cost": 15.0
@@ -75,6 +76,7 @@
           "net": 702.2,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 702.2,
           "transfer_cost": 0.0
@@ -101,6 +103,7 @@
           "net": 2311.0,
           "discount_rate": 0.03,
           "discount": 69.33,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 2241.67,
           "transfer_cost": 15.0
@@ -159,6 +162,7 @@
           "net": 228.9,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 5.0,
           "total": 233.9,
           "transfer_cost": 0.0
@@ -181,6 +185,7 @@
           "net": 1175.85,
           "discount_rate": 0.03,
           "discount": 35.28,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 1140.57,
           "transfer_cost": 0.0
@@ -207,6 +212,7 @@
           "net": 1195.4,
           "discount_rate": 0.03,
           "discount": 35.86,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 1159.54,
           "transfer_cost": 15.0
@@ -263,6 +269,7 @@
           "net": 2333.2,
           "discount_rate": 0.03,
           "discount": 70.0,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 2263.2,
           "transfer_cost": 0.0
@@ -286,6 +293,7 @@
           "net": 2343.6,
           "discount_rate": 0.03,
           "discount": 70.31,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 2273.29,
           "transfer_cost": 0.0
@@ -312,6 +320,7 @@
           "net": 2438.0,
           "discount_rate": 0.03,
           "discount": 73.14,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 2364.86,
           "transfer_cost": 15.0
@@ -353,6 +362,7 @@
           "net": 91.56,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 5.0,
           "total": 96.56,
           "transfer_cost": 0.0
@@ -375,6 +385,7 @@
           "net": 208.02,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 5.0,
           "total": 213.02,
           "transfer_cost": 15.0
@@ -397,6 +408,7 @@
           "net": 249.7,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 5.0,
           "total": 254.7,
           "transfer_cost": 0.0
@@ -447,6 +459,7 @@
           "net": 149.4,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 14.0,
           "total": 163.4,
           "transfer_cost": 15.0
@@ -470,6 +483,7 @@
           "net": 271.0,
           "discount_rate": 0.0,
           "discount": 0.0,
+          "needs_approval": false,
           "shipping": 14.0,
           "total": 285.0,
           "transfer_cost": 0.0
@@ -524,6 +538,7 @@
           "net": 3848.88,
           "discount_rate": 0.05,
           "discount": 192.44,
+          "needs_approval": false,
           "shipping": 0.0,
           "total": 3656.44,
           "transfer_cost": 15.0
@@ -547,6 +562,7 @@
           "net": 8139.92,
           "discount_rate": 0.05,
           "discount": 407.0,
+          "needs_approval": true,
           "shipping": 0.0,
           "total": 7732.92,
           "transfer_cost": 0.0
@@ -569,6 +585,7 @@
           "net": 9787.12,
           "discount_rate": 0.05,
           "discount": 489.36,
+          "needs_approval": true,
           "shipping": 0.0,
           "total": 9297.76,
           "transfer_cost": 15.0

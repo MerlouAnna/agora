@@ -45,15 +45,18 @@ def test_approval_is_read_on_the_band_and_not_on_what_the_ceiling_let_through():
     assert rate(8139.92, Category.UPS) == rate(4000.0, Category.PSU) == 0.05
     assert needs_approval(8139.92)
     assert not needs_approval(4000.0)
+    assert not needs_approval(7999.99)
+    assert needs_approval(8000.0)
 
     asked = CustomerRequirements(request="δοκιμή", category="UPS", quantity=8)
     over = builder.build(asked, [ups("UPS-OVER", 1017.49)], SUPPLIERS, Store.ATHENS)[0]
     under = builder.build(asked, [ups("UPS-UNDER", 500.0)], SUPPLIERS, Store.ATHENS)[0]
 
-    assert (over.net, over.discount_rate) == (8139.92, 0.05)
+    assert (over.net, over.discount_rate, over.needs_approval) == (8139.92, 0.05, True)
     assert any("band needs the sales manager" in note for note in over.notes)
-    assert (under.net, under.discount_rate) == (4000.0, 0.05)
+    assert (under.net, under.discount_rate, under.needs_approval) == (4000.0, 0.05, False)
     assert not any("sales manager" in note for note in under.notes)
+    assert [row["needs_approval"] for row in builder.compare([over, under])] == [True, False]
 
 
 def test_the_volume_band_can_make_the_dearer_product_the_cheaper_order():

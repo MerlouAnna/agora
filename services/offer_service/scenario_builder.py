@@ -134,6 +134,7 @@ def compare(scenarios: list[OfferScenario]) -> list[dict]:
             "quantity": sum(line.quantity for line in scenario.lines),
             "net": scenario.net,
             "discount": scenario.discount,
+            "needs_approval": scenario.needs_approval,
             "shipping": scenario.shipping,
             "total": scenario.total,
             "fit": round(scenario.fit, 2),

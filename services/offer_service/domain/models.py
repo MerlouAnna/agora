@@ -8,6 +8,7 @@ quantity comes from, what it costs, when it arrives, and what could go wrong wit
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+from services.data_service import discounts
 from services.data_service.categories import Warehouse
 
 
@@ -72,8 +73,9 @@ class OfferScenario:
     `days` counts working days, where 0 is the same working day and None means the order
     cannot be dated. `net` is the catalogue value, which is what both business documents
     mean by καθαρή αξία — the discount comes off it and the carriage threshold reads it.
-    `transfer_cost` is the company's own and never the customer's, and `strategies` holds
-    every reading that landed on this offer.
+    `transfer_cost` is the company's own and never the customer's, `needs_approval` is read
+    on the band and not on the discount the ceiling let through, and `strategies` holds every
+    reading that landed on this offer.
     """
 
     strategies: list[Strategy]
@@ -94,6 +96,11 @@ class OfferScenario:
     @property
     def discount(self) -> float:
         return round(self.net * self.discount_rate, 2)
+
+    @property
+    def needs_approval(self) -> bool:
+        """Whether this order's band is past what the salesperson signs off alone."""
+        return discounts.needs_approval(self.net)
 
     @property
     def total(self) -> float:
