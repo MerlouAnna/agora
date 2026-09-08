@@ -25,6 +25,7 @@ from services.data_service.database import SessionLocal
 from services.data_service.delivery import Store, Zone
 from services.data_service.models import Product
 from services.offer_service import scenario_builder as builder
+from services.offer_service import validation
 from services.offer_service.rag import policies
 from services.offer_service.requirements import CustomerRequirements
 
@@ -204,10 +205,8 @@ def table(title: str, checks: list[tuple]) -> int:
     return wrong
 
 
-def offers() -> int:
-    """Build each request and compare every field with the answer derived beforehand."""
-    cases = json.loads(EVAL_FILE.read_text(encoding="utf-8"))["cases"]
-
+def catalogue() -> tuple[dict, dict]:
+    """The products and the suppliers as the database holds them, read once for both tables."""
     with SessionLocal() as db:
         suppliers = {
             str(row.code): {
@@ -221,6 +220,11 @@ def offers() -> int:
             row.sku: row.model_dump() for row in repository.summarize(db, db.query(Product).all())
         }
 
+    return rows, suppliers
+
+
+def offers(cases: list[dict], rows: dict, suppliers: dict) -> int:
+    """Build each request and compare every field with the answer derived beforehand."""
     logger.info("")
     logger.info(
         "the scenario eval — %d requests, %d scenarios derived by hand",
@@ -248,6 +252,58 @@ def offers() -> int:
 
     logger.info("   %d differences from what was derived", wrong)
     return wrong
+
+
+def checked(cases: list[dict], rows: dict, suppliers: dict) -> int:
+    """The validator over every scenario the builder built, which has to stay silent.
+
+    A clean offer must raise nothing at all, and the one warning the eval can predict is
+    the approval its own `needs_approval` records. Anything else is a validator crying
+    wolf at real data, which no unit test over a hand-built product would show.
+    """
+    logger.info("")
+    logger.info("the validator over what was built")
+
+    said = []
+    checks = warnings = 0
+    for case in cases:
+        asked = CustomerRequirements(request=case["request"], **case["requirements"])
+        store = Store(case["store"])
+        built = builder.build(asked, [rows[sku] for sku in case["candidates"]], suppliers, store)
+        report = validation.validate(
+            built,
+            asked,
+            store,
+            catalogue=lambda skus: [rows[sku] for sku in skus if sku in rows],
+            registry=lambda: list(suppliers.values()),
+        )
+        wanted = {one["sku"] for one in case["scenarios"] if one["needs_approval"]}
+
+        for verdict in report.verdicts:
+            sku = verdict.scenario.lines[0].sku
+            checks += len(verdict.checks)
+            warnings += len(verdict.failed)
+            for check in verdict.failed:
+                if check.severity == validation.Severity.FATAL:
+                    said.append(f"{case['id']} · {sku} · {check.name} — {check.said}")
+                elif "salesperson" not in check.name:
+                    said.append(f"{case['id']} · {sku} · unexpected warning: {check.name}")
+            asks = any("salesperson" in check.name for check in verdict.failed)
+            if asks != (sku in wanted):
+                said.append(
+                    f"{case['id']} · {sku} · approval {asks} where the eval says {not asks}"
+                )
+
+    for one in said:
+        logger.info("   ✘ %s", one)
+    logger.info(
+        "   %d checks over %d scenarios, %d raised, %d unaccounted for",
+        checks,
+        sum(len(case["scenarios"]) for case in cases),
+        warnings,
+        len(said),
+    )
+    return len(said)
 
 
 def _differences(case: dict, built: list) -> list[str]:
@@ -288,9 +344,13 @@ def _differences(case: dict, built: list) -> list[str]:
 
 def run() -> None:
     printed = as_printed()
+    cases = json.loads(EVAL_FILE.read_text(encoding="utf-8"))["cases"]
+    rows, suppliers = catalogue()
+
     wrong = table("the registry against the two documents", registry(printed))
     wrong += table("every delivery date, worked out twice", dates(printed))
-    wrong += offers()
+    wrong += offers(cases, rows, suppliers)
+    wrong += checked(cases, rows, suppliers)
 
     logger.info("")
     logger.info("%s", "nothing disagrees" if not wrong else f"{wrong} disagreements")
