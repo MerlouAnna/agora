@@ -206,5 +206,17 @@ def test_an_urgent_order_on_a_supplier_that_will_not_commit_is_flagged_high():
     assert unknown.risk == Risk.HIGH
 
 
+def test_the_volume_band_can_make_the_dearer_product_the_cheaper_order():
+    """A discount is read on the order's value, so 810 € of goods can cost less than 799 €."""
+    under = ups("UPS-A", 20, 799.0, [("ATH-01", 40)])
+    over = ups("UPS-B", 20, 810.0, [("ATH-01", 40)])
+
+    built = builder.build(asked(quantity=1), [under, over], SUPPLIERS, Store.ATHENS)
+    dearer = next(one for one in built if one.lines[0].sku == "UPS-B")
+
+    assert _chose(built, Strategy.CHEAPEST) == "UPS-B"
+    assert (dearer.net, dearer.discount, dearer.total) == (810.0, 24.3, 785.7)
+
+
 def _chose(built, strategy) -> str:
     return next(scenario.lines[0].sku for scenario in built if strategy in scenario.strategies)

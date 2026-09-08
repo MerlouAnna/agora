@@ -50,6 +50,8 @@
           "risk": "low",
           "fit": 0.6667,
           "net": 565.7,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 0.0,
           "total": 565.7,
           "transfer_cost": 15.0
@@ -71,6 +73,8 @@
           "risk": "medium",
           "fit": 1.0,
           "net": 702.2,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 0.0,
           "total": 702.2,
           "transfer_cost": 0.0
@@ -95,8 +99,10 @@
           "risk": "medium",
           "fit": 1.0,
           "net": 2311.0,
+          "discount_rate": 0.03,
+          "discount": 69.33,
           "shipping": 0.0,
-          "total": 2311.0,
+          "total": 2241.67,
           "transfer_cost": 15.0
         }
       ]
@@ -151,6 +157,8 @@
           "risk": "medium",
           "fit": 1.0,
           "net": 228.9,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 5.0,
           "total": 233.9,
           "transfer_cost": 0.0
@@ -171,8 +179,10 @@
           "risk": "low",
           "fit": 0.6667,
           "net": 1175.85,
+          "discount_rate": 0.03,
+          "discount": 35.28,
           "shipping": 0.0,
-          "total": 1175.85,
+          "total": 1140.57,
           "transfer_cost": 0.0
         },
         {
@@ -195,8 +205,10 @@
           "risk": "medium",
           "fit": 0.8667,
           "net": 1195.4,
+          "discount_rate": 0.03,
+          "discount": 35.86,
           "shipping": 0.0,
-          "total": 1195.4,
+          "total": 1159.54,
           "transfer_cost": 15.0
         }
       ]
@@ -249,8 +261,10 @@
           "risk": "low",
           "fit": 0.6667,
           "net": 2333.2,
+          "discount_rate": 0.03,
+          "discount": 70.0,
           "shipping": 0.0,
-          "total": 2333.2,
+          "total": 2263.2,
           "transfer_cost": 0.0
         },
         {
@@ -270,8 +284,10 @@
           "risk": "high",
           "fit": 1.0,
           "net": 2343.6,
+          "discount_rate": 0.03,
+          "discount": 70.31,
           "shipping": 0.0,
-          "total": 2343.6,
+          "total": 2273.29,
           "transfer_cost": 0.0
         },
         {
@@ -294,8 +310,10 @@
           "risk": "medium",
           "fit": 0.6667,
           "net": 2438.0,
+          "discount_rate": 0.03,
+          "discount": 73.14,
           "shipping": 0.0,
-          "total": 2438.0,
+          "total": 2364.86,
           "transfer_cost": 15.0
         }
       ]
@@ -333,6 +351,8 @@
           "risk": "medium",
           "fit": 1.0,
           "net": 91.56,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 5.0,
           "total": 96.56,
           "transfer_cost": 0.0
@@ -353,6 +373,8 @@
           "risk": "low",
           "fit": 1.0,
           "net": 208.02,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 5.0,
           "total": 213.02,
           "transfer_cost": 15.0
@@ -373,6 +395,8 @@
           "risk": "medium",
           "fit": 1.0,
           "net": 249.7,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 5.0,
           "total": 254.7,
           "transfer_cost": 0.0
@@ -421,6 +445,8 @@
           "risk": "low",
           "fit": 1.0,
           "net": 149.4,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 14.0,
           "total": 163.4,
           "transfer_cost": 15.0
@@ -442,9 +468,110 @@
           "risk": "low",
           "fit": 1.0,
           "net": 271.0,
+          "discount_rate": 0.0,
+          "discount": 0.0,
           "shipping": 14.0,
           "total": 285.0,
           "transfer_cost": 0.0
+        }
+      ]
+    },
+    {
+      "id": "ups-large-order-larisa",
+      "request": "Οκτώ UPS από 2200VA και πάνω, με αυτονομία τουλάχιστον 12 λεπτά, για τη Λάρισα.",
+      "requirements": {
+        "category": "UPS",
+        "quantity": 8,
+        "constraints": [
+          {
+            "key": "va",
+            "op": "gte",
+            "value": 2200
+          },
+          {
+            "key": "autonomy_min",
+            "op": "gte",
+            "value": 12
+          }
+        ]
+      },
+      "store": "LARISA",
+      "candidates": [
+        "UPS-1026",
+        "UPS-1009",
+        "UPS-1027",
+        "UPS-1003",
+        "UPS-1007"
+      ],
+      "trap": "the 7% band and the 5% UPS ceiling come to the same discount, and a 5% discount still needs the sales manager because the band is what he approves",
+      "scenarios": [
+        {
+          "sku": "UPS-1026",
+          "strategies": [
+            "cheapest-acceptable",
+            "best-budget"
+          ],
+          "allocation": [
+            [
+              "THE-01",
+              8
+            ]
+          ],
+          "availability": "transfer",
+          "days": 3,
+          "risk": "low",
+          "fit": 0.8261,
+          "net": 3848.88,
+          "discount_rate": 0.05,
+          "discount": 192.44,
+          "shipping": 0.0,
+          "total": 3656.44,
+          "transfer_cost": 15.0
+        },
+        {
+          "sku": "UPS-1003",
+          "strategies": [
+            "best-technical",
+            "best-availability"
+          ],
+          "allocation": [
+            [
+              "PAT-01",
+              8
+            ]
+          ],
+          "availability": "in-stock",
+          "days": 2,
+          "risk": "low",
+          "fit": 1.0,
+          "net": 8139.92,
+          "discount_rate": 0.05,
+          "discount": 407.0,
+          "shipping": 0.0,
+          "total": 7732.92,
+          "transfer_cost": 0.0
+        },
+        {
+          "sku": "UPS-1007",
+          "strategies": [
+            "premium-alternative"
+          ],
+          "allocation": [
+            [
+              "THE-01",
+              8
+            ]
+          ],
+          "availability": "transfer",
+          "days": 3,
+          "risk": "low",
+          "fit": 0.0,
+          "net": 9787.12,
+          "discount_rate": 0.05,
+          "discount": 489.36,
+          "shipping": 0.0,
+          "total": 9297.76,
+          "transfer_cost": 15.0
         }
       ]
     }

@@ -19,8 +19,8 @@ import re
 import sys
 from pathlib import Path
 
-from services.data_service import delivery, repository
-from services.data_service.categories import Warehouse
+from services.data_service import delivery, discounts, repository
+from services.data_service.categories import Category, Warehouse
 from services.data_service.database import SessionLocal
 from services.data_service.delivery import Store, Zone
 from services.data_service.models import Product
@@ -42,7 +42,7 @@ COLUMNS = {
 
 
 def as_printed() -> dict:
-    """Every delivery figure, parsed out of the terms document rather than the code."""
+    """Every figure of both documents, parsed out of them rather than out of the code."""
     held = {passage.id: passage.text for passage in policies.read_all()}
 
     transit = {}
@@ -60,9 +60,26 @@ def as_printed() -> dict:
         if found and found.group(1) in COLUMNS:
             carriage[COLUMNS[found.group(1)]] = float(found.group(2))
 
+    tiers = []
+    for line in held["politiki-ekptoseon#1"].splitlines():
+        found = re.match(r"^(Έως|[\d.]+)[^|]*\|\s*(\d+)%$", line.strip())
+        if found is None:
+            continue
+        floor = 0.0 if found.group(1) == "Έως" else float(found.group(1).replace(".", ""))
+        tiers.append((floor, int(found.group(2)) / 100))
+
     return {
         "transit": transit,
         "shipping": carriage,
+        "tiers": tiers,
+        "caps": {
+            Category(found.group(1)): int(found.group(2)) / 100
+            for found in re.finditer(
+                r"^([A-Z]+)\s*\|\s*(\d+)%$", held["politiki-ekptoseon#2"], re.MULTILINE
+            )
+        },
+        "self_approved": int(_says(r"Έκπτωση έως (\d+)% εγκρίνεται", held["politiki-ekptoseon#4"]))
+        / 100,
         "free_from": float(_says(r"(\d+) € και άνω", held["oroi-paradosis#4"])),
         "lead": {
             found.group(1): int(found.group(2))
@@ -111,6 +128,15 @@ def registry(printed: dict) -> list[tuple]:
             )
     for zone, cost in printed["shipping"].items():
         checks.append((f"carriage {zone.value}", cost, delivery.SHIPPING[zone]))
+    for at, (printed_tier, held_tier) in enumerate(
+        zip(printed["tiers"], discounts.VOLUME_TIERS, strict=True)
+    ):
+        checks.append((f"volume band {at}", printed_tier, held_tier))
+    for category, ceiling in printed["caps"].items():
+        checks.append((f"{category.value} ceiling", ceiling, discounts.CATEGORY_CAPS[category]))
+    checks.append(
+        ("the salesperson's own limit", printed["self_approved"], discounts.SELF_APPROVED)
+    )
     for code, days in printed["lead"].items():
         checks.append((f"{code} lead time", days, _lead(code)))
 
@@ -246,6 +272,8 @@ def _differences(case: dict, built: list) -> list[str]:
             "risk": made.risk.value,
             "fit": made.fit,
             "net": made.net,
+            "discount_rate": made.discount_rate,
+            "discount": made.discount,
             "shipping": made.shipping,
             "total": made.total,
             "transfer_cost": made.transfer_cost,
@@ -259,7 +287,7 @@ def _differences(case: dict, built: list) -> list[str]:
 
 def run() -> None:
     printed = as_printed()
-    wrong = table("the registry against the terms document", registry(printed))
+    wrong = table("the registry against the two documents", registry(printed))
     wrong += table("every delivery date, worked out twice", dates(printed))
     wrong += offers()
 

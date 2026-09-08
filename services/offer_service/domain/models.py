@@ -70,8 +70,10 @@ class OfferScenario:
     """One offer, complete enough to be put in front of a customer or refused.
 
     `days` counts working days, where 0 is the same working day and None means the order
-    cannot be dated. `transfer_cost` is the company's own and never the customer's, and
-    `strategies` holds every reading that landed on this offer.
+    cannot be dated. `net` is the catalogue value, which is what both business documents
+    mean by καθαρή αξία — the discount comes off it and the carriage threshold reads it.
+    `transfer_cost` is the company's own and never the customer's, and `strategies` holds
+    every reading that landed on this offer.
     """
 
     strategies: list[Strategy]
@@ -81,6 +83,7 @@ class OfferScenario:
     availability: Availability
     days: int | None
     risk: Risk
+    discount_rate: float = 0.0
     transfer_cost: float = 0.0
     notes: list[str] = field(default_factory=list)
 
@@ -89,5 +92,9 @@ class OfferScenario:
         return round(sum(line.line_total for line in self.lines), 2)
 
     @property
+    def discount(self) -> float:
+        return round(self.net * self.discount_rate, 2)
+
+    @property
     def total(self) -> float:
-        return round(self.net + self.shipping, 2)
+        return round(self.net - self.discount + self.shipping, 2)

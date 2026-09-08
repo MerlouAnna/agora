@@ -9,6 +9,7 @@ nothing is fetched — everything here is arithmetic over rows the caller alread
 import logging
 from dataclasses import dataclass
 
+from services.data_service import discounts
 from services.data_service.categories import ORDERED_LABELS, Warehouse, is_numeric
 from services.data_service.delivery import (
     Store,
@@ -45,6 +46,7 @@ class Priced:
     availability: Availability
     days: int | None
     risk: Risk
+    discount_rate: float
     transfer: float
     notes: list[str]
 
@@ -53,8 +55,13 @@ class Priced:
         return round(sum(line.line_total for line in self.lines), 2)
 
     @property
+    def discount(self) -> float:
+        return round(self.net * self.discount_rate, 2)
+
+    @property
     def total(self) -> float:
-        return round(self.net + shipping(self.zone, self.net), 2)
+        net = self.net
+        return round(net - self.discount + shipping(self.zone, net), 2)
 
 
 def build(
@@ -126,6 +133,7 @@ def compare(scenarios: list[OfferScenario]) -> list[dict]:
             "skus": [line.sku for line in scenario.lines],
             "quantity": sum(line.quantity for line in scenario.lines),
             "net": scenario.net,
+            "discount": scenario.discount,
             "shipping": scenario.shipping,
             "total": scenario.total,
             "fit": round(scenario.fit, 2),
@@ -228,7 +236,7 @@ def _overshoot(constraint: Constraint, held, spread: float) -> float:
         order = ORDERED_LABELS[constraint.key]
         floor = order.index(constraint.value) + (1 if constraint.op == "gt" else 0)
         room = len(order) - 1 - floor
-        return (order.index(held) - floor) / room if room else 0.0
+        return (order.index(held) - floor) / room if room > 0 else 0.0
 
     if not spread:
         return 0.0
@@ -261,6 +269,10 @@ def _price(
         unit_price=float(product["price"]),
         sources=sources,
     )
+    net = line.line_total
+    if discounts.needs_approval(net):
+        notes = notes + ["the discount needs the sales manager's approval"]
+
     risk, told = _risk(availability, supplier, requirements)
 
     return Priced(
@@ -271,6 +283,7 @@ def _price(
         availability=availability,
         days=days,
         risk=risk,
+        discount_rate=discounts.rate(net, product["category"]),
         transfer=max(transfer_cost(zone, source.warehouse) for source in sources),
         notes=notes + told,
     )
@@ -454,7 +467,7 @@ def _weight(risk: Risk) -> int:
 def _mark(one: Priced) -> tuple:
     """What makes two picks the same offer rather than two."""
     return tuple(
-        (line.sku, line.quantity, tuple((s.warehouse, s.quantity) for s in line.sources))
+        (line.sku, line.quantity, tuple((one.warehouse, one.quantity) for one in line.sources))
         for line in one.lines
     )
 
@@ -468,6 +481,7 @@ def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
         strategies=strategies,
         lines=one.lines,
         shipping=shipping(one.zone, one.net),
+        discount_rate=one.discount_rate,
         fit=one.fit,
         availability=one.availability,
         days=one.days,
