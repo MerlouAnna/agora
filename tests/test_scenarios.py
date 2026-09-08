@@ -138,6 +138,7 @@ def test_one_product_that_answers_several_criteria_is_offered_once():
     assert table[0]["strategies"] == [strategy.value for strategy in built[0].strategies]
     assert table[0]["quantity"] == 5
     assert table[0]["total"] == built[0].total
+    assert [row["discount"] for row in table] == [48.0, 345.0]
 
 
 def test_a_flag_the_catalogue_stores_as_text_is_read_as_a_flag():
