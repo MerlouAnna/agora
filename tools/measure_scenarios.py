@@ -274,6 +274,7 @@ def _differences(case: dict, built: list) -> list[str]:
             "net": made.net,
             "discount_rate": made.discount_rate,
             "discount": made.discount,
+            "needs_approval": made.needs_approval,
             "shipping": made.shipping,
             "total": made.total,
             "transfer_cost": made.transfer_cost,
