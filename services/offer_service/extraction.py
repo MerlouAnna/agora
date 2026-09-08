@@ -116,6 +116,13 @@ class Extracted(BaseModel):
             "ευρώ» goes. Null when the request names no ceiling, and never 0"
         ),
     )
+    budget_max: float | None = Field(
+        ...,
+        description=(
+            "The most the customer will pay for the order as a whole, in euro, and only "
+            "when the request says the figure covers all of it. Null otherwise, never 0"
+        ),
+    )
     immediate: bool = Field(
         ..., description="True only when the request says the stock has to be there now"
     )
@@ -178,6 +185,7 @@ def _requirements(request: str, answer: Extracted) -> CustomerRequirements:
         order=_ordering(answer.order),
         price_min=answer.price_min,
         price_max=answer.price_max,
+        budget_max=answer.budget_max,
         immediate=answer.immediate,
     )
 

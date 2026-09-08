@@ -104,10 +104,20 @@ def rankings(case: dict, corpus_: tuple, whole: bool, constrained: bool, held: t
 
 
 def affordable(codes: list[str], asked: CustomerRequirements, held: tuple) -> list[str]:
-    """What the request's budget and its urgency leave, in the order the ranking put them."""
+    """What the request's budgets and its urgency leave, in the order the ranking put them.
+
+    An order budget is weighed against the catalogue value, which is all the retriever can
+    know: the discount is settled later, and it can only make an order cheaper.
+    """
     prices, stock = held
     if asked.price_max is not None:
         codes = [c for c in codes if prices.get(c) is not None and prices[c] <= asked.price_max]
+    if asked.budget_max is not None and asked.quantity:
+        codes = [
+            c
+            for c in codes
+            if prices.get(c) is not None and prices[c] * asked.quantity <= asked.budget_max
+        ]
     if asked.immediate and asked.quantity:
         codes = [c for c in codes if stock.get(c, 0) >= asked.quantity]
 

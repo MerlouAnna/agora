@@ -26,6 +26,7 @@ EXAMPLES = """| request | what it comes down to |
 | Τροφοδοτικό SFX, πάνω από 700W. | PSU · form_factor eq SFX · watt gt 700 · no quantity, because the request does not say how many |
 | Θέλω UPS online 3000VA με 35 λεπτά αυτονομία. | UPS · topology eq online · va eq 3000 · autonomy_min eq 35 |
 | Καλώδια δικτύου CAT6, μέχρι 25 ευρώ το ένα. | DATA · standard eq CAT6 · price_max 25 · no order at all — «μέχρι» bounds, it does not rank |
+| Δώδεκα ρευματολήπτες CEE 32A, μέχρι 400 ευρώ συνολικά. | CONNECTORS · quantity 12 · connector_type eq CEE · amperage eq 32 · budget_max 400 |
 | Κάτι για μπαλαντέζα. | no category, no constraint — the request names nothing the catalogue can be filtered on |"""
 
 
@@ -78,9 +79,12 @@ written here, or it is left out:
   instead. `price` can be ordered on, and belongs nowhere else.
 - `quantity` — how many units the customer wants, and only when the request says so. A
   request that does not say leaves it empty; silence does not mean one.
-- `price_min`, `price_max` — a budget per unit, in euro. A budget is never a constraint;
-  there is no specification called price. A budget you were not given is left empty, and
-  never written as 0.
+- `price_min`, `price_max` — a budget per unit, in euro: what one piece may cost. A figure
+  the request marks as «το ένα», «ανά τεμάχιο», «each» goes here, and so does a figure the
+  request marks neither way. A budget is never a constraint; there is no specification
+  called price. A budget you were not given is left empty, and never written as 0.
+- `budget_max` — a budget for the whole order, in euro, and only when the request says the
+  figure covers all of it: «συνολικά», «όλα μαζί», «ο προϋπολογισμός μας».
 - `immediate` — true only when the request says the stock has to be there now.
 
 Everything is optional. A request that names nothing the catalogue can be filtered on

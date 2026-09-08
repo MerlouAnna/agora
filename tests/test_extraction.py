@@ -12,6 +12,7 @@ def answer(**changes) -> Extracted:
         "order": None,
         "price_min": None,
         "price_max": None,
+        "budget_max": None,
         "immediate": False,
     }
     return Extracted(**(written | changes))

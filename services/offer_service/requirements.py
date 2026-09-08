@@ -66,6 +66,46 @@ class Constraint(BaseModel):
                 raise ValueError(f"{self.key} has no order, so only eq applies")
         return self
 
+    def holds(self, held) -> bool:
+        """Whether a specification the catalogue reports satisfies this constraint.
+
+        The catalogue stores a flag as the text `true` or `false`, and every string is
+        truthy, so a flag is translated before it is compared.
+        """
+        if self.key in ORDERED_LABELS:
+            order = ORDERED_LABELS[self.key]
+            if held not in order:
+                return False
+            return _compare(self.op, order.index(held), order.index(self.value))
+
+        if isinstance(self.value, bool):
+            return _flag(held) == self.value
+
+        if isinstance(held, str) or isinstance(self.value, str):
+            return held == self.value
+
+        return _compare(self.op, held, self.value)
+
+
+def _flag(held) -> bool:
+    """A flag the way the catalogue stores it, which is the text `true` or `false`."""
+    if isinstance(held, bool):
+        return held
+
+    return str(held).strip().lower() == "true"
+
+
+def _compare(op: str, held, wanted) -> bool:
+    if op == "eq":
+        return held == wanted
+    if op == "gte":
+        return held >= wanted
+    if op == "gt":
+        return held > wanted
+    if op == "lte":
+        return held <= wanted
+    return held < wanted
+
 
 class Ordering(BaseModel):
     """Which end of a range the request is asking for.
@@ -103,6 +143,9 @@ class CustomerRequirements(BaseModel):
     )
     price_min: float | None = Field(default=None, gt=0)
     price_max: float | None = Field(default=None, gt=0)
+    budget_max: float | None = Field(
+        default=None, gt=0, description="A ceiling on the whole order, not on one unit"
+    )
     immediate: bool = Field(
         default=False, description="Stock has to cover the quantity now, not on reorder"
     )
