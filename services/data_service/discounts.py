@@ -50,9 +50,5 @@ def rate(net: float, category: Category) -> float:
 
 
 def needs_approval(net: float) -> bool:
-    """Whether the salesperson signs the discount off alone.
-
-    Read on the band and not on what the ceiling let through: the policy names the order
-    value, and a narrow category does not turn a large order into the salesperson's own.
-    """
+    """Whether the order's band is past what the salesperson signs off alone."""
     return volume_rate(net) > SELF_APPROVED

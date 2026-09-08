@@ -271,7 +271,7 @@ def _price(
     )
     net = line.line_total
     if discounts.needs_approval(net):
-        notes = notes + ["the discount needs the sales manager's approval"]
+        notes = notes + ["the order's discount band needs the sales manager's approval"]
 
     risk, told = _risk(availability, supplier, requirements)
 

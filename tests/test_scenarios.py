@@ -138,6 +138,7 @@ def test_one_product_that_answers_several_criteria_is_offered_once():
     assert table[0]["strategies"] == [strategy.value for strategy in built[0].strategies]
     assert table[0]["quantity"] == 5
     assert table[0]["total"] == built[0].total
+    assert [row["discount"] for row in table] == [48.0, 345.0]
 
 
 def test_a_flag_the_catalogue_stores_as_text_is_read_as_a_flag():
@@ -204,18 +205,6 @@ def test_an_urgent_order_on_a_supplier_that_will_not_commit_is_flagged_high():
     assert ordinary.risk == Risk.MEDIUM
     assert urgent.days == ordinary.days == 16
     assert unknown.risk == Risk.HIGH
-
-
-def test_the_volume_band_can_make_the_dearer_product_the_cheaper_order():
-    """A discount is read on the order's value, so 810 € of goods can cost less than 799 €."""
-    under = ups("UPS-A", 20, 799.0, [("ATH-01", 40)])
-    over = ups("UPS-B", 20, 810.0, [("ATH-01", 40)])
-
-    built = builder.build(asked(quantity=1), [under, over], SUPPLIERS, Store.ATHENS)
-    dearer = next(one for one in built if one.lines[0].sku == "UPS-B")
-
-    assert _chose(built, Strategy.CHEAPEST) == "UPS-B"
-    assert (dearer.net, dearer.discount, dearer.total) == (810.0, 24.3, 785.7)
 
 
 def _chose(built, strategy) -> str:

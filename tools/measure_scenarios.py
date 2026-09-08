@@ -132,8 +132,8 @@ def registry(printed: dict) -> list[tuple]:
         zip(printed["tiers"], discounts.VOLUME_TIERS, strict=True)
     ):
         checks.append((f"volume band {at}", printed_tier, held_tier))
-    for category, ceiling in printed["caps"].items():
-        checks.append((f"{category.value} ceiling", ceiling, discounts.CATEGORY_CAPS[category]))
+    for category, ceiling in discounts.CATEGORY_CAPS.items():
+        checks.append((f"{category.value} ceiling", printed["caps"].get(category), ceiling))
     checks.append(
         ("the salesperson's own limit", printed["self_approved"], discounts.SELF_APPROVED)
     )
