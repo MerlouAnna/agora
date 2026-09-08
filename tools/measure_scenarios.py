@@ -1,12 +1,13 @@
 """
 Scenario measurement
 ====================
-Three tables. The delivery figures the registry holds against the ones the terms document
+Four tables. The delivery figures the registry holds against the ones the terms document
 prints, read out of the document itself. Every delivery date the code can produce, worked
-out a second time from those same figures. And the five requests in
+out a second time from those same figures. The six requests in
 tests/data/scenario_eval.json, whose answers were derived from the catalogue with SQL
 before the builder was trusted with them — which product each strategy has to pick, what
-it costs, when it lands, and what could go wrong with it.
+it costs, when it lands, and what could go wrong with it. And the validator over every
+scenario those requests build, which has to stay silent.
 
 Reads data/docs and data/catalog.db. No service, no model, no cost.
 

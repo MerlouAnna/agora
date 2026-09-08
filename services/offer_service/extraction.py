@@ -112,8 +112,8 @@ class Extracted(BaseModel):
     price_max: float | None = Field(
         ...,
         description=(
-            "The most the customer will pay per unit, in euro — this is where «μέχρι 900 "
-            "ευρώ» goes. Null when the request names no ceiling, and never 0"
+            "The most the customer will pay per unit, in euro. Null when the request names "
+            "no ceiling, and never 0"
         ),
     )
     budget_max: float | None = Field(

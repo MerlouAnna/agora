@@ -100,9 +100,10 @@ gets no category and no constraints, and that is a correct answer, not a failure
 2. **Numbers carry no units and no prefixes.** 2.5kW is 2500. 20 μέτρα is 20. 3x2.5mm is
    `cores` 3 and `section_mm` 2.5. Gigabit is `speed_mbps` 1000.
 3. **Money is not a specification.** A number written with ευρώ, €, or euro is a budget.
-   `price_min` and `price_max` are the only two places it can go: not a constraint, not an
-   ordering. And every number in the request is written down exactly **once** — a number
-   that went to the budget is finished, and does not appear anywhere else as well.
+   `price_min`, `price_max` and `budget_max` are the only places it can go: not a
+   constraint, not an ordering. And every number in the request is written down exactly
+   **once** — a number that went to a budget is finished, and does not appear anywhere else
+   as well.
 4. **A product code is not a number.** PWR-1042, DAT-1013, «swt1022» — three letters and
    four digits name one product. Those digits are not a wattage, not a length and not a
    quantity: the request already carries the code, and you write nothing for it.

@@ -21,18 +21,30 @@ from services.data_service.categories import Warehouse
 from services.data_service.delivery import (
     Store,
     Zone,
+    promises_urgent,
     shipping,
     transfer_cost,
     working_days,
     zone_of,
 )
 from services.offer_service.clients import catalog
-from services.offer_service.domain.models import Allocation, OfferLine, OfferScenario
+from services.offer_service.domain.models import (
+    Allocation,
+    Availability,
+    OfferLine,
+    OfferScenario,
+    Risk,
+    availability_of,
+)
 from services.offer_service.requirements import CustomerRequirements
 
 logger = logging.getLogger(__name__)
 
+# A figure that differs only by a rounding, one meant to be the same number, and `fit`,
+# which the builder rounds to four places.
 CENT = 0.011
+EXACT = 1e-9
+FIT = 1e-4
 
 
 class Severity(StrEnum):
@@ -104,7 +116,7 @@ def validate(
         requirements: What was asked for, which is what the budget and condition checks read.
         store: The branch the order was raised from, which fixes the destination zone.
         catalogue: What reads the products again. Replaced in tests and in the tools.
-        registry: What reads the suppliers, needed to date a quantity being ordered in.
+        registry: What reads the suppliers, needed to date and to rate a quantity ordered in.
         before_cut_off: Whether the order is confirmed by 13:00, as when it was priced.
 
     Returns:
@@ -115,12 +127,10 @@ def validate(
         return ValidationReport(verdicts=[])
 
     held = {str(row["sku"]): row for row in (catalogue or catalog.lookup)(wanted)}
-    leads = {
-        str(row["code"]): row.get("lead_time_days") for row in (registry or catalog.suppliers)()
-    }
+    known = {str(row["code"]): row for row in (registry or catalog.suppliers)()}
 
     zone = zone_of(store)
-    verdicts = [_verdict(one, held, leads, requirements, zone, before_cut_off) for one in scenarios]
+    verdicts = [_verdict(one, held, known, requirements, zone, before_cut_off) for one in scenarios]
 
     withheld = [verdict for verdict in verdicts if not verdict.offerable]
     if withheld:
@@ -132,11 +142,24 @@ def validate(
 def _verdict(
     scenario: OfferScenario,
     held: dict,
-    leads: dict,
+    known: dict,
     requirements: CustomerRequirements,
     zone: Zone,
     before_cut_off: bool,
 ) -> Verdict:
+    if not scenario.lines:
+        return Verdict(
+            scenario=scenario,
+            checks=[
+                Check(
+                    "the offer has something to sell",
+                    Severity.FATAL,
+                    False,
+                    "the scenario carries no lines",
+                )
+            ],
+        )
+
     checks = []
     for line in scenario.lines:
         checks += _line(line, held.get(line.sku))
@@ -145,8 +168,9 @@ def _verdict(
         return Verdict(scenario=scenario, checks=checks)
 
     row = held[scenario.lines[0].sku]
+    supplier = known.get(str(row.get("supplier_code") or ""), {})
     checks += _money(scenario, row, zone)
-    checks += _promise(scenario, row, leads, zone, before_cut_off)
+    checks += _promise(scenario, row, supplier, requirements, zone, before_cut_off)
     checks += _request(scenario, row, requirements)
 
     return Verdict(scenario=scenario, checks=checks)
@@ -168,25 +192,34 @@ def _line(line: OfferLine, row: dict | None) -> list[Check]:
     stock = {
         str(entry["warehouse"]): int(entry["quantity"]) for entry in row.get("warehouses") or []
     }
-    strange = [
-        source.warehouse.value
-        for source in line.sources
-        if source.warehouse is not None and source.warehouse.value not in stock
-    ]
+    # What a warehouse holds covers every allocation drawn on it, not one at a time.
+    wanted: dict[str, int] = {}
+    for source in line.sources:
+        if source.warehouse is not None:
+            wanted[source.warehouse.value] = wanted.get(source.warehouse.value, 0) + source.quantity
+
+    strange = [name for name in wanted if name not in stock]
     short = [
-        f"{source.warehouse.value} is asked for {source.quantity} and holds "
-        f"{stock.get(source.warehouse.value, 0)}"
-        for source in line.sources
-        if source.warehouse is not None and source.quantity > stock.get(source.warehouse.value, 0)
+        f"{name} is asked for {asked} and holds {stock.get(name, 0)}"
+        for name, asked in wanted.items()
+        if asked > stock.get(name, 0)
     ]
+    sourced = sum(source.quantity for source in line.sources)
 
     return [
         Check("the sku is in the catalogue", Severity.FATAL, True),
         Check(
             "the unit price is the catalogue's",
             Severity.FATAL,
-            listed is not None and abs(float(listed) - line.unit_price) < CENT,
+            listed is not None and abs(float(listed) - line.unit_price) < EXACT,
             f"the line says {line.unit_price} and the catalogue says {listed}",
+        ),
+        Check(
+            "the description is the catalogue's",
+            Severity.WARNING,
+            line.description == row.get("description"),
+            f"the line reads {line.description!r} where the catalogue reads "
+            f"{row.get('description')!r}",
         ),
         Check(
             "every warehouse named holds this product",
@@ -200,6 +233,12 @@ def _line(line: OfferLine, row: dict | None) -> list[Check]:
             not short,
             "; ".join(short),
         ),
+        Check(
+            "the allocations add up to the quantity the line sells",
+            Severity.FATAL,
+            sourced == line.quantity,
+            f"{line.quantity} are offered and {sourced} are sourced",
+        ),
     ]
 
 
@@ -207,26 +246,27 @@ def _money(scenario: OfferScenario, row: dict, zone: Zone) -> list[Check]:
     """Every figure between the line totals and what the customer pays."""
     net = scenario.net
     earned = discounts.rate(net, row["category"])
-    moved = max(transfer_cost(zone, _from(source)) for source in _sources(scenario))
+    carriage = shipping(zone, net)
+    moved = max([transfer_cost(zone, _from(source)) for source in _sources(scenario)], default=0.0)
 
     return [
         Check(
             "the discount is the band this order earns, held down by its category",
             Severity.FATAL,
-            abs(earned - scenario.discount_rate) < 1e-9,
+            abs(earned - scenario.discount_rate) < EXACT,
             f"the offer gives {scenario.discount_rate:.0%} where {earned:.0%} is earned",
         ),
         Check(
-            "the discount in euro follows the rate",
+            "the discount in euro follows the band",
             Severity.FATAL,
-            abs(net * scenario.discount_rate - scenario.discount) < CENT,
-            f"{scenario.discount_rate:.0%} of {net} is not {scenario.discount}",
+            abs(net * earned - scenario.discount) < CENT,
+            f"{earned:.0%} of {net} is not {scenario.discount}",
         ),
         Check(
             "the carriage is the destination's, waived above the threshold",
             Severity.FATAL,
-            abs(shipping(zone, net) - scenario.shipping) < CENT,
-            f"the offer charges {scenario.shipping} where {shipping(zone, net)} applies",
+            abs(carriage - scenario.shipping) < CENT,
+            f"the offer charges {scenario.shipping} where {carriage} applies",
         ),
         Check(
             "the internal transfer is charged when the stock has to move",
@@ -237,22 +277,37 @@ def _money(scenario: OfferScenario, row: dict, zone: Zone) -> list[Check]:
         Check(
             "the total is the net less the discount plus the carriage",
             Severity.FATAL,
-            abs(net - scenario.discount + scenario.shipping - scenario.total) < CENT,
-            f"{net} − {scenario.discount} + {scenario.shipping} is not {scenario.total}",
+            abs(net - net * earned + carriage - scenario.total) < CENT,
+            f"{net} − {net * earned:.2f} + {carriage} is not {scenario.total}",
         ),
     ]
 
 
 def _promise(
-    scenario: OfferScenario, row: dict, leads: dict, zone: Zone, before_cut_off: bool
+    scenario: OfferScenario,
+    row: dict,
+    supplier: dict,
+    requirements: CustomerRequirements,
+    zone: Zone,
+    before_cut_off: bool,
 ) -> list[Check]:
-    """The date and the approval, which are promises rather than prices."""
-    lead = leads.get(str(row.get("supplier_code") or ""))
+    """The date, the risk and the approval, which are promises rather than prices."""
+    lead = supplier.get("lead_time_days")
     sources = _sources(scenario)
-    datable = lead is not None or all(source.warehouse is not None for source in sources)
+    told = (
+        availability_of(sources, zone, before_cut_off)
+        if row.get("warehouses")
+        else Availability.UNKNOWN
+    )
+    datable = (
+        bool(sources)
+        and told is not Availability.UNKNOWN
+        and (lead is not None or all(source.warehouse is not None for source in sources))
+    )
 
+    borne = _risk(told, supplier, requirements)
     dated = None
-    if datable and scenario.days is not None:
+    if datable:
         dated = max(
             working_days(zone, _from(source), lead_time=lead, before_cut_off=before_cut_off)
             for source in sources
@@ -260,16 +315,23 @@ def _promise(
 
     return [
         Check(
+            "what the offer calls the stock is what the allocation amounts to",
+            Severity.FATAL,
+            told == scenario.availability,
+            f"the offer says {scenario.availability.value} where the allocation is {told.value}",
+        ),
+        Check(
             "the promised date is what the delivery terms give",
             Severity.FATAL,
-            dated is None or dated == scenario.days,
+            not datable or dated == scenario.days,
             f"the offer promises {scenario.days} working days where the terms give {dated}",
         ),
         Check(
-            "approval is read on the band this order's value earns",
-            Severity.FATAL,
-            discounts.needs_approval(scenario.net) == scenario.needs_approval,
-            f"the offer says {scenario.needs_approval} for an order of {scenario.net}",
+            "the risk is what the allocation and the supplier make of it",
+            Severity.WARNING,
+            borne == scenario.risk,
+            f"the offer calls this {scenario.risk.value} where the allocation makes it "
+            f"{borne.value}",
         ),
         Check(
             "the discount is the salesperson's own to sign",
@@ -278,6 +340,16 @@ def _promise(
             "the sales manager has to approve the band before this goes out",
         ),
     ]
+
+
+def _risk(told: Availability, supplier: dict, requirements: CustomerRequirements) -> Risk:
+    """What the promise rests on beyond a warehouse shelf, read off the allocation."""
+    if told == Availability.ORDERED:
+        reliability = supplier.get("reliability_score")
+        committed = reliability is not None and promises_urgent(float(reliability))
+        return Risk.HIGH if requirements.immediate and not committed else Risk.MEDIUM
+
+    return Risk.MEDIUM if told == Availability.UNKNOWN else Risk.LOW
 
 
 def _request(scenario: OfferScenario, row: dict, requirements: CustomerRequirements) -> list[Check]:
@@ -291,6 +363,7 @@ def _request(scenario: OfferScenario, row: dict, requirements: CustomerRequireme
     unit = scenario.lines[0].unit_price
     offered = sum(line.quantity for line in scenario.lines)
     ordered = requirements.quantity or 1
+    allowed, exact = _allowance(requirements, unmet)
 
     return [
         Check(
@@ -317,7 +390,26 @@ def _request(scenario: OfferScenario, row: dict, requirements: CustomerRequireme
             requirements.budget_max is None or scenario.total <= requirements.budget_max + CENT,
             f"{scenario.total} against a budget of {requirements.budget_max}",
         ),
+        Check(
+            "the fit is what the conditions it meets allow",
+            Severity.WARNING,
+            abs(scenario.fit - allowed) < FIT if exact else scenario.fit <= allowed + FIT,
+            f"the offer scores {scenario.fit} where the conditions it meets allow "
+            f"{round(allowed, 4)}",
+        ),
     ]
+
+
+def _allowance(requirements: CustomerRequirements, unmet: list[str]) -> tuple[float, bool]:
+    """The most `fit` a product missing these conditions can score, and whether it is the figure.
+
+    A miss costs a whole share and overshoot part of one, and only a floor overshoots.
+    """
+    if not requirements.constraints:
+        return 1.0, True
+
+    floors = any(constraint.op in ("gte", "gt") for constraint in requirements.constraints)
+    return 1.0 - len(unmet) / len(requirements.constraints), not floors
 
 
 def _sources(scenario: OfferScenario) -> list[Allocation]:

@@ -15,7 +15,6 @@ from services.data_service.delivery import (
     Store,
     Zone,
     promises_urgent,
-    same_day,
     serves,
     shipping,
     transfer_cost,
@@ -29,6 +28,7 @@ from services.offer_service.domain.models import (
     OfferScenario,
     Risk,
     Strategy,
+    availability_of,
 )
 from services.offer_service.requirements import Constraint, CustomerRequirements
 
@@ -289,7 +289,7 @@ def _allocate(
     if len(sources) > 1 and all(source.warehouse is not None for source in sources):
         notes.append(f"{quantity} covered from {len(sources)} warehouses")
 
-    return sources, _availability(sources, zone, before_cut_off), notes
+    return sources, availability_of(sources, zone, before_cut_off), notes
 
 
 def _first(entry: dict, zone: Zone) -> tuple:
@@ -299,17 +299,6 @@ def _first(entry: dict, zone: Zone) -> tuple:
         -entry["quantity"],
         entry["warehouse"],
     )
-
-
-def _availability(sources: list[Allocation], zone: Zone, before_cut_off: bool) -> Availability:
-    if any(source.warehouse is None for source in sources):
-        return Availability.ORDERED
-    if all(serves(zone, source.warehouse) for source in sources):
-        if all(same_day(zone, source.warehouse, before_cut_off) for source in sources):
-            return Availability.SAME_DAY
-        return Availability.IN_STOCK
-
-    return Availability.TRANSFER
 
 
 def _days(
