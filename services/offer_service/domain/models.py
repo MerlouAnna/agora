@@ -10,6 +10,7 @@ from enum import StrEnum
 
 from services.data_service import discounts
 from services.data_service.categories import Warehouse
+from services.data_service.delivery import Zone, same_day, serves
 
 
 class Strategy(StrEnum):
@@ -105,3 +106,22 @@ class OfferScenario:
     @property
     def total(self) -> float:
         return round(self.net - self.discount + self.shipping, 2)
+
+
+def availability_of(
+    sources: list[Allocation], zone: Zone, before_cut_off: bool = True
+) -> Availability:
+    """What an allocation amounts to, which is what decides the delivery date.
+
+    Άμεση παράδοση is narrower than being in stock: Attica only, out of the two Attica
+    warehouses, and confirmed by the cut-off.
+    """
+    if any(source.warehouse is None for source in sources):
+        return Availability.ORDERED
+
+    if all(serves(zone, source.warehouse) for source in sources):
+        if all(same_day(zone, source.warehouse, before_cut_off) for source in sources):
+            return Availability.SAME_DAY
+        return Availability.IN_STOCK
+
+    return Availability.TRANSFER

@@ -15,7 +15,6 @@ from services.data_service.delivery import (
     Store,
     Zone,
     promises_urgent,
-    same_day,
     serves,
     shipping,
     transfer_cost,
@@ -29,6 +28,7 @@ from services.offer_service.domain.models import (
     OfferScenario,
     Risk,
     Strategy,
+    availability_of,
 )
 from services.offer_service.requirements import Constraint, CustomerRequirements
 
@@ -179,7 +179,7 @@ def _fit(
     missing = []
     for constraint in requirements.constraints:
         held = specs.get(constraint.key)
-        if held is None or not _satisfies(constraint, held):
+        if held is None or not constraint.holds(held):
             penalties.append(1.0)
             missing.append(f"{constraint.key} {constraint.op} {constraint.value}")
             continue
@@ -187,42 +187,6 @@ def _fit(
         penalties.append(_overshoot(constraint, held, spreads.get(constraint.key, 0.0)))
 
     return round(1.0 - sum(penalties) / len(penalties), 4), missing
-
-
-def _satisfies(constraint: Constraint, held) -> bool:
-    if constraint.key in ORDERED_LABELS:
-        order = ORDERED_LABELS[constraint.key]
-        if held not in order:
-            return False
-        return _compare(constraint.op, order.index(held), order.index(constraint.value))
-
-    if isinstance(constraint.value, bool):
-        return _flag(held) == constraint.value
-
-    if isinstance(held, str) or isinstance(constraint.value, str):
-        return held == constraint.value
-
-    return _compare(constraint.op, held, constraint.value)
-
-
-def _flag(held) -> bool:
-    """A flag the way the catalogue stores it, which is the text `true` or `false`."""
-    if isinstance(held, bool):
-        return held
-
-    return str(held).strip().lower() == "true"
-
-
-def _compare(op: str, held, wanted) -> bool:
-    if op == "eq":
-        return held == wanted
-    if op == "gte":
-        return held >= wanted
-    if op == "gt":
-        return held > wanted
-    if op == "lte":
-        return held <= wanted
-    return held < wanted
 
 
 def _overshoot(constraint: Constraint, held, spread: float) -> float:
@@ -325,7 +289,7 @@ def _allocate(
     if len(sources) > 1 and all(source.warehouse is not None for source in sources):
         notes.append(f"{quantity} covered from {len(sources)} warehouses")
 
-    return sources, _availability(sources, zone, before_cut_off), notes
+    return sources, availability_of(sources, zone, before_cut_off), notes
 
 
 def _first(entry: dict, zone: Zone) -> tuple:
@@ -335,17 +299,6 @@ def _first(entry: dict, zone: Zone) -> tuple:
         -entry["quantity"],
         entry["warehouse"],
     )
-
-
-def _availability(sources: list[Allocation], zone: Zone, before_cut_off: bool) -> Availability:
-    if any(source.warehouse is None for source in sources):
-        return Availability.ORDERED
-    if all(serves(zone, source.warehouse) for source in sources):
-        if all(same_day(zone, source.warehouse, before_cut_off) for source in sources):
-            return Availability.SAME_DAY
-        return Availability.IN_STOCK
-
-    return Availability.TRANSFER
 
 
 def _days(
@@ -419,7 +372,8 @@ def _most_for_the_money(
     inside = [
         one
         for one in candidates
-        if requirements.price_max is None or one.lines[0].unit_price <= requirements.price_max
+        if (requirements.price_max is None or one.lines[0].unit_price <= requirements.price_max)
+        and (requirements.budget_max is None or one.total <= requirements.budget_max)
     ]
     return max(
         inside or candidates,

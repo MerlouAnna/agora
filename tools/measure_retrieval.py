@@ -16,7 +16,7 @@ import logging
 import sys
 from pathlib import Path
 
-from services.data_service import repository
+from services.data_service import delivery, discounts, repository
 from services.data_service.database import SessionLocal
 from services.data_service.models import Price, Product, Stock
 from services.offer_service.rag import embeddings, lexical, retriever
@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 EVAL_FILE = Path(__file__).resolve().parent.parent / "tests" / "data" / "retrieval_eval.json"
 CUTOFFS = (5, 10)
+LIGHTEST = min(delivery.SHIPPING.values())
 COLUMNS = ("words", "meaning", "merged")
 KEYS = ("by_word", "by_meaning", "merged")
 
@@ -44,16 +45,17 @@ def corpus() -> tuple[list[str], list[str]]:
     return [card.sku for card in cards], [card.text for card in cards]
 
 
-def current() -> tuple[dict, dict]:
-    """Price and total stock per SKU. The service reads these over HTTP; here they are read
-    straight from the database, so the measurement needs nothing running."""
+def current() -> tuple[dict, dict, dict]:
+    """Price, total stock and category per SKU. The service reads these over HTTP; here they
+    are read straight from the database, so the measurement needs nothing running."""
     with SessionLocal() as db:
         prices = {row.sku: row.amount for row in db.query(Price).all()}
+        categories = {row.sku: row.category for row in db.query(Product).all()}
         stock: dict[str, int] = {}
         for row in db.query(Stock).all():
             stock[row.sku] = stock.get(row.sku, 0) + row.quantity
 
-    return prices, stock
+    return prices, stock, categories
 
 
 def recall(found: list[str], expected: list[str], at: int) -> float:
@@ -104,14 +106,32 @@ def rankings(case: dict, corpus_: tuple, whole: bool, constrained: bool, held: t
 
 
 def affordable(codes: list[str], asked: CustomerRequirements, held: tuple) -> list[str]:
-    """What the request's budget and its urgency leave, in the order the ranking put them."""
-    prices, stock = held
+    """What the request's budgets and its urgency leave, in the order the ranking put them.
+
+    An order budget is weighed against the least the order could come to — the band its
+    catalogue value earns, and the lightest carriage any destination charges, because the
+    retriever is not told which store raised it.
+    """
+    prices, stock, categories = held
     if asked.price_max is not None:
         codes = [c for c in codes if prices.get(c) is not None and prices[c] <= asked.price_max]
+    if asked.budget_max is not None and asked.quantity:
+        codes = [
+            c
+            for c in codes
+            if prices.get(c) is not None
+            and _least(prices[c], asked.quantity, categories[c]) <= asked.budget_max
+        ]
     if asked.immediate and asked.quantity:
         codes = [c for c in codes if stock.get(c, 0) >= asked.quantity]
 
     return codes
+
+
+def _least(price: float, quantity: int, category: str) -> float:
+    net = round(price * quantity, 2)
+    carriage = 0.0 if net >= delivery.SHIPPING_FREE_FROM else LIGHTEST
+    return round(net - round(net * discounts.rate(net, category), 2) + carriage, 2)
 
 
 def table(title: str, cases: list, corpus_: tuple, whole: bool, constrained: bool, held: tuple):

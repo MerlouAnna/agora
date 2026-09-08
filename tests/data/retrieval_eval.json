@@ -257,6 +257,26 @@
         "PWR-1041",
         "PWR-1054"
       ]
+    },
+    {
+      "id": "data-cable-order-budget",
+      "request": "Σαράντα καλώδια δικτύου CAT6, μέχρι 700 ευρώ συνολικά.",
+      "trap": "the 700 is for the lot: read per unit it leaves all fifteen CAT6 cables in, read for the order it leaves two",
+      "requirements": {
+        "category": "DATA",
+        "quantity": 40,
+        "constraints": [
+          {
+            "key": "standard",
+            "value": "CAT6"
+          }
+        ],
+        "budget_max": 700
+      },
+      "expected": [
+        "DAT-1036",
+        "DAT-1043"
+      ]
     }
   ]
 }

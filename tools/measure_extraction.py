@@ -25,7 +25,7 @@ from tools.measure_retrieval import CUTOFFS, EVAL_FILE, affordable, current, rec
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-FIELDS = ("category", "quantity", "price_min", "price_max", "immediate")
+FIELDS = ("category", "quantity", "price_min", "price_max", "budget_max", "immediate")
 
 
 def measured(case: dict, held: tuple, by_hand: dict) -> dict:
