@@ -172,9 +172,10 @@ def grounds(offers: list[OfferScenario]) -> list:
 def _context(
     offers: list[OfferScenario], requirements: CustomerRequirements, sections: list
 ) -> dict:
+    beaten = _beaten(offers)
     return {
         "request": requirements.request,
-        "offers": [_offer(one) for one in offers],
+        "offers": [_offer(one, beaten.get(one.lines[0].sku)) for one in offers],
         "policy": [
             {
                 "document": passage.metadata["document"],
@@ -186,8 +187,15 @@ def _context(
     }
 
 
-def _offer(one: OfferScenario) -> dict:
+def _offer(one: OfferScenario, beaten_by: str | None = None) -> dict:
     line = one.lines[0]
+    notes = one.notes
+    if beaten_by:
+        notes = notes + [
+            f"nothing to prefer this over {beaten_by}: it is cheaper, at least as fast, "
+            "and meets no less of the request"
+        ]
+
     return {
         "strategies": [strategy.value for strategy in one.strategies],
         "sku": line.sku,
@@ -203,8 +211,28 @@ def _offer(one: OfferScenario) -> dict:
         "days": one.days,
         "risk": one.risk.value,
         "needs_approval": one.needs_approval,
-        "notes": one.notes,
+        "notes": notes,
     }
+
+
+def _beaten(offers: list[OfferScenario]) -> dict[str, str]:
+    """Which offer each one loses to on price, time and fit together, when there is one."""
+    beaten = {}
+    for one in offers:
+        winner = next((other for other in offers if other is not one and _beats(other, one)), None)
+        if winner is not None:
+            beaten[one.lines[0].sku] = winner.lines[0].sku
+
+    return beaten
+
+
+def _beats(a: OfferScenario, b: OfferScenario) -> bool:
+    sooner = a.days is not None and (b.days is None or a.days <= b.days)
+    return a.total < b.total and sooner and not _short(a)
+
+
+def _short(one: OfferScenario) -> bool:
+    return any(note.startswith("does not meet") for note in one.notes)
 
 
 def _allowed(offers: list[OfferScenario], requirements: CustomerRequirements) -> set[str]:

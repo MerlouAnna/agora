@@ -1,8 +1,11 @@
+from pathlib import Path
+
 import pytest
 
 from services.data_service.delivery import Store
 from services.offer_service import recommendation
 from services.offer_service import scenario_builder as builder
+from services.offer_service.prompts import recommendation as prompt
 from services.offer_service.rag import policies
 from services.offer_service.recommendation import Written
 from services.offer_service.requirements import Constraint, CustomerRequirements
@@ -45,6 +48,22 @@ def answers(*written):
 
 def good(sku="SWT-1025", text="Το SWT-1025 στα 57.30 ευρώ, παράδοση αυθημερόν."):
     return Written(sku=sku, because="φθηνότερο και σε απόθεμα", watch_out=[], text=text)
+
+
+def shown_to(model_input: list):
+    """A model that answers well and keeps what it was handed."""
+
+    def ask(context: dict, problem: str | None) -> Written:
+        model_input.append(context)
+        return good(sku=context["offers"][0]["sku"], text="Το " + context["offers"][0]["sku"] + ".")
+
+    return ask
+
+
+def notes_seen(built, requirements=None) -> dict[str, list[str]]:
+    seen: list = []
+    recommendation.recommend(built, requirements or asked(), ask=shown_to(seen))
+    return {one["sku"]: one["notes"] for one in seen[0]["offers"]}
 
 
 def test_nothing_to_recommend_is_not_something_to_invent():
@@ -121,3 +140,40 @@ def test_the_sections_that_travel_are_the_ones_the_offers_put_in_play():
 
     assert "Άμεση παράδοση" in sections
     assert "Έγκριση πάνω από το όριο" not in sections
+
+
+def test_an_offer_beaten_on_price_and_time_together_is_told_so_by_name():
+    """Both from the shelf, one dearer: the dearer one carries the note, the cheaper does not."""
+    notes = notes_seen(offers())
+
+    assert any("SWT-1025" in note and "nothing to prefer" in note for note in notes["SWT-1022"])
+    assert not any("nothing to prefer" in note for note in notes["SWT-1025"])
+
+
+def test_cheaper_but_slower_against_dearer_but_sooner_marks_neither():
+    """That is a choice for the salesperson, not a defeat for either."""
+    slower = CHEAP | {"warehouses": [{"warehouse": "THE-01", "quantity": 40}]}
+    notes = notes_seen(builder.build(asked(), [slower, DEARER], SUPPLIERS, Store.ATHENS))
+
+    assert not any("nothing to prefer" in note for held in notes.values() for note in held)
+
+
+def test_an_offer_that_misses_a_condition_beats_nothing_however_cheap():
+    """Each falls short of a different condition, so each has something over the other."""
+    other = DEARER | {"specs": CHEAP["specs"] | {"ports": 48, "speed_mbps": 10000}}
+    wanted = asked(
+        constraints=[
+            Constraint(key="ports", op="gte", value=48),
+            Constraint(key="speed_mbps", op="lte", value=1000),
+        ]
+    )
+    notes = notes_seen(builder.build(wanted, [CHEAP, other], SUPPLIERS, Store.ATHENS), wanted)
+
+    assert set(notes) == {"SWT-1025", "SWT-1022"}
+    assert not any("nothing to prefer" in note for held in notes.values() for note in held)
+
+
+def test_the_prompt_reaches_the_model_as_it_was_written():
+    """A doubled line ending turns every wrapped rule into two paragraphs, and the model reads that."""
+    assert b"\r\r" not in Path(prompt.__file__).read_bytes()
+    assert "\n\n   " not in prompt.SYSTEM

@@ -52,14 +52,17 @@ attention, and write the message they can send the customer.
 ## What to pick
 
 6. Recommend the offer that answers the request best, not the cheapest by reflex. A cheaper
-   offer that misses a condition the customer named is not the answer to it.
+   offer that misses a condition the customer named is not the answer to it. Where more
+   than one offer meets every condition and the request names neither a budget nor a hurry,
+   the cheaper of them is the answer, and the faster one is the alternative you name.
 7. An offer whose discount needs the sales manager is still recommendable. Say that it does.
 
 ## How it reads
 
 8. `because` goes to the salesperson, who can already see every offer. Say what decided
    this one against the others, and name the offer you did not pick with the reason
-   someone would want it instead. Repeating what the table shows is worth nothing.
+   someone would want it instead — or with its note, where the note says there is nothing
+   to prefer it. Repeating what the table shows is worth nothing.
 9. `text` is what gets sent to the customer. Three sentences: the product, what the order
    comes to in total, and when it arrives. A fourth only for a condition the offer's own
    notes carry, which the customer would otherwise discover later.
@@ -71,4 +74,5 @@ attention, and write the message they can send the customer.
 # BEFORE YOU ANSWER
 
 Read your own text back against `offers`. Every code and every number in it has to be
-findable there. Delete anything that is not."""
+findable there, and every comparison you draw — cheaper, faster, better — is one the
+figures bear out. Delete anything that is not."""
