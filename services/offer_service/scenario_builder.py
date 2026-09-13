@@ -19,7 +19,6 @@ from services.data_service.delivery import (
     serves,
     shipping,
     transfer_cost,
-    transfer_days,
     working_days,
     zone_of,
 )
@@ -237,8 +236,18 @@ def _price(
         sources=sources,
     )
     net = line.line_total
+    if requirements.constraints:
+        notes = notes + (
+            ["does not meet " + ", ".join(missing)]
+            if missing
+            else ["every condition the request named is met"]
+        )
     if availability == Availability.SAME_DAY:
         notes = notes + [f"the same day only if the order is confirmed by {CUT_OFF:%H:%M}"]
+    if availability == Availability.TRANSFER:
+        notes = notes + [
+            f"the {days} working days quoted already include the move between warehouses"
+        ]
     if discounts.needs_approval(net):
         notes = notes + ["the order's discount band needs the sales manager's approval"]
 
@@ -346,11 +355,7 @@ def _risk(
         return Risk.MEDIUM, ["stock is unknown, which is not the same as none"]
 
     if availability == Availability.TRANSFER:
-        moved = transfer_days(zone)
-        return Risk.LOW, [
-            f"stock moves between warehouses first, which adds {moved} working "
-            f"{'day' if moved == 1 else 'days'}"
-        ]
+        return Risk.LOW, []
 
     return Risk.LOW, []
 
@@ -439,10 +444,6 @@ def _mark(one: Priced) -> tuple:
 
 
 def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
-    notes = list(one.notes)
-    if one.missing:
-        notes.append("does not meet " + ", ".join(one.missing))
-
     return OfferScenario(
         strategies=strategies,
         lines=one.lines,
@@ -453,5 +454,5 @@ def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
         days=one.days,
         risk=one.risk,
         transfer_cost=one.transfer,
-        notes=notes,
+        notes=one.notes,
     )

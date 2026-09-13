@@ -210,7 +210,9 @@ def test_an_urgent_order_on_a_supplier_that_will_not_commit_is_flagged_high():
 def test_a_condition_on_an_offer_carries_the_figure_it_rests_on():
     """A note that names a condition without its number sends the reader to the policy.
 
-    Attica serves the islands, so the move that costs two days is the one out of Patra.
+    The move is quoted as part of the total and never as a day on top of it, or the
+    customer is told a later date than the one promised. Attica serves the islands, so
+    the move that costs two days is the one out of Patra.
     """
     attica = ups("UPS-A", 20, 320.0, [("ATH-01", 40)])
     patra = ups("UPS-B", 20, 320.0, [("PAT-01", 40)])
@@ -220,8 +222,27 @@ def test_a_condition_on_an_offer_carries_the_figure_it_rests_on():
     island = only([patra], asked(quantity=5), store=Store.HERAKLION)
 
     assert any("13:00" in note for note in same_day.notes)
-    assert any("adds 1 working day" in note for note in moved.notes)
-    assert any("adds 2 working days" in note for note in island.notes)
+    assert any("the 3 working days quoted already include" in note for note in moved.notes)
+    assert any("the 6 working days quoted already include" in note for note in island.notes)
+
+
+def test_an_offer_says_whether_it_answers_the_request_and_does_not_leave_it_to_be_worked_out():
+    """A floor met exactly is still met, and a reader left to work that out gets it wrong.
+
+    Nothing is said at all when the request named no condition, since there is then
+    nothing for an offer to meet or miss.
+    """
+    exactly = ups("UPS-A", 12, 320.0, [("ATH-01", 40)])
+    under = ups("UPS-B", 8, 295.0, [("ATH-01", 40)])
+    asks = asked(quantity=5, constraints=[Constraint(key="autonomy_min", op="gte", value=12)])
+
+    met = only([exactly], asks)
+    short = only([under], asks)
+    unasked = only([exactly], asked(quantity=5))
+
+    assert any("every condition the request named is met" in note for note in met.notes)
+    assert any("does not meet autonomy_min" in note for note in short.notes)
+    assert not any("condition the request named" in note for note in unasked.notes)
 
 
 def _chose(built, strategy) -> str:

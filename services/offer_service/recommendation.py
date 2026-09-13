@@ -83,7 +83,10 @@ class Written(BaseModel):
     """The model's answer, before it has been held against the offers."""
 
     sku: str = Field(..., description="The SKU of the offer being recommended, exactly as given")
-    because: str = Field(..., description="What decided it, for the salesperson, one sentence")
+    because: str = Field(
+        ...,
+        description="For the salesperson: what decided it, and the offer you did not pick",
+    )
     watch_out: list[str] = Field(
         ..., description="Every condition the customer would otherwise discover later"
     )

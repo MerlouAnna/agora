@@ -98,6 +98,7 @@ def measured(case: dict, rows: dict, suppliers: dict) -> dict:
         "sections": len(written.sections),
         "said": [f"never says {name}" for name in missing]
         + ([f"{beat} beats it on every axis"] if beat else []),
+        "because": written.because,
         "text": written.text,
     }
 
@@ -127,6 +128,24 @@ def table(rows: list[dict]) -> int:
     return wrong
 
 
+def wrote(rows: list[dict]) -> None:
+    """The answers themselves, which no number in the table above is a substitute for.
+
+    `because` goes to the salesperson and `text` to the customer, so they are printed
+    apart: a `because` written to the customer is a defect a count would never show.
+    """
+    logger.info("")
+    logger.info("what it wrote")
+    for row in rows:
+        if "text" not in row:
+            continue
+
+        logger.info("")
+        logger.info("%s — %s", row["id"], row["sku"])
+        logger.info("   to the salesperson   %s", row["because"])
+        logger.info("   to the customer      %s", row["text"])
+
+
 def run(runs: int = 1) -> None:
     cases = json.loads(EVAL_FILE.read_text(encoding="utf-8"))["cases"]
     rows, suppliers = catalogue()
@@ -140,6 +159,7 @@ def run(runs: int = 1) -> None:
         logger.info("")
         logger.info("run %d of %d", attempt, runs)
         wrong += table(answered)
+        wrote(answered)
         for row in answered:
             seen[row["id"]].append(row["sku"])
 
