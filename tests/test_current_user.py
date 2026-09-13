@@ -23,7 +23,7 @@ def test_no_token_is_401_before_anything_runs():
 
 
 def test_a_token_signed_with_another_key_is_401():
-    forged = jwt.encode({"sub": "maria"}, "someone-elses-key", algorithm=security.ALGORITHM)
+    forged = jwt.encode({"sub": "pmoschos"}, "someone-elses-key", algorithm=security.ALGORITHM)
 
     answered = client.post(
         "/offers/generate",

@@ -13,7 +13,7 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def logged_in(monkeypatch):
     monkeypatch.setattr(settings, "jwt_secret_key", "test-only")
-    client.headers["Authorization"] = f"Bearer {security.create_access_token('maria')}"
+    client.headers["Authorization"] = f"Bearer {security.create_access_token('pmoschos')}"
 
 
 def test_a_request_comes_back_with_the_offers_the_check_let_through(monkeypatch):

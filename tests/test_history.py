@@ -26,27 +26,27 @@ def history():
 
 client = TestClient(app)
 
-MARIA = {"username": "maria"}
-NIKOS = {"username": "nikos"}
+PMOSCHOS = {"username": "pmoschos"}
+AMERLOU = {"username": "amerlou"}
 TOOLS = [{"name": "product_stock", "arguments": {"sku": "PSU-1018"}}]
 
 
 def test_a_conversation_reads_back_in_the_order_it_was_written():
-    opened = client.post("/conversations", json=MARIA)
+    opened = client.post("/conversations", json=PMOSCHOS)
     thread = opened.json()["id"]
     client.post(
         f"/conversations/{thread}/messages",
-        params=MARIA,
+        params=PMOSCHOS,
         json={"role": "user", "content": "τι απόθεμα έχει το PSU-1018;"},
     )
     client.post(
         f"/conversations/{thread}/messages",
-        params=MARIA,
+        params=PMOSCHOS,
         json={"role": "assistant", "content": "12 τεμάχια στην ATH-01.", "tools": TOOLS},
     )
 
-    body = client.get(f"/conversations/{thread}", params=MARIA).json()
-    listed = client.get("/conversations", params=MARIA).json()
+    body = client.get(f"/conversations/{thread}", params=PMOSCHOS).json()
+    listed = client.get("/conversations", params=PMOSCHOS).json()
 
     assert opened.status_code == 201
     assert [turn["role"] for turn in body["messages"]] == ["user", "assistant"]
@@ -56,11 +56,12 @@ def test_a_conversation_reads_back_in_the_order_it_was_written():
 
 
 def test_a_conversation_that_is_not_there_or_not_yours_is_404():
-    thread = client.post("/conversations", json=MARIA).json()["id"]
+    thread = client.post("/conversations", json=PMOSCHOS).json()["id"]
     turn = {"role": "user", "content": "…"}
 
-    assert client.get("/conversations/9999", params=MARIA).status_code == 404
-    assert client.get(f"/conversations/{thread}", params=NIKOS).status_code == 404
+    assert client.get("/conversations/9999", params=PMOSCHOS).status_code == 404
+    assert client.get(f"/conversations/{thread}", params=AMERLOU).status_code == 404
     assert (
-        client.post(f"/conversations/{thread}/messages", params=NIKOS, json=turn).status_code == 404
+        client.post(f"/conversations/{thread}/messages", params=AMERLOU, json=turn).status_code
+        == 404
     )

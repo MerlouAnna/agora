@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 # Demo accounts. The passwords are not secrets — the JWT key is.
 DEMO_USERS = [
-    ("maria", "agora-maria"),
-    ("nikos", "agora-nikos"),
+    ("pmoschos", "ai-for-devs-moschos"),
+    ("amerlou", "ai-for-devs-merlou"),
 ]
 
 

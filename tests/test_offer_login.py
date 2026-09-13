@@ -18,7 +18,7 @@ def test_the_form_goes_through_and_the_token_comes_back_unchanged(monkeypatch):
     def data_service(request: httpx.Request) -> httpx.Response:
         form = dict(parse_qsl(request.content.decode()))
         seen.append((request.url.path, form))
-        if form["password"] == "agora-maria":
+        if form["password"] == "ai-for-devs-moschos":
             return httpx.Response(200, json=ISSUED)
         return httpx.Response(401, json={"detail": "Incorrect username or password"})
 
@@ -28,12 +28,14 @@ def test_the_form_goes_through_and_the_token_comes_back_unchanged(monkeypatch):
         lambda: httpx.Client(base_url="http://data", transport=httpx.MockTransport(data_service)),
     )
 
-    good = client.post("/auth/login", data={"username": "maria", "password": "agora-maria"})
-    bad = client.post("/auth/login", data={"username": "maria", "password": "nope"})
+    good = client.post(
+        "/auth/login", data={"username": "pmoschos", "password": "ai-for-devs-moschos"}
+    )
+    bad = client.post("/auth/login", data={"username": "pmoschos", "password": "nope"})
 
     assert good.status_code == 200
     assert good.json() == ISSUED
-    assert seen[0] == ("/auth/login", {"username": "maria", "password": "agora-maria"})
+    assert seen[0] == ("/auth/login", {"username": "pmoschos", "password": "ai-for-devs-moschos"})
     assert bad.status_code == 401
     assert bad.headers["WWW-Authenticate"] == "Bearer"
     assert bad.json()["detail"] == "Incorrect username or password"

@@ -13,7 +13,7 @@ QUESTION = "Τι απόθεμα έχει το PSU-1018;"
 TOOLS = [{"name": "product_stock", "arguments": {"sku": "PSU-1018"}}]
 THREAD = {
     "id": 7,
-    "username": "maria",
+    "username": "pmoschos",
     "started_at": "2026-09-13T10:00:00",
     "messages": [
         {
@@ -30,7 +30,7 @@ THREAD = {
 @pytest.fixture(autouse=True)
 def logged_in(monkeypatch):
     monkeypatch.setattr(settings, "jwt_secret_key", "test-only")
-    client.headers["Authorization"] = f"Bearer {security.create_access_token('maria')}"
+    client.headers["Authorization"] = f"Bearer {security.create_access_token('pmoschos')}"
 
 
 def wire(monkeypatch, answer="12 τεμάχια στην ATH-01.", refused=None):
@@ -67,8 +67,8 @@ def test_both_turns_are_recorded_under_the_user_the_token_names(monkeypatch):
     assert body["answer"] == "12 τεμάχια στην ATH-01."
     assert body["refused"] is False
     assert recorded == [
-        ("maria", "user", QUESTION, None),
-        ("maria", "assistant", "12 τεμάχια στην ATH-01.", TOOLS),
+        ("pmoschos", "user", QUESTION, None),
+        ("pmoschos", "assistant", "12 τεμάχια στην ATH-01.", TOOLS),
     ]
 
 
@@ -89,4 +89,4 @@ def test_the_conversation_list_is_asked_for_under_the_token_user_only(monkeypatc
 
     assert answered.status_code == 200
     assert answered.json() == []
-    assert asked_for == ["maria"]
+    assert asked_for == ["pmoschos"]

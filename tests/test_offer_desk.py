@@ -16,7 +16,7 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def logged_in(monkeypatch):
     monkeypatch.setattr(settings, "jwt_secret_key", "test-only")
-    client.headers["Authorization"] = f"Bearer {security.create_access_token('maria')}"
+    client.headers["Authorization"] = f"Bearer {security.create_access_token('pmoschos')}"
 
 
 def test_the_screen_reads_every_column_the_service_sends(monkeypatch):
