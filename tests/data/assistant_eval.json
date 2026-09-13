@@ -1,0 +1,213 @@
+{
+  "ground_truth": "written by hand from data/catalog.db with SQL and from the sections of data/docs, never from a run of the assistant. `tools` holds the call each turn needs, with the arguments that matter; `facts` holds what the last answer has to say, each as the spellings that count as saying it; `must_not` holds codes that are grounded but beside the point",
+  "cases": [
+    {
+      "id": "psu-1018-stock",
+      "turns": [
+        "Τι απόθεμα έχει το PSU-1018;"
+      ],
+      "tools": [
+        [
+          {
+            "name": "product_stock",
+            "arguments": {
+              "sku": "PSU-1018"
+            }
+          }
+        ]
+      ],
+      "facts": [
+        [
+          "PSU-1018"
+        ],
+        [
+          "25"
+        ],
+        [
+          "PAT-01"
+        ]
+      ],
+      "trap": "one warehouse, one figure; anything else in the answer is invented"
+    },
+    {
+      "id": "psu-1018-warranty",
+      "turns": [
+        "Τι εγγύηση έχει το PSU-1018;"
+      ],
+      "tools": [
+        [
+          {
+            "name": "search_policies"
+          }
+        ]
+      ],
+      "facts": [
+        [
+          "PSU-1018"
+        ],
+        [
+          "3 έτη",
+          "3 χρόνια",
+          "τρία έτη",
+          "τρία χρόνια",
+          "τριετ",
+          "3ετ"
+        ]
+      ],
+      "must_not": [
+        "UPS-1014",
+        "PSU-1020"
+      ],
+      "trap": "the warranty is per category; PSU is one of the two three-year ones. The category datasheet is about another product and has no business in the answer"
+    },
+    {
+      "id": "ups-under-300-in-stock",
+      "turns": [
+        "Τι έχουμε σε UPS κάτω από 300 € με απόθεμα;"
+      ],
+      "tools": [
+        [
+          {
+            "name": "find_products",
+            "arguments": {
+              "category": "UPS",
+              "max_price": 300,
+              "min_stock": 1
+            }
+          }
+        ]
+      ],
+      "facts": [
+        [
+          "UPS-1000"
+        ],
+        [
+          "UPS-1021"
+        ],
+        [
+          "123,39",
+          "123.39"
+        ],
+        [
+          "103,51",
+          "103.51"
+        ]
+      ],
+      "trap": "exactly two UPS meet both filters, and only with min_stock set — without it the answer is right by luck; the price is the list price, unrounded"
+    },
+    {
+      "id": "unknown-sku",
+      "turns": [
+        "Τι απόθεμα έχει το PSU-9999;"
+      ],
+      "tools": [
+        [
+          {
+            "name": "product_stock",
+            "arguments": {
+              "sku": "PSU-9999"
+            }
+          }
+        ]
+      ],
+      "facts": [
+        [
+          "PSU-9999"
+        ],
+        [
+          "δεν υπάρχει",
+          "δεν βρέθηκε"
+        ]
+      ],
+      "trap": "the catalogue has no such code; the answer says so in Greek and offers no figure"
+    },
+    {
+      "id": "same-day-delivery",
+      "turns": [
+        "Πότε παραδίδουμε αυθημερόν και ποια είναι η ώρα cut-off;"
+      ],
+      "tools": [
+        [
+          {
+            "name": "search_policies"
+          }
+        ]
+      ],
+      "facts": [
+        [
+          "13:00"
+        ],
+        [
+          "Αττικ"
+        ],
+        [
+          "ATH-01"
+        ],
+        [
+          "ATH-02"
+        ]
+      ],
+      "trap": "same-day has three conditions — Attica, the two Athens warehouses, 13:00"
+    },
+    {
+      "id": "volume-discount-4000",
+      "turns": [
+        "Πόση έκπτωση όγκου παίρνει μια παραγγελία 4.000 €;"
+      ],
+      "tools": [
+        [
+          {
+            "name": "search_policies"
+          }
+        ]
+      ],
+      "facts": [
+        [
+          "5%",
+          "5 %"
+        ]
+      ],
+      "trap": "4.000 € sits in the 3.000–7.999,99 band; the 3% below and 7% above are wrong"
+    },
+    {
+      "id": "follow-up-warranty",
+      "turns": [
+        "Τι απόθεμα έχει το UPS-1021;",
+        "Και τι εγγύηση έχει;"
+      ],
+      "tools": [
+        [
+          {
+            "name": "product_stock",
+            "arguments": {
+              "sku": "UPS-1021"
+            }
+          }
+        ],
+        [
+          {
+            "name": "search_policies"
+          }
+        ]
+      ],
+      "facts": [
+        [
+          "UPS-1021",
+          "UPS"
+        ],
+        [
+          "2 έτη",
+          "2 χρόνια",
+          "δύο έτη",
+          "δύο χρόνια",
+          "διετ",
+          "2ετ"
+        ]
+      ],
+      "must_not": [
+        "UPS-1014"
+      ],
+      "trap": "the second turn names no product: the subject comes from the first turn and the years from the documents. The subject may be written as the code or as the category, because the warranty is a category term and «για τα UPS η εγγύηση είναι 2 έτη» is the exacter answer of the two"
+    }
+  ]
+}
