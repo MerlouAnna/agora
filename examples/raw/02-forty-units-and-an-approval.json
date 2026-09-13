@@ -1,0 +1,234 @@
+{
+  "request": {
+    "request": "Θέλω 40 τροφοδοτικά 80+ Gold ATX τουλάχιστον 750W για πελάτη στη Θεσσαλονίκη.",
+    "store": "THESSALONIKI",
+    "before_cut_off": true
+  },
+  "answer": {
+    "requirements": {
+      "request": "Θέλω 40 τροφοδοτικά 80+ Gold ATX τουλάχιστον 750W για πελάτη στη Θεσσαλονίκη.",
+      "category": "PSU",
+      "quantity": 40,
+      "constraints": [
+        {
+          "key": "efficiency",
+          "op": "eq",
+          "value": "80+ Gold"
+        },
+        {
+          "key": "form_factor",
+          "op": "eq",
+          "value": "ATX"
+        },
+        {
+          "key": "watt",
+          "op": "gte",
+          "value": 750.0
+        }
+      ],
+      "immediate": false
+    },
+    "offers": [
+      {
+        "strategies": [
+          "cheapest-acceptable",
+          "best-availability"
+        ],
+        "skus": [
+          "PSU-1018"
+        ],
+        "description": "Τροφοδοτικό 1000W 80+ Gold ATX",
+        "quantity": 40,
+        "net": 2262.8,
+        "discount": 67.88,
+        "needs_approval": false,
+        "shipping": 0.0,
+        "total": 2194.92,
+        "fit": 0.67,
+        "days": 5,
+        "availability": "ordered",
+        "risk": "medium",
+        "notes": [
+          "15 of 40 are not in any warehouse and would be ordered",
+          "every condition the request named is met",
+          "ordered from SUP-01"
+        ]
+      },
+      {
+        "strategies": [
+          "best-technical",
+          "best-budget"
+        ],
+        "skus": [
+          "PSU-1002"
+        ],
+        "description": "Τροφοδοτικό 750W 80+ Gold ATX",
+        "quantity": 40,
+        "net": 2808.8,
+        "discount": 84.26,
+        "needs_approval": false,
+        "shipping": 0.0,
+        "total": 2724.54,
+        "fit": 1.0,
+        "days": 16,
+        "availability": "ordered",
+        "risk": "medium",
+        "notes": [
+          "40 of 40 are not in any warehouse and would be ordered",
+          "every condition the request named is met",
+          "ordered from SUP-03"
+        ]
+      },
+      {
+        "strategies": [
+          "premium-alternative"
+        ],
+        "skus": [
+          "PSU-1006"
+        ],
+        "description": "Τροφοδοτικό 750W 80+ Gold ATX",
+        "quantity": 40,
+        "net": 9244.0,
+        "discount": 554.64,
+        "needs_approval": true,
+        "shipping": 0.0,
+        "total": 8689.36,
+        "fit": 1.0,
+        "days": 7,
+        "availability": "ordered",
+        "risk": "medium",
+        "notes": [
+          "36 of 40 are not in any warehouse and would be ordered",
+          "every condition the request named is met",
+          "the order's discount band needs the sales manager's approval",
+          "ordered from SUP-04"
+        ]
+      }
+    ],
+    "recommendation": {
+      "sku": "PSU-1018",
+      "because": "Και τα τρία προϊόντα καλύπτουν πλήρως την απαίτηση για 80+ Gold ATX τουλάχιστον 750W. Μεταξύ τους, το PSU-1018 είναι σαφώς φθηνότερο από τα PSU-1002 και PSU-1006, έχει μικρότερο συνολικό ποσό (2194.92 έναντι 2724.54 και 8689.36) και συντομότερο χρόνο παράδοσης (5 εργάσιμες ημέρες έναντι 16 για το PSU-1002 και 7 για το PSU-1006). Επιπλέον, δεν απαιτεί έγκριση προϊσταμένου, σε αντίθεση με το PSU-1006. Ως εναλλακτική, το PSU-1006 μπορεί να προταθεί μόνο αν ο πελάτης ζητήσει συγκεκριμένα αυτό το μοντέλο, γνωρίζοντας ότι είναι πολύ ακριβότερο, χρειάζεται έγκριση έκπτωσης και δεν προσφέρει ταχύτερη παράδοση από το PSU-1018.",
+      "watch_out": [
+        "15 of 40 are not in any warehouse and would be ordered",
+        "ordered from SUP-01"
+      ],
+      "text": "Σας προτείνουμε το τροφοδοτικό PSU-1018, 1000W 80+ Gold ATX, σε ποσότητα 40 τεμαχίων, με συνολική αξία παραγγελίας 2194.92. Ο εκτιμώμενος χρόνος παράδοσης είναι 5 εργάσιμες ημέρες. Σημειώνεται ότι 15 από τα 40 τεμάχια δεν βρίσκονται σε καμία αποθήκη και θα παραγγελθούν από τον προμηθευτή SUP-01.",
+      "rounds_used": 1,
+      "sections": [
+        "oroi-paradosis#5",
+        "politiki-ekptoseon#1",
+        "politiki-ekptoseon#4"
+      ]
+    },
+    "refused": null,
+    "checked": [
+      {
+        "sku": "PSU-1018",
+        "offerable": true,
+        "failed": []
+      },
+      {
+        "sku": "PSU-1002",
+        "offerable": true,
+        "failed": []
+      },
+      {
+        "sku": "PSU-1006",
+        "offerable": true,
+        "failed": [
+          {
+            "name": "the discount is the salesperson's own to sign",
+            "severity": "warning",
+            "passed": false,
+            "said": "the sales manager has to approve the band before this goes out"
+          }
+        ]
+      }
+    ],
+    "trace": {
+      "extract": {
+        "rounds": 1
+      },
+      "retrieve": {
+        "eligible": 5,
+        "filter": {
+          "$and": [
+            {
+              "category": {
+                "$eq": "PSU"
+              }
+            },
+            {
+              "efficiency": {
+                "$in": [
+                  "80+ Gold"
+                ]
+              }
+            },
+            {
+              "form_factor": {
+                "$eq": "ATX"
+              }
+            },
+            {
+              "watt": {
+                "$gte": 750.0
+              }
+            }
+          ]
+        },
+        "by_word": [
+          "PSU-1006",
+          "PSU-1018",
+          "PSU-1002",
+          "PSU-1032",
+          "PSU-1012"
+        ],
+        "by_meaning": [
+          "PSU-1006",
+          "PSU-1002",
+          "PSU-1032",
+          "PSU-1012",
+          "PSU-1018"
+        ],
+        "merged": [
+          "PSU-1006",
+          "PSU-1018",
+          "PSU-1002",
+          "PSU-1032",
+          "PSU-1012"
+        ],
+        "candidates": [
+          "PSU-1006",
+          "PSU-1018",
+          "PSU-1002",
+          "PSU-1032",
+          "PSU-1012"
+        ]
+      },
+      "build_scenarios": {
+        "built": [
+          "PSU-1018",
+          "PSU-1002",
+          "PSU-1006"
+        ]
+      },
+      "validate": {
+        "offerable": [
+          "PSU-1018",
+          "PSU-1002",
+          "PSU-1006"
+        ],
+        "withheld": {}
+      },
+      "recommend": {
+        "rounds": 1,
+        "sections": [
+          "oroi-paradosis#5",
+          "politiki-ekptoseon#1",
+          "politiki-ekptoseon#4"
+        ]
+      }
+    }
+  }
+}
