@@ -24,8 +24,8 @@ def extract(state: OfferState) -> dict:
 def retrieve(state: OfferState) -> dict:
     """What the builder needs out of the catalogue: the candidates and the supplier registry.
 
-    The rows are fetched again by SKU because the index holds a card and a price, and the
-    builder works on the specifications and the per-warehouse stock behind them.
+    The rows are fetched again by SKU because the builder works on the specifications and
+    the per-warehouse stock, which the search does not carry.
     """
     found = retriever.search(state["requirements"])
     codes = [match.sku for match in found.matches]

@@ -5,20 +5,15 @@ The one place text becomes a vector, so that every model call lands on the usage
 The store is handed finished vectors and never talks to OpenAI itself.
 """
 
-import logging
 import time
 from collections.abc import Sequence
 
 from services import config, usage
 from services.config import settings
 
-logger = logging.getLogger(__name__)
-
 SERVICE = "offer_service"
 
 BATCH = 100
-
-_client = None
 
 
 class EmbeddingsUnavailable(RuntimeError):
@@ -45,29 +40,8 @@ def embed(texts: list[str], purpose: str) -> list[Sequence[float]]:
     return vectors
 
 
-def client():
-    """The OpenAI client, built once per process."""
-    global _client
-
-    if _client is None:
-        if not settings.openai_api_key:
-            raise EmbeddingsUnavailable("no OPENAI_API_KEY in the environment")
-
-        logger.info(
-            "loading the OpenAI client — key %s, read from %s",
-            config.key_fingerprint(),
-            config.key_source(),
-        )
-        from openai import OpenAI
-
-        _client = OpenAI(api_key=settings.openai_api_key)
-        logger.info("client ready, embedding with %s", settings.embedding_model)
-
-    return _client
-
-
 def _ask_model(texts: list[str], purpose: str) -> list[list[float]]:
-    talk = client()
+    talk = config.openai_client(EmbeddingsUnavailable)
 
     started = time.monotonic()
     try:

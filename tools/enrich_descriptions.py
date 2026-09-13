@@ -17,6 +17,7 @@ import argparse
 import json
 import logging
 
+from services import config
 from services.data_service.generation import descriptions
 from services.data_service.ingestion.loader import CATALOG_FILE, load_catalog
 from tools.check_descriptions import products, shop_texts
@@ -45,7 +46,7 @@ def run(limit: int | None = None, batch: int = BATCH) -> None:
     if not items:
         return
 
-    descriptions.client()
+    config.openai_client(descriptions.ModelUnavailable)
     refused: list[str] = []
 
     for start in range(0, len(items), batch):

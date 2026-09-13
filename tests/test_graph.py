@@ -64,7 +64,7 @@ def wire(monkeypatch, *catalogues):
         "search",
         lambda requirements: retriever.Retrieval(
             [
-                retriever.Match(row["sku"], "", {}, row["price"], 40)
+                retriever.Match(row["sku"], row["price"], 40)
                 for row in catalogues[0].values()
             ],
             {"merged": list(catalogues[0])},

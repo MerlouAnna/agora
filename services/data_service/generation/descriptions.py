@@ -30,8 +30,6 @@ MAX_ROUNDS = 3
 SERVICE = "data_service"
 PURPOSE = "product-descriptions"
 
-_client = None
-
 SYSTEM = """# ROLE
 
 You write the product copy for the online shop of a Greek wholesaler of electrical and
@@ -197,35 +195,9 @@ def _request(item: dict, problem: str | None) -> dict:
     return request
 
 
-def client():
-    """The OpenAI client, built once.
-
-    The import is what costs: the SDK declares a few hundred models and pulling it in takes
-    long enough on a cold start to look like a hang, so it happens behind a log line and
-    only once per process.
-    """
-    global _client
-
-    if _client is None:
-        if not settings.openai_api_key:
-            raise ModelUnavailable("no OPENAI_API_KEY in the environment")
-
-        logger.info(
-            "loading the OpenAI client — key %s, read from %s",
-            config.key_fingerprint(),
-            config.key_source(),
-        )
-        from openai import OpenAI
-
-        _client = OpenAI(api_key=settings.openai_api_key)
-        logger.info("client ready, talking to %s", settings.llm_model)
-
-    return _client
-
-
 def _ask_model(requests: list[dict]) -> dict[str, str]:
     """One call for the whole batch, with the answers keyed by a SKU we recognise."""
-    talk = client()
+    talk = config.openai_client(ModelUnavailable)
 
     started = time.monotonic()
     try:

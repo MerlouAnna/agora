@@ -13,7 +13,6 @@ parsers, and whatever cannot be salvaged comes back as a rejection instead of st
 run.
 """
 
-import logging
 import math
 from dataclasses import dataclass
 from datetime import date
@@ -22,8 +21,6 @@ from pydantic import BaseModel, Field, ValidationError
 
 from services.data_service.categories import Category, Warehouse
 from services.data_service.ingestion import parsers
-
-logger = logging.getLogger(__name__)
 
 ERP_FIELDS = {
     "sku": "item_code",

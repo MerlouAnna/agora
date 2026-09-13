@@ -192,7 +192,6 @@ def test_the_price_and_the_stock_come_from_the_catalogue():
 
     assert priced["PWR-1001"] == (18.4, None)
     assert priced["PWR-1002"] == (210.0, 7)
-    assert all("price" not in match.metadata for match in found.matches)
 
 
 def test_a_product_the_catalogue_no_longer_has_is_named_rather_than_priced_at_nothing(monkeypatch):

@@ -35,8 +35,6 @@ SKU = re.compile(r"\b[A-Z]{3}-\d{4}\b")
 NUMBER = re.compile(r"\d[\d.,]*")
 GROUPED = re.compile(r"\d{1,3}(?:\.\d{3})+(?:,\d+)?")
 
-_client = None
-
 # What an offer has to carry for a section of the documents to be worth putting in front of
 # the model. Named by document and heading, never by passage id: an id counts sections from
 # the top, so a document re-rendered with one more heading moves every id below it.
@@ -300,30 +298,9 @@ def _plain(figure: float | int) -> str:
     return str(int(number)) if number.is_integer() else f"{number:.2f}"
 
 
-def client():
-    """The OpenAI client, built once. The import is what costs, so it happens behind a log line."""
-    global _client
-
-    if _client is None:
-        if not settings.openai_api_key:
-            raise ModelUnavailable("no OPENAI_API_KEY in the environment")
-
-        logger.info(
-            "loading the OpenAI client — key %s, read from %s",
-            config.key_fingerprint(),
-            config.key_source(),
-        )
-        from openai import OpenAI
-
-        _client = OpenAI(api_key=settings.openai_api_key)
-        logger.info("client ready, talking to %s", settings.llm_model)
-
-    return _client
-
-
 def _ask_model(context: dict, problem: str | None) -> Written:
     """One call, with the refusal from the round before carried into the request."""
-    talk = client()
+    talk = config.openai_client(ModelUnavailable)
     asked = context if problem is None else context | {"fix": problem}
 
     started = time.monotonic()

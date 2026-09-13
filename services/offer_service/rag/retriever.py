@@ -38,8 +38,6 @@ class Match:
     """One product a request reached, as the catalogue prices and counts it right now."""
 
     sku: str
-    card: str
-    metadata: dict
     price: float | None
     stock: int | None
 
@@ -133,15 +131,7 @@ def search(requirements: CustomerRequirements, limit: int = 10) -> Retrieval:
     if not ordered:
         return Retrieval([], trace)
 
-    held = _built().get(ids=ordered, include=["documents", "metadatas"])
-    cards = dict(
-        zip(
-            held["ids"],
-            zip(held["documents"] or [], held["metadatas"] or [], strict=True),
-            strict=True,
-        )
-    )
-    matches, withdrawn = _priced(ordered, cards)
+    matches, withdrawn = _priced(ordered)
     if withdrawn:
         trace |= {"withdrawn": withdrawn}
     if on_price:
@@ -223,10 +213,7 @@ def _relaxed(products, requirements: CustomerRequirements) -> tuple[list[str], d
         clause = _without(requirements, n)
         opened[_written(constraint)] = list(products.get(where=clause, include=[])["ids"])
 
-    reached: dict[str, None] = {}
-    for found in opened.values():
-        for code in found:
-            reached.setdefault(code)
+    reached = dict.fromkeys(code for found in opened.values() for code in found)
 
     if reached:
         return list(reached), {"concessions": {c: f for c, f in opened.items() if f}}
@@ -314,7 +301,7 @@ def _merged(*rankings: list[str]) -> list[str]:
     return list(merged)
 
 
-def _priced(codes: list[str], held: dict) -> tuple[list[Match], list[str]]:
+def _priced(codes: list[str]) -> tuple[list[Match], list[str]]:
     current = {row["sku"]: row for row in catalog.lookup(codes)}
 
     gone = [code for code in codes if code not in current]
@@ -324,8 +311,6 @@ def _priced(codes: list[str], held: dict) -> tuple[list[Match], list[str]]:
     found = [
         Match(
             sku=code,
-            card=held[code][0],
-            metadata=dict(held[code][1]),
             price=current.get(code, {}).get("price"),
             stock=current.get(code, {}).get("stock_total"),
         )

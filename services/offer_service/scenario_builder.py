@@ -7,7 +7,7 @@ nothing is fetched — everything here is arithmetic over rows the caller alread
 """
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from services.data_service import discounts
 from services.data_service.categories import ORDERED_LABELS, Warehouse, is_numeric
@@ -38,31 +38,10 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class Priced:
-    """One candidate with everything the strategies compare it on."""
+    """One candidate as it would be offered, and what it fails outright."""
 
-    zone: Zone
-    fit: float
+    offer: OfferScenario
     missing: list[str]
-    lines: list[OfferLine]
-    availability: Availability
-    days: int | None
-    risk: Risk
-    discount_rate: float
-    transfer: float
-    notes: list[str]
-
-    @property
-    def net(self) -> float:
-        return round(sum(line.line_total for line in self.lines), 2)
-
-    @property
-    def discount(self) -> float:
-        return round(self.net * self.discount_rate, 2)
-
-    @property
-    def total(self) -> float:
-        net = self.net
-        return round(net - self.discount + shipping(self.zone, net), 2)
 
 
 def build(
@@ -123,7 +102,7 @@ def build(
 
         picks[mark] = (one, [strategy])
 
-    return [_scenario(labels, one) for one, labels in picks.values()]
+    return [replace(one.offer, strategies=labels) for one, labels in picks.values()]
 
 
 def compare(scenarios: list[OfferScenario]) -> list[dict]:
@@ -256,16 +235,19 @@ def _price(
     risk, told = _risk(availability, supplier, requirements, zone)
 
     return Priced(
-        zone=zone,
-        fit=fit,
+        offer=OfferScenario(
+            strategies=[],
+            lines=[line],
+            shipping=shipping(zone, net),
+            fit=fit,
+            availability=availability,
+            days=days,
+            risk=risk,
+            discount_rate=discounts.rate(net, product["category"]),
+            transfer_cost=max(transfer_cost(zone, source.warehouse) for source in sources),
+            notes=notes + told,
+        ),
         missing=missing,
-        lines=[line],
-        availability=availability,
-        days=days,
-        risk=risk,
-        discount_rate=discounts.rate(net, product["category"]),
-        transfer=max(transfer_cost(zone, source.warehouse) for source in sources),
-        notes=notes + told,
     )
 
 
@@ -369,7 +351,7 @@ def _cheapest(candidates: list[Priced], requirements: CustomerRequirements) -> P
     """The least the customer can pay and still get what they asked for."""
     return min(
         candidates,
-        key=lambda one: (len(one.missing), one.total, -one.fit, one.lines[0].sku),
+        key=lambda one: (len(one.missing), one.offer.total, -one.offer.fit, one.offer.lines[0].sku),
         default=None,
     )
 
@@ -378,7 +360,7 @@ def _closest(candidates: list[Priced], requirements: CustomerRequirements) -> Pr
     """Nearest to the request, with nothing to spare and nothing missing."""
     return min(
         candidates,
-        key=lambda one: (len(one.missing), -one.fit, one.total, one.lines[0].sku),
+        key=lambda one: (len(one.missing), -one.offer.fit, one.offer.total, one.offer.lines[0].sku),
         default=None,
     )
 
@@ -390,16 +372,19 @@ def _most_for_the_money(
     inside = [
         one
         for one in candidates
-        if (requirements.price_max is None or one.lines[0].unit_price <= requirements.price_max)
-        and (requirements.budget_max is None or one.total <= requirements.budget_max)
+        if (
+            requirements.price_max is None
+            or one.offer.lines[0].unit_price <= requirements.price_max
+        )
+        and (requirements.budget_max is None or one.offer.total <= requirements.budget_max)
     ]
     return max(
         inside or candidates,
         key=lambda one: (
             -len(one.missing),
-            one.fit / one.total if one.total else 0.0,
-            -one.total,
-            one.lines[0].sku,
+            one.offer.fit / one.offer.total if one.offer.total else 0.0,
+            -one.offer.total,
+            one.offer.lines[0].sku,
         ),
         default=None,
     )
@@ -410,15 +395,15 @@ def _soonest(candidates: list[Priced], requirements: CustomerRequirements) -> Pr
 
     A candidate with no date is left out rather than ranked last.
     """
-    datable = [one for one in candidates if one.days is not None]
+    datable = [one for one in candidates if one.offer.days is not None]
     return min(
         datable,
         key=lambda one: (
             len(one.missing),
-            one.days,
-            _weight(one.risk),
-            one.total,
-            one.lines[0].sku,
+            one.offer.days,
+            _weight(one.offer.risk),
+            one.offer.total,
+            one.offer.lines[0].sku,
         ),
         default=None,
     )
@@ -428,7 +413,7 @@ def _step_up(candidates: list[Priced], requirements: CustomerRequirements) -> Pr
     """The top of what the catalogue holds for this request, for the customer who asks."""
     return max(
         candidates,
-        key=lambda one: (-len(one.missing), one.total, one.fit, one.lines[0].sku),
+        key=lambda one: (-len(one.missing), one.offer.total, one.offer.fit, one.offer.lines[0].sku),
         default=None,
     )
 
@@ -441,20 +426,5 @@ def _mark(one: Priced) -> tuple:
     """What makes two picks the same offer rather than two."""
     return tuple(
         (line.sku, line.quantity, tuple((one.warehouse, one.quantity) for one in line.sources))
-        for line in one.lines
-    )
-
-
-def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
-    return OfferScenario(
-        strategies=strategies,
-        lines=one.lines,
-        shipping=shipping(one.zone, one.net),
-        discount_rate=one.discount_rate,
-        fit=one.fit,
-        availability=one.availability,
-        days=one.days,
-        risk=one.risk,
-        transfer_cost=one.transfer,
-        notes=one.notes,
+        for line in one.offer.lines
     )

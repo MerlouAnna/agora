@@ -11,14 +11,11 @@ twice, by the number of rows and by the size of a single value.
 Nothing here goes through SQLAlchemy: the point is to run the caller's own SQL.
 """
 
-import logging
 import sqlite3
 import time
 from contextlib import closing
 
 from services.data_service.database import DB_PATH
-
-logger = logging.getLogger(__name__)
 
 MAX_ROWS = 500
 MAX_VALUE_BYTES = 100_000

@@ -61,8 +61,6 @@ ENDS = {"highest": "max", "lowest": "min"}
 TRUE = ("true", "yes", "ναι", "1")
 FALSE = ("false", "no", "όχι", "0")
 
-_client = None
-
 
 class ModelUnavailable(RuntimeError):
     """The extraction model could not be reached."""
@@ -233,30 +231,9 @@ def _sentence(error: dict) -> str:
     return f"{where}: {said}" if where else said
 
 
-def client():
-    """The OpenAI client, built once per process."""
-    global _client
-
-    if _client is None:
-        if not settings.openai_api_key:
-            raise ModelUnavailable("no OPENAI_API_KEY in the environment")
-
-        logger.info(
-            "loading the OpenAI client — key %s, read from %s",
-            config.key_fingerprint(),
-            config.key_source(),
-        )
-        from openai import OpenAI
-
-        _client = OpenAI(api_key=settings.openai_api_key)
-        logger.info("client ready, talking to %s", settings.llm_model)
-
-    return _client
-
-
 def _ask_model(request: str, problem: str | None) -> Extracted:
     """One call, with the refusal from the previous round when there was one."""
-    talk = client()
+    talk = config.openai_client(ModelUnavailable)
     asked = {"request": request}
     if problem is not None:
         asked["fix"] = problem

@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from services.data_service import discounts
-from services.data_service.categories import Warehouse
 from services.data_service.delivery import (
     Store,
     Zone,
@@ -77,9 +76,7 @@ class Verdict:
 
     @property
     def offerable(self) -> bool:
-        return not any(
-            check.severity == Severity.FATAL for check in self.checks if not check.passed
-        )
+        return not any(check.severity == Severity.FATAL for check in self.failed)
 
 
 @dataclass(frozen=True)
@@ -247,7 +244,9 @@ def _money(scenario: OfferScenario, row: dict, zone: Zone) -> list[Check]:
     net = scenario.net
     earned = discounts.rate(net, row["category"])
     carriage = shipping(zone, net)
-    moved = max([transfer_cost(zone, _from(source)) for source in _sources(scenario)], default=0.0)
+    moved = max(
+        [transfer_cost(zone, source.warehouse) for source in _sources(scenario)], default=0.0
+    )
 
     return [
         Check(
@@ -309,7 +308,7 @@ def _promise(
     dated = None
     if datable:
         dated = max(
-            working_days(zone, _from(source), lead_time=lead, before_cut_off=before_cut_off)
+            working_days(zone, source.warehouse, lead_time=lead, before_cut_off=before_cut_off)
             for source in sources
         )
 
@@ -414,7 +413,3 @@ def _allowance(requirements: CustomerRequirements, unmet: list[str]) -> tuple[fl
 
 def _sources(scenario: OfferScenario) -> list[Allocation]:
     return [source for line in scenario.lines for source in line.sources]
-
-
-def _from(source: Allocation) -> Warehouse | None:
-    return source.warehouse
