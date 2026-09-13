@@ -236,6 +236,12 @@ def _price(
         sources=sources,
     )
     net = line.line_total
+    if requirements.constraints:
+        notes = notes + (
+            ["does not meet " + ", ".join(missing)]
+            if missing
+            else ["every condition the request named is met"]
+        )
     if availability == Availability.SAME_DAY:
         notes = notes + [f"the same day only if the order is confirmed by {CUT_OFF:%H:%M}"]
     if availability == Availability.TRANSFER:
@@ -438,10 +444,6 @@ def _mark(one: Priced) -> tuple:
 
 
 def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
-    notes = list(one.notes)
-    if one.missing:
-        notes.append("does not meet " + ", ".join(one.missing))
-
     return OfferScenario(
         strategies=strategies,
         lines=one.lines,
@@ -452,5 +454,5 @@ def _scenario(strategies: list[Strategy], one: Priced) -> OfferScenario:
         days=one.days,
         risk=one.risk,
         transfer_cost=one.transfer,
-        notes=notes,
+        notes=one.notes,
     )

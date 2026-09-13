@@ -226,5 +226,24 @@ def test_a_condition_on_an_offer_carries_the_figure_it_rests_on():
     assert any("the 6 working days quoted already include" in note for note in island.notes)
 
 
+def test_an_offer_says_whether_it_answers_the_request_and_does_not_leave_it_to_be_worked_out():
+    """A floor met exactly is still met, and a reader left to work that out gets it wrong.
+
+    Nothing is said at all when the request named no condition, since there is then
+    nothing for an offer to meet or miss.
+    """
+    exactly = ups("UPS-A", 12, 320.0, [("ATH-01", 40)])
+    under = ups("UPS-B", 8, 295.0, [("ATH-01", 40)])
+    asks = asked(quantity=5, constraints=[Constraint(key="autonomy_min", op="gte", value=12)])
+
+    met = only([exactly], asks)
+    short = only([under], asks)
+    unasked = only([exactly], asked(quantity=5))
+
+    assert any("every condition the request named is met" in note for note in met.notes)
+    assert any("does not meet autonomy_min" in note for note in short.notes)
+    assert not any("condition the request named" in note for note in unasked.notes)
+
+
 def _chose(built, strategy) -> str:
     return next(scenario.lines[0].sku for scenario in built if strategy in scenario.strategies)
