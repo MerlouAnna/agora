@@ -113,8 +113,12 @@ def working_days(
     if serves(zone, held_in):
         return direct
 
-    moved = TRANSFER_DAYS_TO_ISLAND if zone == Zone.ISLANDS else TRANSFER_DAYS
-    return moved + direct
+    return transfer_days(zone) + direct
+
+
+def transfer_days(zone: Zone) -> int:
+    """What moving stock between warehouses costs before anything ships."""
+    return TRANSFER_DAYS_TO_ISLAND if zone == Zone.ISLANDS else TRANSFER_DAYS
 
 
 def same_day(zone: Zone, held_in: Warehouse | None, before_cut_off: bool = True) -> bool:

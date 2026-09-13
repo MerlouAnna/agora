@@ -12,12 +12,14 @@ from dataclasses import dataclass
 from services.data_service import discounts
 from services.data_service.categories import ORDERED_LABELS, Warehouse, is_numeric
 from services.data_service.delivery import (
+    CUT_OFF,
     Store,
     Zone,
     promises_urgent,
     serves,
     shipping,
     transfer_cost,
+    transfer_days,
     working_days,
     zone_of,
 )
@@ -235,10 +237,12 @@ def _price(
         sources=sources,
     )
     net = line.line_total
+    if availability == Availability.SAME_DAY:
+        notes = notes + [f"the same day only if the order is confirmed by {CUT_OFF:%H:%M}"]
     if discounts.needs_approval(net):
         notes = notes + ["the order's discount band needs the sales manager's approval"]
 
-    risk, told = _risk(availability, supplier, requirements)
+    risk, told = _risk(availability, supplier, requirements, zone)
 
     return Priced(
         zone=zone,
@@ -323,7 +327,10 @@ def _days(
 
 
 def _risk(
-    availability: Availability, supplier: dict, requirements: CustomerRequirements
+    availability: Availability,
+    supplier: dict,
+    requirements: CustomerRequirements,
+    zone: Zone,
 ) -> tuple[Risk, list[str]]:
     """What the promise rests on beyond a warehouse shelf."""
     if availability == Availability.ORDERED:
@@ -339,7 +346,11 @@ def _risk(
         return Risk.MEDIUM, ["stock is unknown, which is not the same as none"]
 
     if availability == Availability.TRANSFER:
-        return Risk.LOW, ["stock moves between warehouses before it ships"]
+        moved = transfer_days(zone)
+        return Risk.LOW, [
+            f"stock moves between warehouses first, which adds {moved} working "
+            f"{'day' if moved == 1 else 'days'}"
+        ]
 
     return Risk.LOW, []
 

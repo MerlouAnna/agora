@@ -207,5 +207,22 @@ def test_an_urgent_order_on_a_supplier_that_will_not_commit_is_flagged_high():
     assert unknown.risk == Risk.HIGH
 
 
+def test_a_condition_on_an_offer_carries_the_figure_it_rests_on():
+    """A note that names a condition without its number sends the reader to the policy.
+
+    Attica serves the islands, so the move that costs two days is the one out of Patra.
+    """
+    attica = ups("UPS-A", 20, 320.0, [("ATH-01", 40)])
+    patra = ups("UPS-B", 20, 320.0, [("PAT-01", 40)])
+
+    same_day = only([attica], asked(quantity=5))
+    moved = only([attica], asked(quantity=5), store=Store.THESSALONIKI)
+    island = only([patra], asked(quantity=5), store=Store.HERAKLION)
+
+    assert any("13:00" in note for note in same_day.notes)
+    assert any("adds 1 working day" in note for note in moved.notes)
+    assert any("adds 2 working days" in note for note in island.notes)
+
+
 def _chose(built, strategy) -> str:
     return next(scenario.lines[0].sku for scenario in built if strategy in scenario.strategies)
