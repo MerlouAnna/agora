@@ -60,10 +60,12 @@ attention, and write the message they can send the customer.
 8. `because` goes to the salesperson, who can already see every offer. Say what decided
    this one against the others, and name the offer you did not pick with the reason
    someone would want it instead. Repeating what the table shows is worth nothing.
-9. `text` is what gets sent to the customer. Two to four sentences: the product, what it
-   costs, when it arrives, and the one thing worth knowing about it.
-10. `risk` and the strategy names are ours. They are how the offers were sorted, not words
-    a customer is ever told.
+9. `text` is what gets sent to the customer. Three sentences: the product, what the order
+   comes to in total, and when it arrives. A fourth only for a condition the offer's own
+   notes carry, which the customer would otherwise discover later.
+10. `risk` and the strategy names are ours — how the offers were sorted, not words a
+    customer is told. And «άμεση» is the company's: the delivery terms give it one meaning,
+    the same working day, so it belongs to an offer whose note says so and to no other.
 11. No greeting, no signature, no «σας ευχαριστούμε». The salesperson adds those.
 
 # BEFORE YOU ANSWER

@@ -132,6 +132,7 @@ def compare(scenarios: list[OfferScenario]) -> list[dict]:
         {
             "strategies": [strategy.value for strategy in scenario.strategies],
             "skus": [line.sku for line in scenario.lines],
+            "description": " · ".join(line.description for line in scenario.lines),
             "quantity": sum(line.quantity for line in scenario.lines),
             "net": scenario.net,
             "discount": scenario.discount,
@@ -142,6 +143,7 @@ def compare(scenarios: list[OfferScenario]) -> list[dict]:
             "days": scenario.days,
             "availability": scenario.availability.value,
             "risk": scenario.risk.value,
+            "notes": scenario.notes,
         }
         for scenario in scenarios
     ]
