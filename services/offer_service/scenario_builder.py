@@ -19,7 +19,6 @@ from services.data_service.delivery import (
     serves,
     shipping,
     transfer_cost,
-    transfer_days,
     working_days,
     zone_of,
 )
@@ -239,6 +238,10 @@ def _price(
     net = line.line_total
     if availability == Availability.SAME_DAY:
         notes = notes + [f"the same day only if the order is confirmed by {CUT_OFF:%H:%M}"]
+    if availability == Availability.TRANSFER:
+        notes = notes + [
+            f"the {days} working days quoted already include the move between warehouses"
+        ]
     if discounts.needs_approval(net):
         notes = notes + ["the order's discount band needs the sales manager's approval"]
 
@@ -346,11 +349,7 @@ def _risk(
         return Risk.MEDIUM, ["stock is unknown, which is not the same as none"]
 
     if availability == Availability.TRANSFER:
-        moved = transfer_days(zone)
-        return Risk.LOW, [
-            f"stock moves between warehouses first, which adds {moved} working "
-            f"{'day' if moved == 1 else 'days'}"
-        ]
+        return Risk.LOW, []
 
     return Risk.LOW, []
 
