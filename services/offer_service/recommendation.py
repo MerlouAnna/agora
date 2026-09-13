@@ -192,8 +192,10 @@ def _offer(one: OfferScenario, beaten_by: str | None = None) -> dict:
     notes = one.notes
     if beaten_by:
         notes = notes + [
-            f"nothing to prefer this over {beaten_by}: it is cheaper, at least as fast, "
-            "and meets no less of the request"
+            (
+                f"nothing to prefer this over {beaten_by}: it is cheaper, at least as fast, "
+                "and meets no less of the request"
+            )
         ]
 
     return {
