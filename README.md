@@ -67,10 +67,11 @@ Without a secret the services refuse to issue or accept a token and say so, rath
 falling back to a default that would be the same on every clone.
 
 The catalogue database is committed to the repository, already populated with 226
-products, four warehouses and their suppliers, so there is nothing to import first. It
-carries no users: two demo accounts are written into it the first time the catalogue
-service starts against an empty user table, so a fresh clone has someone to log in as —
-**pmoschos** / `ai-for-devs-moschos` and **amerlou** / `ai-for-devs-merlou`.
+products, four warehouses and their suppliers, so there is nothing to import first. The two
+demo accounts are in it as well — **pmoschos** / `ai-for-devs-moschos` and **amerlou** /
+`ai-for-devs-merlou` — and the catalogue service writes them itself the first time it starts
+against an empty user table, so a database that begins empty ends up with someone to log in
+as too.
 
 ## 3. Run the backend
 
