@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, status
 from services.offer_service import extraction, recommendation
 from services.offer_service import scenario_builder as builder
 from services.offer_service.clients import catalog
+from services.offer_service.dependencies import CurrentUser
 from services.offer_service.graph.builder import build_graph
 from services.offer_service.graph.state import make_initial_state
 from services.offer_service.rag import embeddings, retriever
@@ -56,7 +57,7 @@ def graph():
     summary="Turn a request into offers and a recommendation",
     response_description="The offers, the answer, and the working behind both",
 )
-def generate(asked: OfferRequest) -> OfferAnswer:
+def generate(asked: OfferRequest, user: CurrentUser) -> OfferAnswer:
     """
     Read the request, search the catalogue, price five readings of it, check every figure,
     and recommend one — or say why there is nothing to recommend.

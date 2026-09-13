@@ -1,10 +1,19 @@
+import pytest
 from fastapi.testclient import TestClient
 
+from services import security
+from services.config import settings
 from services.offer_service.clients import catalog
 from services.offer_service.main import app
 from tests.test_graph import BOTH, CHEAP, DEARER, REQUEST, wire
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def logged_in(monkeypatch):
+    monkeypatch.setattr(settings, "jwt_secret_key", "test-only")
+    client.headers["Authorization"] = f"Bearer {security.create_access_token('maria')}"
 
 
 def test_a_request_comes_back_with_the_offers_the_check_let_through(monkeypatch):

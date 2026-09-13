@@ -33,6 +33,10 @@ pdfplumber = "^0.11.7"
 gradio = "^6.10.0"
 python-multipart = "^0.0.32"
 
+# Auth
+python-jose = { extras = ["cryptography"], version = "^3.5.0" }
+bcrypt = "^5.0.0"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"
 ruff = "^0.16.6"

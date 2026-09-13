@@ -123,3 +123,14 @@ class LlmCall(TableBase):
     duration_ms = Column(Integer, default=0)
     ok = Column(Boolean, default=True)
     detail = Column(String, nullable=True)
+
+
+class User(TableBase):
+    """Who may log in. The column holds a bcrypt hash, never the password."""
+
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
