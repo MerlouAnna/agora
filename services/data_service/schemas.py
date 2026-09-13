@@ -5,6 +5,7 @@ What the catalogue service accepts and returns.
 """
 
 from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -285,3 +286,34 @@ class QueryResult(BaseModel):
     row_count: int
     truncated: bool = Field(..., description="There were more rows than the limit asked for")
     elapsed_ms: int
+
+
+class ConversationOpen(BaseModel):
+    username: str = Field(..., min_length=1)
+
+
+class ConversationSummary(BaseModel):
+    id: int
+    username: str
+    started_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class MessageIn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+    tools: list[dict] | None = Field(
+        default=None, description="For an answer, the tool calls it was built from"
+    )
+
+
+class MessageOut(MessageIn):
+    id: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ConversationDetail(ConversationSummary):
+    messages: list[MessageOut] = Field(default_factory=list)

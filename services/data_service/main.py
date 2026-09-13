@@ -4,7 +4,15 @@ from fastapi import FastAPI
 
 from services.data_service import models, users
 from services.data_service.database import SessionLocal, engine
-from services.data_service.routers import admin, auth, products, sql, stats, suppliers
+from services.data_service.routers import (
+    admin,
+    auth,
+    conversations,
+    products,
+    sql,
+    stats,
+    suppliers,
+)
 
 models.TableBase.metadata.create_all(bind=engine)
 
@@ -24,6 +32,7 @@ app.include_router(suppliers.router, prefix="/suppliers", tags=["Suppliers"])
 app.include_router(stats.router, prefix="/stats", tags=["Statistics"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 app.include_router(sql.router, prefix="/sql", tags=["SQL console"])
+app.include_router(conversations.router, prefix="/conversations", tags=["Conversations"])
 
 
 @app.get("/health")

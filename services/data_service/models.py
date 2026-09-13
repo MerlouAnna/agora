@@ -134,3 +134,26 @@ class User(TableBase):
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
+
+
+class Conversation(TableBase):
+    """One salesperson's thread of questions. Opened at login, never shared."""
+
+    __tablename__ = "conversations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, index=True)
+    started_at = Column(DateTime, index=True)
+
+
+class Message(TableBase):
+    """A question or an answer, and for an answer the tools it was built from."""
+
+    __tablename__ = "messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"), index=True)
+    role = Column(String)
+    content = Column(String)
+    tools = Column(JSON, nullable=True)
+    created_at = Column(DateTime, index=True)
