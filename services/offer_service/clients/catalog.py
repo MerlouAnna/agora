@@ -85,6 +85,33 @@ def lookup(skus: list[str]) -> list[dict]:
     return answer.json()
 
 
+def stock(sku: str) -> dict | None:
+    """Where one product is held and how much of it, or None for a code the catalogue lacks."""
+    with _http() as http:
+        try:
+            answer = http.get(f"/products/{sku}/stock")
+            if answer.status_code != 404:
+                answer.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise CatalogueUnavailable(f"the stock of {sku} did not answer: {exc}") from exc
+
+    return None if answer.status_code == 404 else answer.json()
+
+
+def search(
+    category: str | None = None,
+    max_price: float | None = None,
+    min_stock: int | None = None,
+    limit: int = 20,
+) -> list[dict]:
+    """The first products that meet every filter given. A filter left out is not applied."""
+    asked = {"category": category, "max_price": max_price, "min_stock": min_stock}
+    params = {"limit": limit} | {key: value for key, value in asked.items() if value is not None}
+
+    with _http() as http:
+        return _get(http, "/products/search", params)
+
+
 def _http() -> httpx.Client:
     return httpx.Client(base_url=settings.catalog_service_url, timeout=TIMEOUT)
 

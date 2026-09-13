@@ -1,8 +1,9 @@
 """
 Offer desk
 ==========
-The salesperson's screen. It talks to the offer service over HTTP and holds no rule of its
-own: everything here was decided by the services and is only laid out for reading.
+The salesperson's screen: a login, then the offers and the questions side by side. It
+talks to the offer service alone, over HTTP, and holds no rule of its own — everything here
+was decided by the services and is only laid out for reading.
 
 Run from the repository root, with both services up:  python ui/gradio_app.py
 """
@@ -25,6 +26,11 @@ EXAMPLES = [
     "Οκτώ UPS από 2200VA και πάνω, με αυτονομία τουλάχιστον 12 λεπτά.",
     "Είκοσι ρευματολήπτες Schuko 16A.",
     "Ένα τροφοδοτικό, ό,τι έχετε.",
+]
+QUESTIONS = [
+    "Τι απόθεμα έχει το PSU-1018;",
+    "Τι εγγύηση έχει το PSU-1018;",
+    "Τι έχουμε σε UPS κάτω από 300 € με απόθεμα;",
 ]
 
 OFFERS = [
@@ -82,7 +88,31 @@ SPECS = {
 LIMITS = {"eq": "", "gte": "τουλάχιστον", "gt": "πάνω από", "lte": "το πολύ", "lt": "κάτω από"}
 
 
-def ask(request: str, branch: str, before_cut_off: bool) -> tuple:
+def login(username: str, password: str) -> tuple:
+    """One call to the service. A token back is what opens the desk."""
+    try:
+        answered = httpx.post(
+            f"{OFFER_SERVICE}/auth/login",
+            data={"username": username, "password": password},
+            timeout=TIMEOUT,
+        )
+    except httpx.HTTPError as exc:
+        return None, f"Η υπηρεσία δεν απαντά: {exc}", gr.update(), gr.update(), gr.update()
+
+    if answered.status_code != 200:
+        return None, _said(answered), gr.update(), gr.update(), gr.update()
+
+    token = answered.json()["access_token"]
+    return (
+        token,
+        "",
+        gr.update(visible=False),
+        gr.update(visible=True),
+        gr.update(choices=threads(token), value=None),
+    )
+
+
+def ask(request: str, branch: str, before_cut_off: bool, token: str | None) -> tuple:
     """One call to the service, and everything the screen shows comes out of the answer."""
     if not request.strip():
         return "Γράψε τι ζητάει ο πελάτης.", [], "", "", []
@@ -91,6 +121,7 @@ def ask(request: str, branch: str, before_cut_off: bool) -> tuple:
         answered = httpx.post(
             f"{OFFER_SERVICE}/offers/generate",
             json={"request": request, "store": branch, "before_cut_off": before_cut_off},
+            headers=_bearer(token),
             timeout=TIMEOUT,
         )
     except httpx.HTTPError as exc:
@@ -216,34 +247,169 @@ def _said(answered: httpx.Response) -> str:
         return answered.text
 
 
+def _bearer(token: str | None) -> dict:
+    return {"Authorization": f"Bearer {token}"} if token else {}
+
+
+# ── Questions ────────────────────────────────────────────────────────────────
+
+
+def threads(token: str) -> list[tuple[str, int]]:
+    """The user's conversations as the picker lists them, newest first."""
+    answered = httpx.get(
+        f"{OFFER_SERVICE}/assistant/conversations", headers=_bearer(token), timeout=TIMEOUT
+    )
+    if answered.status_code != 200:
+        return []
+
+    return [
+        (f"#{row['id']} · {row['started_at'][:16].replace('T', ' ')}", row["id"])
+        for row in answered.json()
+    ]
+
+
+def open_thread(conversation_id: int | None, token: str) -> tuple:
+    """A conversation as the chat shows it, every turn in order."""
+    if conversation_id is None:
+        return [], None
+
+    answered = httpx.get(
+        f"{OFFER_SERVICE}/assistant/conversations/{conversation_id}",
+        headers=_bearer(token),
+        timeout=TIMEOUT,
+    )
+    if answered.status_code != 200:
+        return [{"role": "assistant", "content": _said(answered)}], None
+
+    return chat(answered.json()["messages"]), conversation_id
+
+
+def new_thread() -> tuple:
+    """An empty chat. The first question opens the conversation on the service."""
+    return [], None, gr.update(value=None)
+
+
+def send(question: str, conversation_id: int | None, token: str, shown: list[dict]) -> tuple:
+    """One question to the assistant. The answer joins the chat and the thread is kept."""
+    if not question.strip():
+        return shown, conversation_id, question, gr.update()
+
+    shown = shown + [{"role": "user", "content": question}]
+    try:
+        answered = httpx.post(
+            f"{OFFER_SERVICE}/assistant/ask",
+            json={"question": question, "conversation_id": conversation_id},
+            headers=_bearer(token),
+            timeout=TIMEOUT,
+        )
+    except httpx.HTTPError as exc:
+        said = f"Η υπηρεσία δεν απαντά: {exc}"
+        return shown + [{"role": "assistant", "content": said}], conversation_id, "", gr.update()
+
+    if answered.status_code != 200:
+        said = f"{answered.status_code} — {_said(answered)}"
+        return shown + [{"role": "assistant", "content": said}], conversation_id, "", gr.update()
+
+    body = answered.json()
+    shown = shown + [{"role": "assistant", "content": turn(body["answer"], body["tools"])}]
+    picker = gr.update()
+    if conversation_id is None:
+        picker = gr.update(choices=threads(token), value=body["conversation_id"])
+
+    return shown, body["conversation_id"], "", picker
+
+
+def chat(turns: list[dict]) -> list[dict]:
+    """A recorded conversation in the chat's own shape."""
+    return [
+        {"role": one["role"], "content": turn(one["content"], one.get("tools"))} for one in turns
+    ]
+
+
+def turn(content: str, tools: list[dict] | None) -> str:
+    """An answer with the tools that produced it named underneath, so the reader knows."""
+    if not tools:
+        return content
+
+    named = ", ".join(sorted({one["name"] for one in tools}))
+    return f"{content}\n\n*Από: {named}*"
+
+
+# ── Layout ───────────────────────────────────────────────────────────────────
+
+
 def screen() -> gr.Blocks:
     with gr.Blocks(title="Agora — Γραφείο προσφορών") as app:
-        gr.Markdown("# Agora\nΓράψε τι ζητάει ο πελάτης. Η προσφορά βγαίνει από τον κατάλογο.")
+        token = gr.State(None)
+        thread = gr.State(None)
 
-        with gr.Row():
-            request = gr.Textbox(label="Το αίτημα", lines=2, scale=4)
-            branch = gr.Dropdown(BRANCHES, value="ATHENS", label="Κατάστημα", scale=1)
-            before_cut_off = gr.Checkbox(value=True, label="Παραγγελία πριν τις 13:00")
+        gr.Markdown("# Agora")
 
-        gr.Examples(EXAMPLES, inputs=request, label="Παραδείγματα")
-        run = gr.Button("Ετοιμασία προσφοράς", variant="primary")
+        with gr.Column() as gate:
+            gr.Markdown("Συνδέσου για να συνεχίσεις.")
+            username = gr.Textbox(label="Χρήστης")
+            password = gr.Textbox(label="Κωδικός", type="password")
+            enter = gr.Button("Σύνδεση", variant="primary")
+            refused = gr.Markdown()
 
-        answer = gr.Markdown()
-        offers = gr.Dataframe(headers=OFFERS, column_widths=WIDTHS, label="Οι προσφορές", wrap=True)
+        with gr.Column(visible=False) as desk:
+            with gr.Tabs():
+                with gr.Tab("Προσφορές"):
+                    gr.Markdown("Γράψε τι ζητάει ο πελάτης. Η προσφορά βγαίνει από τον κατάλογο.")
 
-        with gr.Accordion("Πώς βγήκε αυτό", open=False):
-            gr.Markdown("**Τι κατάλαβε από το αίτημα**")
-            asked = gr.Markdown()
-            gr.Markdown("**Τι βρήκε στον κατάλογο**")
-            candidates = gr.Markdown()
-            gr.Markdown("**Τι είπε ο έλεγχος**")
-            checked = gr.Dataframe(headers=CHECKS, column_widths=["20%", "15%", "65%"], wrap=True)
+                    with gr.Row():
+                        request = gr.Textbox(label="Το αίτημα", lines=2, scale=4)
+                        branch = gr.Dropdown(BRANCHES, value="ATHENS", label="Κατάστημα", scale=1)
+                        before_cut_off = gr.Checkbox(value=True, label="Παραγγελία πριν τις 13:00")
+
+                    gr.Examples(EXAMPLES, inputs=request, label="Παραδείγματα")
+                    run = gr.Button("Ετοιμασία προσφοράς", variant="primary")
+
+                    answer = gr.Markdown()
+                    offers = gr.Dataframe(
+                        headers=OFFERS, column_widths=WIDTHS, label="Οι προσφορές", wrap=True
+                    )
+
+                    with gr.Accordion("Πώς βγήκε αυτό", open=False):
+                        gr.Markdown("**Τι κατάλαβε από το αίτημα**")
+                        asked = gr.Markdown()
+                        gr.Markdown("**Τι βρήκε στον κατάλογο**")
+                        candidates = gr.Markdown()
+                        gr.Markdown("**Τι είπε ο έλεγχος**")
+                        checked = gr.Dataframe(
+                            headers=CHECKS, column_widths=["20%", "15%", "65%"], wrap=True
+                        )
+
+                with gr.Tab("Ερωτήσεις"):
+                    with gr.Row():
+                        picker = gr.Dropdown([], label="Συζήτηση", scale=3)
+                        fresh = gr.Button("Νέα συζήτηση", scale=1)
+                    talk = gr.Chatbot(label="Ο βοηθός", height=420)
+                    question = gr.Textbox(label="Η ερώτηση", lines=1)
+                    gr.Examples(QUESTIONS, inputs=question, label="Παραδείγματα")
+                    send_it = gr.Button("Ρώτησε", variant="primary")
+
+        entering = dict(
+            fn=login, inputs=[username, password], outputs=[token, refused, gate, desk, picker]
+        )
+        enter.click(**entering)
+        password.submit(**entering)
 
         run.click(
             ask,
-            inputs=[request, branch, before_cut_off],
+            inputs=[request, branch, before_cut_off, token],
             outputs=[answer, offers, asked, candidates, checked],
         )
+
+        picker.input(open_thread, inputs=[picker, token], outputs=[talk, thread])
+        fresh.click(new_thread, outputs=[talk, thread, picker])
+        asking = dict(
+            fn=send,
+            inputs=[question, thread, token, talk],
+            outputs=[talk, thread, question, picker],
+        )
+        send_it.click(**asking)
+        question.submit(**asking)
 
     return app
 

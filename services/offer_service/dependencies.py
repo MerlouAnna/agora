@@ -12,11 +12,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from services import security
-from services.config import settings
 
 logger = logging.getLogger(__name__)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.catalog_service_url}/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
